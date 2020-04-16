@@ -12,11 +12,17 @@ module iob_t2p_mem #(
     output reg [(DATA_W-1):0] q_a, q_b
 		    );
 
+   //this allows ISE 14.7 to work; do not remove
+   parameter mem_init_file_int = MEM_INIT_FILE;
+
+   
    // Declare the RAM
    reg [DATA_W-1:0] 			       ram[2**ADDR_W-1:0];
 
    // Initialize the RAM
-   //initial $readmemh(MEM_INIT_FILE, ram, 0, 2**ADDR_W - 1);
+   initial 
+     if(mem_init_file_int != "none")
+       $readmemh(MEM_INIT_FILE, ram, 0, 2**ADDR_W - 1);
 
    // Operate the RAM
    always @ (posedge clk) // Port A
