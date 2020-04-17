@@ -24,21 +24,18 @@ module iob_t2p_mem #(
      if(mem_init_file_int != "none")
        $readmemh(MEM_INIT_FILE, ram, 0, 2**ADDR_W - 1);
 
-   // Operate the RAM
    always @ (posedge clk) // Port A
-     if(en_a)
-       if (we_a) begin
-	  ram[addr_a] <= data_a;
-	  q_a <= data_a;
-       end else
+     if (en_a)
+       if (we_a)
+	 ram[addr_a] <= data_a;
+       else
 	 q_a <= ram[addr_a];
 
-   always @ (posedge clk) // Port b
-     if(en_b)
-       if (we_b) begin
-	  ram[addr_b] <= data_b;
-	  q_b <= data_b;
-       end else
+   always @ (posedge clk) // Port B
+     if (en_b)
+       if (we_b)
+	 ram[addr_b] <= data_b;
+       else
 	 q_b <= ram[addr_b];
 
  endmodule
