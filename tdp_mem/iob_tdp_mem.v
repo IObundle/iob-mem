@@ -1,7 +1,7 @@
 `timescale 1 ns / 1 ps
 
 module iob_t2p_mem #(
-		      parameter MEM_INIT_FILE=0,
+		      parameter MEM_INIT_FILE="none",
 		      parameter DATA_W=32,
 		      parameter ADDR_W=11
 		      )

@@ -4,7 +4,8 @@
 `timescale 1 ns / 1 ps
 
 module iob_tdp_mem_be
-  #(parameter NUM_COL = 4,
+  #(parameter FILE = "none",
+    parameter NUM_COL = 4,
     parameter COL_WIDTH = 8,
     parameter ADDR_WIDTH = 10,  
     //Addr Width in bits : 2*ADDR_WIDTH = RAM Depth
@@ -25,10 +26,17 @@ module iob_tdp_mem_be
      output reg [DATA_WIDTH-1 :0] doutB 
      ); 
 
+   //this allow ISE 14.7 to work; do not remove
+   parameter mem_init_file_int = FILE;
 
    // Core Memory 
    reg [DATA_WIDTH-1:0]           ram_block[(2**ADDR_WIDTH)-1:0]; 
 
+   // Initialize the RAM
+   initial
+     if(mem_init_file_int != "none")
+       $readmemh(mem_init_file_int, ram_block, 0, 2**AADR_WIDTH - 1);
+   
    integer                        i;  
    
    //Port-A Operation 
