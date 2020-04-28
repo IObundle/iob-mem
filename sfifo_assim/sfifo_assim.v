@@ -1,0 +1,130 @@
+`timescale 1ns/1ps
+
+`define max(a,b) {(a) > (b) ? (a) : (b)}
+`define min(a,b) {(a) < (b) ? (a) : (b)}
+
+module bin_counter #(parameter   COUNTER_WIDTH = 4)
+   (
+	input 			                rst, //Count reset.
+	input 			                clk,
+	input 			                en, //Count enable.
+	output reg [COUNTER_WIDTH-1:0] 	data_out
+	);
+	   
+   	always @ (posedge clk or posedge rst)
+		if (rst)
+		    data_out <= 0;  
+		else if (en)
+		    data_out <= data_out + 1'b1;
+   
+endmodule
+
+
+/* WARNING: This memory assumes that the write port data width is bigger than the
+read port data width and that they are multiples of eachother
+*/
+module iob_sync_assim_fifo
+	#(
+		parameter W_DATA_W = 8,
+		parameter W_ADDR_W = 7,
+		parameter R_ADDR_W = 6,
+		parameter R_DATA_W = 16
+	)
+	(
+	input                       rst,
+	input                       clk,
+
+	//read port
+	output [R_DATA_W-1:0]		data_out, 
+	output		                empty,
+	input                       read_en,
+
+	//write port	 
+	input [W_DATA_W-1:0]      	data_in, 
+	output		                full,
+	input                       write_en
+	);
+
+	//local variables
+	localparam maxADDR_W = `max(W_ADDR_W, R_ADDR_W);
+	localparam maxDATA_W = `max(W_DATA_W, R_DATA_W);
+	localparam minDATA_W = `min(W_DATA_W, R_DATA_W);
+	localparam RATIO = maxDATA_W / minDATA_W;
+	localparam FIFO_DEPTH = (2**maxADDR_W);
+	
+	reg [maxADDR_W:0]   		fifo_ocupancy;
+
+	//WRITE DOMAIN 
+	wire [W_ADDR_W-1:0]   		wptr;
+	wire                        write_en_int;
+	reg 						wptr_incr;
+	
+	//READ DOMAIN    
+	wire [R_ADDR_W-1:0]    		rptr;
+	wire                        read_en_int;
+	reg 						rptr_incr;
+
+
+	always @ (posedge clk or posedge rst)
+		if (rst)
+			fifo_ocupancy <= 0;
+		else if (wptr_incr)
+			fifo_ocupancy <= fifo_ocupancy+RATIO;
+		else if (rptr_incr)
+			fifo_ocupancy <= fifo_ocupancy-1;
+
+	//WRITE DOMAIN LOGIC
+	//effective write enable
+	assign write_en_int = write_en & ~full;
+	assign full = (fifo_ocupancy == FIFO_DEPTH);
+	
+	//sync write pointer
+	always @ (posedge clk) begin
+		wptr_incr <= write_en_int;
+	end
+    
+	bin_counter #(W_ADDR_W) wptr_counter (
+	   	.clk(clk),
+	   	.rst(rst), 
+	   	.en(write_en_int),
+	   	.data_out(wptr)
+	);
+
+	//READ DOMAIN LOGIC
+	//effective read enable
+	assign read_en_int  = read_en & ~empty;
+	assign empty = (fifo_ocupancy == 0);
+	
+	//sync read pointer
+	always @ (posedge clk) begin 
+	  	rptr_incr <= read_en_int;
+	end
+   
+	bin_counter #(R_ADDR_W) rptr_counter (
+	   	.clk(clk),
+	   	.rst(rst), 
+		.en(read_en_int),
+	   	.data_out(rptr)
+	);
+	
+	
+	//FIFO memory
+	iob_2p_assim_mem_w_big #(
+		.W_DATA_W(W_DATA_W), 
+		.W_ADDR_W(W_ADDR_W),
+		.R_ADDR_W(R_ADDR_W),
+		.R_DATA_W(R_DATA_W)
+	) fifo_mem (
+		.clk(clk),
+		.w_en(write_en_int),
+		.data_in(data_in),
+		.w_addr(wptr),
+		.r_addr(rptr),
+		.w_port_en(write_en_int),
+		.r_port_en(read_en_int),
+		.data_out(data_out)
+	);
+
+endmodule
+   
+
