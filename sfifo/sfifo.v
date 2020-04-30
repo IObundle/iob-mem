@@ -43,31 +43,24 @@ module iob_sync_fifo
 	//WRITE DOMAIN 
 	wire [ADDRESS_WIDTH-1:0]    wptr;
 	wire                        write_en_int;
-	reg 						wptr_incr;
 	
 	//READ DOMAIN    
 	wire [ADDRESS_WIDTH-1:0]    rptr;
 	wire                        read_en_int;
-	reg 						rptr_incr;
 
 
 	always @ (posedge clk or posedge rst)
 		if (rst)
 			fifo_ocupancy <= 0;
-		else if (wptr_incr)
+		else if (write_en_int)
 			fifo_ocupancy <= fifo_ocupancy+1;
-		else if (rptr_incr)
+		else if (read_en_int)
 			fifo_ocupancy <= fifo_ocupancy-1;
 
 	//WRITE DOMAIN LOGIC
 	//effective write enable
 	assign write_en_int = write_en & ~full;
 	assign full = (fifo_ocupancy == FIFO_DEPTH);
-	
-	//sync write pointer
-	always @ (posedge clk) begin
-		wptr_incr <= write_en_int;
-	end
     
 	bin_counter #(ADDRESS_WIDTH) wptr_counter (
 	   	.clk(clk),
@@ -80,11 +73,6 @@ module iob_sync_fifo
 	//effective read enable
 	assign read_en_int  = read_en & ~empty;
 	assign empty = (fifo_ocupancy == 0);
-	
-	//sync read pointer
-	always @ (posedge clk) begin 
-	  	rptr_incr <= read_en_int;
-	end
    
 	bin_counter #(ADDRESS_WIDTH) rptr_counter (
 	   	.clk(clk),
