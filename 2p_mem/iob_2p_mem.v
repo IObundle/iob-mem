@@ -24,10 +24,17 @@ module iob_2p_mem
 	//writing to the RAM
 	always@(posedge clk)
 	begin
-		if(w_en == 1 && w_port_en)    //check if write enable is ON
+		if(w_en && w_port_en)
 		    ram[w_addr] <= data_in;
-		else
-			data_out <= r_port_en ? ram[r_addr] : 'dZ;
+	end
+
+    //reading from the RAM
+	always@(posedge clk)
+	begin
+		if(r_port_en)
+		    data_out <= ram[r_addr];
+        else
+            data_out <= 'dZ;
 	end
 
 endmodule   
