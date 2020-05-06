@@ -62,15 +62,31 @@ module iob_sync_assim_fifo
 	wire [R_ADDR_W-1:0]    		rptr;
 	wire                        read_en_int;
 
-
-	always @ (posedge clk or posedge rst)
+	//FIFO ocupancy counter
+	generate
+	if(W_DATA_W > R_DATA_W) 
+	begin
+		always @ (posedge clk or posedge rst)
+			if (rst)
+				fifo_ocupancy <= 0;
+			else if (write_en_int)
+				fifo_ocupancy <= fifo_ocupancy+RATIO;
+			else if (read_en_int)
+				fifo_ocupancy <= fifo_ocupancy-1;
+	end
+	else
+	begin
+		always @ (posedge clk or posedge rst)
 		if (rst)
 			fifo_ocupancy <= 0;
 		else if (write_en_int)
-			fifo_ocupancy <= fifo_ocupancy+RATIO;
+			fifo_ocupancy <= fifo_ocupancy+1;
 		else if (read_en_int)
-			fifo_ocupancy <= fifo_ocupancy-1;
-
+			fifo_ocupancy <= fifo_ocupancy-RATIO;
+	end
+	endgenerate
+	
+	
 	//WRITE DOMAIN LOGIC
 	//effective write enable
 	assign write_en_int = write_en & ~full;
@@ -97,7 +113,7 @@ module iob_sync_assim_fifo
 	
 	
 	//FIFO memory
-	iob_2p_assim_mem_w_big #(
+	iob_2p_assim_mem #(
 		.W_DATA_W(W_DATA_W), 
 		.W_ADDR_W(W_ADDR_W),
 		.R_ADDR_W(R_ADDR_W),

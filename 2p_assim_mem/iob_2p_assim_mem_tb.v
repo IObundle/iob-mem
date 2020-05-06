@@ -5,8 +5,8 @@
 `define R_DATA_W 8
 `define R_ADDR_W 4
 
-
-module iob_2p_assim_mem_w_big_tb;
+//Tests when the write data width is bigger than the read data width
+module iob_2p_assim_mem_tb;
 
     // Inputs
     reg clk;
@@ -23,7 +23,7 @@ module iob_2p_assim_mem_w_big_tb;
     integer i;
 
     // Instantiate the Unit Under Test (UUT)
-    iob_2p_assim_mem_w_big #(
+    iob_2p_assim_mem #(
     	.W_DATA_W(`W_DATA_W),
     	.W_ADDR_W(`W_ADDR_W),
     	.R_DATA_W(`R_DATA_W),
@@ -45,10 +45,8 @@ module iob_2p_assim_mem_w_big_tb;
 
     initial begin
     
-    	$dumpfile("2p_assim_mem_w_big_tb.vcd");
+    	$dumpfile("2p_assim_mem_r_big_tb.vcd");
     	$dumpvars();
-    	for (i=0; i < 16; i=i+1)
-    		$dumpvars(1,uut.ram[i]);
         // Initialize Inputs
         clk = 1;
         w_addr = 0;
@@ -62,17 +60,18 @@ module iob_2p_assim_mem_w_big_tb;
         @(posedge clk) w_port_en = 1; 
         w_en = 1;
 		for(i=0; i < 4; i = i + 1) begin
-			@(posedge clk) data_in[7:0] = i*4;
-			data_in[15:8] = i*4+1;
-			data_in[23:16] = i*4+2;
-			data_in[31:24] = i*4+3;
-			w_addr = i;
+			data_in[7:0] = i*4+1;
+			data_in[15:8] = i*4+2;
+			data_in[23:16] = i*4+3;
+			data_in[31:24] = i*4+4;
+			@(posedge clk) w_addr = i;
 			#10;
 		end
 		@(posedge clk) w_port_en = 0;
 		w_en = 0; 
+		#10
 		//Read all the locations of RAM
-		r_port_en = 1; 
+		@(posedge clk)r_port_en = 1; 
 		for(i=0; i < 16; i = i + 1) begin
 			@(posedge clk) r_addr = i;
 			#10;
