@@ -40,8 +40,6 @@ module sfifo_assim_tb;
     
     	$dumpfile("sfifo_assim.vcd");
     	$dumpvars();
-    	for (i=0; i < 16; i=i+1)
-    		$dumpvars(1,uut.fifo_mem.ram[i]);
     	
     	//Initialize Inputs
         clk = 0;
@@ -55,7 +53,6 @@ module sfifo_assim_tb;
          @(posedge clk) reset = 1;
          #10
          @(posedge clk) reset = 0;
-         @(posedge clk)$display("out=%d full=%b empty=%b",data_out, full_out, empty_out);
         #20;
 		for(i=0; i < 4; i = i + 1) begin
         	 @(posedge clk) write = 1;
@@ -74,14 +71,11 @@ module sfifo_assim_tb;
 		for(i=0; i < 16; i = i + 1) begin
         	 @(posedge clk) read=1;
 			#10;
-			//Result will only be available in the next cycle
-			$display("out=%d full=%b empty=%b",data_out, full_out, empty_out);
 			 @(posedge clk) read = 0;
 			#10;
 		end
 		 @(posedge clk) read = 0; //Fifo is now empty
         #50;
-        $display("out=%d full=%b empty=%b",data_out, full_out, empty_out);
         $finish;
     end
 
