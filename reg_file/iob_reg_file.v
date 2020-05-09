@@ -1,3 +1,5 @@
+`timescale 1 ns / 1 ps
+
 module iob_reg_file #(
                       parameter NUM_COL = 4,
                       parameter COL_WIDTH = 8,
