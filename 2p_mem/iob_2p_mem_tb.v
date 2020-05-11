@@ -35,27 +35,28 @@ module iob_2p_mem_tb;
       w_addr = 0;
       data_in = 0;
 
-      r_addr = 0; 
       r_port_en = 0;
-      #20;
+      r_addr = 0;
+
+      @(posedge clk) #1;
+      w_port_en = 1; 
+      w_en = 1;
 
       //Write all the locations of RAM 
       for(i=0; i < 16; i = i + 1) begin
-         @(posedge clk) w_port_en = 1; 
-         w_en = 1;
 	 data_in = i;
 	 w_addr = i;
-	 #10;
+	 @(posedge clk) #1;
       end
 
-      @(posedge clk)   w_port_en = 0;
+      w_port_en = 0;
       w_en = 0; 	 
-      
+      r_port_en = 1; 
+ 
       //Read all the locations of RAM
       for(i=0; i < 16; i = i + 1) begin
-         @(posedge clk) r_port_en = 1; 
          r_addr = i;
-	 #10;
+	 @(posedge clk) #1;
       end
 
       #50$finish;
