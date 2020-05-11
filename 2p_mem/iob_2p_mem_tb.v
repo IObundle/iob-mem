@@ -6,26 +6,68 @@
 
 module iob_2p_mem_tb;
 
-    // Inputs
-    reg clk;
-    reg w_en;
-    reg [`DATA_W-1:0] data_in;
-    reg [`ADDR_W-1:0] w_addr;
-    reg [`ADDR_W-1:0] r_addr;
-    reg w_port_en;
-    reg r_port_en;
+   // Inputs
+   reg clk;
 
-    // Outputs
-    wire [`DATA_W-1:0] data_out;
+
+   //write signals
+   reg w_port_en;
+   reg w_en;
+   reg [`DATA_W-1:0] data_in;
+   reg [`ADDR_W-1:0] w_addr;
+
+
+   //read signals   
+   reg [`ADDR_W-1:0] r_addr;
+   reg               r_port_en;
+   wire [`DATA_W-1:0] data_out;
+   
+
+   integer            i=0;
+
+   initial begin
+      $dumpfile("2p_mem_tb.vcd");
+      $dumpvars();
+
+      clk = 1;
+      w_port_en = 0; 
+      w_en = 0;
+      w_addr = 0;
+      data_in = 0;
+
+      r_addr = 0; 
+      r_port_en = 0;
+      #20;
+
+      //Write all the locations of RAM 
+      for(i=0; i < 16; i = i + 1) begin
+         @(posedge clk) w_port_en = 1; 
+         w_en = 1;
+	 data_in = i;
+	 w_addr = i;
+	 #10;
+      end
+
+      @(posedge clk)   w_port_en = 0;
+      w_en = 0; 	 
+      
+      //Read all the locations of RAM
+      for(i=0; i < 16; i = i + 1) begin
+         @(posedge clk) r_port_en = 1; 
+         r_addr = i;
+	 #10;
+      end
+
+      #50$finish;
+
+   end
     
-    integer i;
-
-    // Instantiate the Unit Under Test (UUT)
-    iob_2p_mem #(
-    	.DATA_W(`DATA_W),
-    	.ADDR_W(`ADDR_W)
-    )
-     uut (
+   // Instantiate the Unit Under Test (UUT)
+   iob_2p_mem #(
+    	        .DATA_W(`DATA_W),
+    	        .ADDR_W(`ADDR_W)
+                )
+   uut (
         .clk(clk), 
         .w_en(w_en), 
         .data_in(data_in), 
@@ -34,45 +76,9 @@ module iob_2p_mem_tb;
         .w_port_en(w_port_en),
         .r_port_en(r_port_en),
         .data_out(data_out)
-    );
-    
-    always
-        #5 clk = ~clk;
+        );
 
-    initial begin
-    
-    	$dumpfile("2p_mem_tb.vcd");
-    	$dumpvars();
-    	for (i=0; i < 16; i=i+1)
-    		$dumpvars(1,uut.ram[i]);
-        // Initialize Inputs
-        clk = 1;
-        w_addr = 0;
-        w_en = 0;
-        data_in = 0;
-        r_addr = 0; 
-        r_port_en = 0;
-        w_port_en = 0; 
-        #20;
-        //Write all the locations of RAM 
-        w_port_en = 1; 
-        w_en = 1;
-		for(i=1; i <= 16; i = i + 1) begin
-			data_in = i;
-			w_addr = i-1;
-			#10;
-		end
-		w_port_en = 0;
-		w_en = 0; 
-		//Read all the locations of RAM
-		r_port_en = 1; 
-		for(i=1; i <= 16; i = i + 1) begin
-			r_addr = i-1;
-			#10;
-		end
-		r_port_en = 0;
-    #50
-    $finish;
-    end
-      
+   //Clock
+   always #5 clk = ~clk;
+
 endmodule
