@@ -19,7 +19,8 @@ module sfifo_tb;
    	// Instantiate the Unit Under Test (UUT)
     iob_sync_fifo #(
     	.DATA_WIDTH(8), 
-    	.ADDRESS_WIDTH(4)
+    	.ADDRESS_WIDTH(4),
+    	.USE_RAM(1)
 	) uut (
 		.clk(clk), 
 		.rst(reset), 
@@ -38,8 +39,6 @@ module sfifo_tb;
     
     	$dumpfile("sfifo.vcd");
     	$dumpvars();
-    	for (i=0; i < 16; i=i+1)
-    		$dumpvars(1,uut.fifo_mem.ram[i]);
     	
     	//Initialize Inputs
         clk = 0;

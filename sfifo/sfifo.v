@@ -85,7 +85,8 @@ module iob_sync_fifo
 	//FIFO memory
 	iob_2p_mem #(
 		.DATA_W(DATA_WIDTH), 
-		.ADDR_W(ADDRESS_WIDTH)
+		.ADDR_W(ADDRESS_WIDTH),
+		.USE_RAM(1)
 	) fifo_mem (
 		.clk(clk),
 		.w_en(write_en_int),

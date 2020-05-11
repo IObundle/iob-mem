@@ -24,6 +24,7 @@ module iob_2p_mem_tb;
     iob_2p_mem #(
     	.DATA_W(`DATA_W),
     	.ADDR_W(`ADDR_W)
+    	.USE_RAM(0)
     )
      uut (
         .clk(clk), 
@@ -43,8 +44,6 @@ module iob_2p_mem_tb;
     
     	$dumpfile("2p_mem_tb.vcd");
     	$dumpvars();
-    	for (i=0; i < 16; i=i+1)
-    		$dumpvars(1,uut.ram[i]);
         // Initialize Inputs
         clk = 1;
         w_addr = 0;
@@ -55,22 +54,24 @@ module iob_2p_mem_tb;
         w_port_en = 0; 
         #20;
         //Write all the locations of RAM 
-        w_port_en = 1; 
-        w_en = 1;
 		for(i=1; i <= 16; i = i + 1) begin
+        	@(posedge clk)w_port_en = 1; 
+        	w_en = 1;
 			data_in = i;
 			w_addr = i-1;
-			#10;
+			//@(posedge clk) w_en = 0;
+			//w_port_en = 0;
+			
 		end
-		w_port_en = 0;
+		@(posedge clk)w_port_en = 0;
 		w_en = 0; 
-		//Read all the locations of RAM
-		r_port_en = 1; 
+		//Read all the locations of RAM 
 		for(i=1; i <= 16; i = i + 1) begin
+			@(posedge clk)r_port_en = 1;
 			r_addr = i-1;
 			#10;
 		end
-		r_port_en = 0;
+		@(posedge clk)r_port_en = 0;
     #50
     $finish;
     end
