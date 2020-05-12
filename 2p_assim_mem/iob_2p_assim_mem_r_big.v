@@ -41,22 +41,17 @@ module iob_2p_assim_mem_r_big
 	
 	//writing to the RAM
 	always@(posedge clk)
-	begin
 		if (w_en && w_port_en)
 			ram[w_addr] <= data_in;
-	end
 	
 	//reading from the RAM
-	always@(posedge clk)
-	begin
+	always@(posedge clk) begin
 		if (r_port_en) begin
 			for (i = 0; i < RATIO; i = i+1) begin
 				lsbaddr = i;
 				data_out[(i+1)*minDATA_W-1 -: minDATA_W] <= ram[{r_addr, lsbaddr}];
 			end
 		end
-		else
-			data_out <= 'dZ;
 	end
 
 endmodule   

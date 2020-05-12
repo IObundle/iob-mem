@@ -47,8 +47,7 @@ module iob_2p_assim_mem_w_big_tb;
     
     	$dumpfile("2p_assim_mem_w_big_tb.vcd");
     	$dumpvars();
-    	for (i=0; i < 16; i=i+1)
-    		$dumpvars(1,uut.ram[i]);
+    	
         // Initialize Inputs
         clk = 1;
         w_addr = 0;
@@ -57,29 +56,29 @@ module iob_2p_assim_mem_w_big_tb;
         r_addr = 0; 
         r_port_en = 0;
         w_port_en = 0; 
-        #20;
+        @(posedge clk) #1;
         //Write all the locations of RAM 
-        @(posedge clk) w_port_en = 1; 
+        w_port_en = 1; 
         w_en = 1;
 		for(i=0; i < 4; i = i + 1) begin
-			@(posedge clk) data_in[7:0] = i*4;
+			data_in[7:0] = i*4;
 			data_in[15:8] = i*4+1;
 			data_in[23:16] = i*4+2;
 			data_in[31:24] = i*4+3;
 			w_addr = i;
-			#10;
+			@(posedge clk) #1;
 		end
-		@(posedge clk) w_port_en = 0;
+		w_port_en = 0;
 		w_en = 0; 
 		//Read all the locations of RAM
 		r_port_en = 1; 
 		for(i=0; i < 16; i = i + 1) begin
-			@(posedge clk) r_addr = i;
-			#10;
+			r_addr = i;
+			@(posedge clk) #1;
 		end
-		@(posedge clk) r_port_en = 0;
-    #50
-    $finish;
+		@(posedge clk) #1;
+		 r_port_en = 0;
+    #50 $finish;
     end
       
 endmodule

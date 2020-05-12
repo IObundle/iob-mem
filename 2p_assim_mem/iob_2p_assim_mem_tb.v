@@ -1,11 +1,11 @@
 `timescale 1ns / 1ps
 
-`define W_DATA_W 32
-`define W_ADDR_W 2
-`define R_DATA_W 8
-`define R_ADDR_W 4
+`define W_DATA_W 8
+`define W_ADDR_W 4
+`define R_DATA_W 32
+`define R_ADDR_W 2
 
-//Tests when the write data width is bigger than the read data width
+//Tests when the read data width is bigger than the write data width
 module iob_2p_assim_mem_tb;
 
     // Inputs
@@ -45,7 +45,7 @@ module iob_2p_assim_mem_tb;
 
     initial begin
     
-    	$dumpfile("2p_assim_mem_r_big_tb.vcd");
+    	$dumpfile("2p_assim_mem_tb.vcd");
     	$dumpvars();
         // Initialize Inputs
         clk = 1;
@@ -55,30 +55,26 @@ module iob_2p_assim_mem_tb;
         r_addr = 0; 
         r_port_en = 0;
         w_port_en = 0; 
-        #20;
+        @(posedge clk) #1;
         //Write all the locations of RAM 
-        @(posedge clk) w_port_en = 1; 
+        w_port_en = 1; 
         w_en = 1;
-		for(i=0; i < 4; i = i + 1) begin
-			data_in[7:0] = i*4+1;
-			data_in[15:8] = i*4+2;
-			data_in[23:16] = i*4+3;
-			data_in[31:24] = i*4+4;
-			@(posedge clk) w_addr = i;
-			#10;
-		end
-		@(posedge clk) w_port_en = 0;
-		w_en = 0; 
-		#10
-		//Read all the locations of RAM
-		@(posedge clk)r_port_en = 1; 
 		for(i=0; i < 16; i = i + 1) begin
-			@(posedge clk) r_addr = i;
-			#10;
+			data_in = i;
+			w_addr = i;
+			@(posedge clk) #1;
 		end
-		@(posedge clk) r_port_en = 0;
-    #50
-    $finish;
+		w_port_en = 0;
+		w_en = 0; 
+		
+		//Read all the locations of RAM
+		r_port_en = 1; 
+		for(i=0; i < 4; i = i + 1) begin
+			 r_addr = i;
+			@(posedge clk) #1;
+		end
+		r_port_en = 0;
+    #50 $finish;
     end
       
 endmodule

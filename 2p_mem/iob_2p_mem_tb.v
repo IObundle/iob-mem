@@ -62,13 +62,14 @@ module iob_2p_mem_tb;
       #50$finish;
 
    end
-    
-   // Instantiate the Unit Under Test (UUT)
-   iob_2p_mem #(
-    	        .DATA_W(`DATA_W),
-    	        .ADDR_W(`ADDR_W)
-                )
-   uut (
+
+    // Instantiate the Unit Under Test (UUT)
+    iob_2p_mem #(
+    	.DATA_W(`DATA_W),
+    	.ADDR_W(`ADDR_W),
+    	.USE_RAM(0)
+    )
+     uut (
         .clk(clk), 
         .w_en(w_en), 
         .data_in(data_in), 

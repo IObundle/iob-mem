@@ -48,38 +48,31 @@ module sfifo_assim_tb;
         read = 0;
         write = 0;
         
+   		@(posedge clk) #1;
+        reset = 1;
+        @(posedge clk) #1;
+        reset = 0;
          //Write all the locations of FIFO
-   		#15;
-         @(posedge clk) reset = 1;
-         #10
-         @(posedge clk) reset = 0;
-        #20;
 		for(i=0; i < 4; i = i + 1) begin
-        	 @(posedge clk) write = 1;
+        	write = 1;
 			data_in[7:0] = i*4;
 			data_in[15:8] = i*4+1;
 			data_in[23:16] = i*4+2;
 			data_in[31:24] = i*4+3;
-			#10;
-			 @(posedge clk) write = 0;
+			@(posedge clk) #1;
 		end
-         @(posedge clk) write = 0; //Fifo is now full
-        #10
+        write = 0; //Fifo is now full
         
-        #10
         //Read all the locations of RAM. 
 		for(i=0; i < 16; i = i + 1) begin
-        	 @(posedge clk) read=1;
-			#10;
-			 @(posedge clk) read = 0;
-			#10;
+        	 read=1;
+        	 @(posedge clk) #1;
 		end
-		 @(posedge clk) read = 0; //Fifo is now empty
-        #50;
-        $finish;
+		read = 0; //Fifo is now empty
+        #50 $finish;
     end
 
 
-endmodule // sfifo_tb
+endmodule // sfifo_assim_tb
 
 
