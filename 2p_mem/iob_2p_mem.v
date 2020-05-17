@@ -3,38 +3,49 @@
 module iob_2p_mem
 	#( 
 		parameter DATA_W = 8,
-		parameter ADDR_W = 6
+		parameter ADDR_W = 6,
+		parameter USE_RAM = 1
 	) 
 	(
-		//Inputs
-		input 				clk,
-        input 				w_en,    //write enable
-        input [DATA_W-1:0] 	data_in, //Input data to write port
-        input [ADDR_W-1:0] 	w_addr,  //address for write port
-        input [ADDR_W-1:0] 	r_addr,  //address for read port
-        input 				w_port_en,
-        input				r_port_en,
-        //Outputs
-        output reg [DATA_W-1:0] data_out //output port
+	 input                   clk,
+
+	 //write port
+         input                   w_port_en,
+         input                   w_en,
+         input [ADDR_W-1:0]      w_addr,
+         input [DATA_W-1:0]      data_in,
+
+         //read port
+         input                   r_port_en,
+         input [ADDR_W-1:0]      r_addr,
+         output reg [DATA_W-1:0] data_out
     );
 
-	//memory declaration.
-	reg [DATA_W-1:0] ram [2**ADDR_W-1:0];
-
-	//writing to the RAM
+   //memory declaration
+   generate
+   if(USE_RAM) begin
+	reg [DATA_W-1:0]              ram [2**ADDR_W-1:0];
+   //writing to the RAM
+    always@(posedge clk)
+	  if(w_en && w_port_en)
+	    ram[w_addr] <= data_in;
+   //reading from the RAM
+   always@(posedge clk)
+     if(r_port_en)
+       data_out <= ram[r_addr];
+   end
+   else begin
+	reg [DATA_W*(2**ADDR_W)-1:0] 	 mem ;
+   //writing to the register
 	always@(posedge clk)
-	begin
-		if(w_en && w_port_en)
-		    ram[w_addr] <= data_in;
-	end
+   	  if(w_en && w_port_en)
+	    mem[8*w_addr +: 8] <= data_in;
+	//reading from the RAM
+    always@(posedge clk)
+      if(r_port_en)
+        data_out <= mem[8*r_addr +: 8];
+   end
+   endgenerate
 
-    //reading from the RAM
-	always@(posedge clk)
-	begin
-		if(r_port_en)
-		    data_out <= ram[r_addr];
-        else
-            data_out <= 'dZ;
-	end
 
 endmodule   

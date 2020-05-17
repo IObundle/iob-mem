@@ -20,7 +20,8 @@ module iob_sync_fifo
 	#(parameter 
 		DATA_WIDTH = 8, 
 		ADDRESS_WIDTH = 4, 
-		FIFO_DEPTH = (1 << ADDRESS_WIDTH)
+		FIFO_DEPTH = (1 << ADDRESS_WIDTH),
+		USE_RAM = 1
 	)
 	(
 	input                       rst,
@@ -85,7 +86,8 @@ module iob_sync_fifo
 	//FIFO memory
 	iob_2p_mem #(
 		.DATA_W(DATA_WIDTH), 
-		.ADDR_W(ADDRESS_WIDTH)
+		.ADDR_W(ADDRESS_WIDTH),
+		.USE_RAM(USE_RAM)
 	) fifo_mem (
 		.clk(clk),
 		.w_en(write_en_int),

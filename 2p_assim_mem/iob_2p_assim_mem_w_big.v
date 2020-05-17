@@ -41,13 +41,11 @@ module iob_2p_assim_mem_w_big
 	
 	//reading from the RAM
 	always@(posedge clk)
-	begin
-		data_out <= r_port_en ? ram[r_addr] : 'dZ;
-	end
+		if (r_port_en)
+			data_out <= ram[r_addr];
 	
 	//writing to the RAM
-	always@(posedge clk)
-	begin
+	always@(posedge clk) begin
 		for (i = 0; i < RATIO; i = i+1) begin
 			lsbaddr = i;
 			if(w_en == 1 && w_port_en)    //check if write enable is ON
