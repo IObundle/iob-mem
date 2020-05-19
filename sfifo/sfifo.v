@@ -53,9 +53,9 @@ module iob_sync_fifo
 	always @ (posedge clk or posedge rst)
 		if (rst)
 			fifo_ocupancy <= 0;
-		else if (write_en_int)
+		else if (write_en_int & !read_en_int)
 			fifo_ocupancy <= fifo_ocupancy+1;
-		else if (read_en_int)
+		else if (read_en_int & !write_en_int)
 			fifo_ocupancy <= fifo_ocupancy-1;
 
 	//WRITE DOMAIN LOGIC
@@ -94,8 +94,7 @@ module iob_sync_fifo
 		.data_in(data_in),
 		.w_addr(wptr),
 		.r_addr(rptr),
-		.w_port_en(write_en_int),
-		.r_port_en(read_en_int),
+		.r_en(read_en_int),
 		.data_out(data_out)
 	);
 

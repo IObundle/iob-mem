@@ -124,8 +124,7 @@ module iob_sync_assim_fifo
 		.data_in(data_in),
 		.w_addr(wptr),
 		.r_addr(rptr),
-		.w_port_en(write_en_int),
-		.r_port_en(read_en_int),
+		.r_en(read_en_int),
 		.data_out(data_out)
 	);
 
