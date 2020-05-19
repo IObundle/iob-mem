@@ -12,8 +12,7 @@ module iob_2p_assim_mem
         input [W_DATA_W-1:0] 	data_in, //Input data to write port
         input [W_ADDR_W-1:0] 	w_addr,  //address for write port
         input [R_ADDR_W-1:0] 	r_addr,  //address for read port
-        input 				w_port_en,
-        input				r_port_en,
+        input				r_en,
         //Outputs
         output [R_DATA_W-1:0] data_out //output port
     );
@@ -32,8 +31,7 @@ module iob_2p_assim_mem
     		 	.data_in(data_in),
     		 	.w_addr(w_addr),
     		 	.r_addr(r_addr),
-    		 	.w_port_en(w_port_en),
-    		 	.r_port_en(r_port_en),
+    		 	.r_en(r_en),
     		 	.data_out(data_out)
     		 );
     	end
@@ -50,8 +48,7 @@ module iob_2p_assim_mem
     		 	.data_in(data_in),
     		 	.w_addr(w_addr),
     		 	.r_addr(r_addr),
-    		 	.w_port_en(w_port_en),
-    		 	.r_port_en(r_port_en),
+    		 	.r_en(r_en),
     		 	.data_out(data_out)
     		 );
     	end

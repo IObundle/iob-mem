@@ -21,8 +21,7 @@ module iob_2p_assim_mem_r_big
         input [W_DATA_W-1:0] 	data_in, //Input data to write port
         input [W_ADDR_W-1:0] 	w_addr,  //address for write port
         input [R_ADDR_W-1:0] 	r_addr,  //address for read port
-        input 				w_port_en,
-        input				r_port_en,
+        input				r_en,
         //Outputs
         output reg [R_DATA_W-1:0] data_out //output port
     );
@@ -41,12 +40,12 @@ module iob_2p_assim_mem_r_big
 	
 	//writing to the RAM
 	always@(posedge clk)
-		if (w_en && w_port_en)
+		if (w_en)
 			ram[w_addr] <= data_in;
 	
 	//reading from the RAM
 	always@(posedge clk) begin
-		if (r_port_en) begin
+		if (r_en) begin
 			for (i = 0; i < RATIO; i = i+1) begin
 				lsbaddr = i;
 				data_out[(i+1)*minDATA_W-1 -: minDATA_W] <= ram[{r_addr, lsbaddr}];
