@@ -26,17 +26,17 @@ module iob_2p_mem
    //write
    always@(posedge clk)
      if(w_en)
-       ram[w_addr] <= data_in;
+       mem[w_addr] <= data_in;
 
    //read mode depends on mem implementation, as ram or reg
    generate
       if(USE_RAM)
         always@(posedge clk)  begin
            if(r_en)
-             data_out <= ram[r_addr];
+             data_out <= mem[r_addr];
         end
-      else //use reg file 
-        data_out <= mem[r_addr];
+      else //use reg file
+        always@* data_out = mem[r_addr];
    endgenerate
 
 endmodule   
