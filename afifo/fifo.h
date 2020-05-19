@@ -1,15 +1,6 @@
 #ifndef IOB_FIFO_H
 #define IOB_FIFO_H
 
-#ifndef MEMSET
-#define MEMSET(base, location, value) (*((volatile int*) (base + (sizeof(int)) * location)) = value)
-#endif
-
-#ifndef MEMGET
-#define MEMGET(base, location)        (*((volatile int*) (base + (sizeof(int)) * location)))
-#endif
-
-
 //memory map
 #define FIFO_DATA 0
 #define FIFO_EMPTY 1
