@@ -3,7 +3,7 @@
 
 `timescale 1 ns / 1 ps
 
-module iob_sp_mem_be 
+module iob_sp_ram_be 
   #(
     parameter FILE="none",
     parameter NUM_COL = 4,
