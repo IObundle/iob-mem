@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module iob_1p_mem #(
+module iob_sp_ram #(
 		    parameter FILE="none",
 		    parameter DATA_W=8,
 		    parameter ADDR_W=14

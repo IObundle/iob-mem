@@ -3,7 +3,7 @@
 
 `timescale 1 ns / 1 ps
 
-module iob_tdp_mem_be
+module iob_tdp_ram_be
   #(parameter FILE = "none",
     parameter NUM_COL = 4,
     parameter COL_WIDTH = 8,
