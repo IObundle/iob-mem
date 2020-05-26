@@ -39,7 +39,7 @@ module iob_sync_fifo
 	);
 
 
-	reg [DATA_WIDTH:0]   		fifo_ocupancy;
+	reg [ADRESS_WIDTH:0]   		fifo_ocupancy;
 
 	//WRITE DOMAIN 
 	wire [ADDRESS_WIDTH-1:0]    wptr;
