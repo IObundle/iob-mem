@@ -64,26 +64,28 @@ module iob_sync_assim_fifo
 
 	//FIFO ocupancy counter
 	generate
-	if(W_DATA_W > R_DATA_W) 
-	begin
-		always @ (posedge clk or posedge rst)
+		if(W_DATA_W > R_DATA_W) begin
+			always @ (posedge clk or posedge rst)
+				if (rst)
+					fifo_ocupancy <= 0;
+				else if (write_en_int & !read_en_int)
+					fifo_ocupancy <= fifo_ocupancy+RATIO;
+				else if (read_en_int & !write_en_int)
+					fifo_ocupancy <= fifo_ocupancy-1;
+				else if (read_en_int & write_en_int)
+					fifo_ocupancy <= fifo_ocupancy+RATIO-1;
+		end
+		else begin
+			always @ (posedge clk or posedge rst)
 			if (rst)
 				fifo_ocupancy <= 0;
-			else if (write_en_int)
-				fifo_ocupancy <= fifo_ocupancy+RATIO;
-			else if (read_en_int)
-				fifo_ocupancy <= fifo_ocupancy-1;
-	end
-	else
-	begin
-		always @ (posedge clk or posedge rst)
-		if (rst)
-			fifo_ocupancy <= 0;
-		else if (write_en_int)
-			fifo_ocupancy <= fifo_ocupancy+1;
-		else if (read_en_int)
-			fifo_ocupancy <= fifo_ocupancy-RATIO;
-	end
+			else if (write_en_int & !read_en_int)
+				fifo_ocupancy <= fifo_ocupancy+1;
+			else if (read_en_int & !write_en_int
+				fifo_ocupancy <= fifo_ocupancy-RATIO;
+			else if (read_en_int & write_en_int)
+				fifo_ocupancy <= fifo_ocupancy-RATIO+1;
+		end
 	endgenerate
 	
 	
