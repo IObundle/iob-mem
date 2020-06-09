@@ -81,7 +81,7 @@ module iob_sync_assim_fifo
 				fifo_ocupancy <= 0;
 			else if (write_en_int & !read_en_int)
 				fifo_ocupancy <= fifo_ocupancy+1;
-			else if (read_en_int & !write_en_int
+			else if (read_en_int & !write_en_int)
 				fifo_ocupancy <= fifo_ocupancy-RATIO;
 			else if (read_en_int & write_en_int)
 				fifo_ocupancy <= fifo_ocupancy-RATIO+1;

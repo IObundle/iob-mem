@@ -3,7 +3,6 @@
 `define max(a,b) {(a) > (b) ? (a) : (b)}
 `define min(a,b) {(a) < (b) ? (a) : (b)}
 
-
 /*WARNING: This memory assumes that the write port data width is bigger than the
 read port data width and that they are multiples of eachother
 */
@@ -30,7 +29,7 @@ module iob_2p_assim_mem_w_big
 	localparam maxDATA_W = `max(W_DATA_W, R_DATA_W);
 	localparam minDATA_W = `min(W_DATA_W, R_DATA_W);
 	localparam RATIO = maxDATA_W / minDATA_W;
-	localparam log2RATIO = $clog2(RATIO);
+	localparam log2RATIO = log2(RATIO);
 	
 	//memory declaration
 	reg [minDATA_W-1:0] ram [2**maxADDR_W-1:0];
