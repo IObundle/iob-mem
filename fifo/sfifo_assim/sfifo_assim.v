@@ -33,6 +33,9 @@ module iob_sync_assim_fifo
 	(
 	input                       rst,
 	input                       clk,
+	
+	output reg [31:0]   		fifo_ocupancy,
+	
 
 	//read port
 	output [R_DATA_W-1:0]		data_out, 
@@ -52,7 +55,6 @@ module iob_sync_assim_fifo
 	localparam RATIO = maxDATA_W / minDATA_W;
 	localparam FIFO_DEPTH = (2**maxADDR_W);
 	
-	reg [maxADDR_W:0]   		fifo_ocupancy;
 
 	//WRITE DOMAIN 
 	wire [W_ADDR_W-1:0]   		wptr;

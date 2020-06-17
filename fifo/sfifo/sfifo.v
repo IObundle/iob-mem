@@ -26,9 +26,11 @@ module iob_sync_fifo
 	(
 	input                       rst,
 	input                       clk,
+	
+	output reg [31:0] 			fifo_ocupancy,				
 
 	//read port
-	output [DATA_WIDTH-1:0] data_out, 
+	output [DATA_WIDTH-1:0] 	data_out, 
 	output		                empty,
 	input                       read_en,
 
@@ -37,9 +39,6 @@ module iob_sync_fifo
 	output		                full,
 	input                       write_en
 	);
-
-
-	reg [ADDRESS_WIDTH:0]   		fifo_ocupancy;
 
 	//WRITE DOMAIN 
 	wire [ADDRESS_WIDTH-1:0]    wptr;
