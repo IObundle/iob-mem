@@ -33,6 +33,9 @@ module iob_sync_assim_fifo
 	(
 	input                       rst,
 	input                       clk,
+	
+	output reg [31:0]   		fifo_ocupancy,
+	
 
 	//read port
 	output [R_DATA_W-1:0]		data_out, 
@@ -52,7 +55,6 @@ module iob_sync_assim_fifo
 	localparam RATIO = maxDATA_W / minDATA_W;
 	localparam FIFO_DEPTH = (2**maxADDR_W);
 	
-	reg [maxADDR_W:0]   		fifo_ocupancy;
 
 	//WRITE DOMAIN 
 	wire [W_ADDR_W-1:0]   		wptr;
@@ -64,26 +66,28 @@ module iob_sync_assim_fifo
 
 	//FIFO ocupancy counter
 	generate
-	if(W_DATA_W > R_DATA_W) 
-	begin
-		always @ (posedge clk or posedge rst)
+		if(W_DATA_W > R_DATA_W) begin
+			always @ (posedge clk or posedge rst)
+				if (rst)
+					fifo_ocupancy <= 0;
+				else if (write_en_int & !read_en_int)
+					fifo_ocupancy <= fifo_ocupancy+RATIO;
+				else if (read_en_int & !write_en_int)
+					fifo_ocupancy <= fifo_ocupancy-1;
+				else if (read_en_int & write_en_int)
+					fifo_ocupancy <= fifo_ocupancy+RATIO-1;
+		end
+		else begin
+			always @ (posedge clk or posedge rst)
 			if (rst)
 				fifo_ocupancy <= 0;
-			else if (write_en_int)
-				fifo_ocupancy <= fifo_ocupancy+RATIO;
-			else if (read_en_int)
-				fifo_ocupancy <= fifo_ocupancy-1;
-	end
-	else
-	begin
-		always @ (posedge clk or posedge rst)
-		if (rst)
-			fifo_ocupancy <= 0;
-		else if (write_en_int)
-			fifo_ocupancy <= fifo_ocupancy+1;
-		else if (read_en_int)
-			fifo_ocupancy <= fifo_ocupancy-RATIO;
-	end
+			else if (write_en_int & !read_en_int)
+				fifo_ocupancy <= fifo_ocupancy+1;
+			else if (read_en_int & !write_en_int)
+				fifo_ocupancy <= fifo_ocupancy-RATIO;
+			else if (read_en_int & write_en_int)
+				fifo_ocupancy <= fifo_ocupancy-RATIO+1;
+		end
 	endgenerate
 	
 	
