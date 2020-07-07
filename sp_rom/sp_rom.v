@@ -13,7 +13,7 @@ module sp_rom #(
     );
    
    // this allows ISE 14.7 to work; do not remove
-   parameter mem_init_file_int = FILE;
+   localparam mem_init_file_int = FILE;
 
    // Declare the ROM
    reg [DATA_W-1:0]     rom[2**ADDR_W-1:0];

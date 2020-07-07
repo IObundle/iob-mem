@@ -15,7 +15,7 @@ module iob_sp_ram #(
     );
 
    //this allows ISE 14.7 to work; do not remove
-   parameter mem_init_file_int = FILE;
+   localparam mem_init_file_int = FILE;
 
    // Declare the RAM
    reg [DATA_W-1:0] 	      ram[2**ADDR_W-1:0];

@@ -23,7 +23,7 @@ module iob_tdp_ram
     );
 
    //this allows ISE 14.7 to work; do not remove
-   parameter mem_init_file_int = MEM_INIT_FILE;
+   localparam mem_init_file_int = MEM_INIT_FILE;
 
    
    // Declare the RAM
