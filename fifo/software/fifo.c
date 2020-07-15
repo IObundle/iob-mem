@@ -1,4 +1,5 @@
 #include "fifo.h"
+#include "interconnect.h"
 
 int fifo_empty(int base) {
   return MEMGET(base, FIFO_EMPTY);
