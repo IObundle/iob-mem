@@ -11,6 +11,7 @@ module iob_2p_assim_mem_w_big_tb;
     // Inputs
     reg clk;
     reg w_en;
+    reg r_en;
     reg [`W_DATA_W-1:0] data_in;
     reg [`W_ADDR_W-1:0] w_addr;
     reg [`R_ADDR_W-1:0] r_addr;
@@ -31,7 +32,8 @@ module iob_2p_assim_mem_w_big_tb;
     )
      uut (
         .clk(clk), 
-        .w_en(w_en), 
+        .w_en(w_en),
+        .r_en(r_en), 
         .data_in(data_in), 
         .w_addr(w_addr), 
         .r_addr(r_addr),

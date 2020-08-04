@@ -1,8 +1,8 @@
 defmacro:=-D
-incdir:=-I
 
 #simulator flags
-VSRC += iob_2p_assim_mem_r_big.v
+VSRC += iob_2p_assim_mem_w_big.v
+VSRC += iob_2p_assim_mem_w_big_tb.v
 DEFINE += $(defmacro)VCD
 VLOG = iverilog -W all -g2005-sv $(DEFINE)
 
@@ -12,6 +12,6 @@ run:
 	./a.out
 
 clean:
-	@rm -f ./a.out
+	@rm -f ./a.out *.vcd
 
 .PHONY: clean

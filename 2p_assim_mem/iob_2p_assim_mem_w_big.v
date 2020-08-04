@@ -17,10 +17,12 @@ module iob_2p_assim_mem_w_big
 		//Inputs
 		input 				clk,
         input 				w_en,    //write enable
+        input				r_en,	 //read enable
         input [W_DATA_W-1:0] 	data_in, //Input data to write port
         input [W_ADDR_W-1:0] 	w_addr,  //address for write port
         input [R_ADDR_W-1:0] 	r_addr,  //address for read port
-        input				r_en,
+        input 				w_port_en,
+        input 				r_port_en,
         //Outputs
         output reg [R_DATA_W-1:0] data_out //output port
     );
