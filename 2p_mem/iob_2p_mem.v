@@ -11,11 +11,13 @@ module iob_2p_mem
 
     //write port
     input                   w_en,
+    input                   w_port_en,
     input [ADDR_W-1:0]      w_addr,
     input [DATA_W-1:0]      data_in,
 
     //read port
-    input                   r_en,
+
+    input                   r_port_en,
     input [ADDR_W-1:0]      r_addr,
     output reg [DATA_W-1:0] data_out
     );
