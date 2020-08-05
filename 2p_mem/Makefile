@@ -1,6 +1,5 @@
-defmacro := -D
-
 #simulator flags
+defmacro := -D
 VSRC += *.v
 DEFINE += $(defmacro)VCD
 VLOG = iverilog -W all -g2005-sv $(DEFINE)
