@@ -10,7 +10,6 @@ CMPLR = $(VLOG) $(VSRC) && ./a.out
 
 # run the simulator
 run:
-	@echo $(DIRS)
 	$(foreach dir, $(DIRS), $(shell cd $(dir) && $(CMPLR)))
 
 clean:
