@@ -1,5 +1,6 @@
 # find folders and subfolders to work on
-DIRS += $(shell find -type f -name '*.v' -printf '%h\n' | sort -u)
+DIRS := $(wildcard */)
+DIRS += $(shell find $(DIRS) -type f -name '*.v' -printf '%h\n' | sort -u)
 
 # simulator flags
 defmacro := -D
@@ -10,7 +11,7 @@ CMPLR = $(VLOG) $(VSRC) && ./a.out
 
 # run the simulator
 run:
-	$(foreach dir, $(DIRS), $(shell cd $(dir) && $(CMPLR)))
+	for d in $(DIRS); do ( cd $$d && $(CMPLR); ); done
 
 clean:
 	@find . -name "*.vcd" -type f -delete
