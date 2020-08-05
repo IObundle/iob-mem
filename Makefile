@@ -1,6 +1,5 @@
 # find folders and subfolders to work on
-DIRS := $(wildcard */)
-DIRS += $(shell find $(DIRS) -type f -name '*.v' -printf '%h\n' | sort -u)
+DIRS := $(shell find . -type f -name '*.v' -printf '%h\n' | sort -u)
 
 # simulator flags
 defmacro := -D
