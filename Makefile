@@ -1,5 +1,6 @@
 # find folders and subfolders to work on
-DIRS := $(shell find . -type f -name '*.v' -printf '%h\n' | sort -u)
+#DIRS := $(shell find . -type f -name '*.v' -printf '%h\n' | sort -u)
+DIRS := $(wildcard */)
 
 # simulator flags
 defmacro := -D
@@ -10,7 +11,7 @@ CMPLR = $(VLOG) $(VSRC) && ./a.out
 
 # run the simulator
 run:
-	for d in $(DIRS); do ( cd $$d && $(CMPLR); ); done
+	for d in $(DIRS); do ( cd $$d && if test -f Makefile; then make; else $(CMPLR); fi; ); done
 
 clean:
 	@find . -name "*.vcd" -type f -delete
