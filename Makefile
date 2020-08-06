@@ -1,6 +1,5 @@
 # Makefile lists top level folders and tests if there's a Makefile in them.
 # If there is, it runs 'make' in that directory; if not, it runs the compiler.
-# To compile a specific memory module, type 'make <path-to-module>'
 
 # find folders to work on
 #DIRS := $(shell find . -type f -name '*.v' -printf '%h\n' | sort -u)
