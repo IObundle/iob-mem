@@ -1,20 +1,15 @@
-define_D:=-D
-
 #simulator flags
-VSRC += iob_2p_mem.v
-VSRC += iob_2p_mem_tb.v
-DEFINE += $(define_D) VCD
+defmacro := -D
+VSRC += *.v
+DEFINE += $(defmacro)VCD
 VLOG = iverilog -W all -g2005-sv $(DEFINE)
 
 #run the simulator
-all: a.out
-	./$<	
-
-a.out: $(VSRC)
+run:
 	$(VLOG) $(VSRC)
+	./a.out
 
-
-clean: 
-	@rm -f a.out *~ *.vcd
+clean:
+	@rm -f ./a.out *.vcd
 
 .PHONY: clean
