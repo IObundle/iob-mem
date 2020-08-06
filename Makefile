@@ -1,3 +1,6 @@
+# Makefile lists top level folders and tests if there's a Makefile in them.
+# If there is, it runs 'make' in that directory; if not, it runs the compiler.
+
 # find folders and subfolders to work on
 #DIRS := $(shell find . -type f -name '*.v' -printf '%h\n' | sort -u)
 DIRS := $(wildcard */)
