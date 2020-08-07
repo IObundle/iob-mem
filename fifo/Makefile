@@ -1,4 +1,4 @@
-DIRS := $(wildcard */)
+include ../mem.mk
 
 run:
 	@for d in $(DIRS); do ( \

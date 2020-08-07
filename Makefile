@@ -6,7 +6,7 @@ include mem.mk
 all: $(MEM_DIR)
 
 $(MEM_DIR):
-	if test -f $(MEM_DIR)/Makefile; then make -C $(MEM_DIR); fi;
+	make -C $(MEM_DIR)
 
 clean:
 	@find . -name "*.vcd" -type f -delete
