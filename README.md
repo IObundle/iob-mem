@@ -9,3 +9,6 @@ Just type `make`.
 ### Compile specific memory module ###
 
 Type `make <path-to-module>`.
+
+### Generate Value change dump ###
+Type `make VCD=1`
