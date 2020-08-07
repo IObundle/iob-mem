@@ -4,8 +4,7 @@ MEM_DIR := $(MAKECMDGOALS)
 
 # optional VCD
 ifeq ($(VCD),1)
-	defmacro := -D
-	DEFINE += $(defmacro)VCD
+	DEFINE += -DVCD
 endif
 
 # simulator flags
