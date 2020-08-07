@@ -5,6 +5,7 @@ all: $(MEM_DIR)
 $(MEM_DIR):
 	make -C $(MEM_DIR)
 	$(CMPLR)
+	./a.out
 
 clean:
 	@find . -name "*.vcd" -type f -delete
