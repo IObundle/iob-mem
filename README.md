@@ -10,20 +10,5 @@ Just type `make`.
 
 Type `make <path-to-module>`.
 
-If you need an external file, create a Makefile in your folder as such:
-
-```
-VSRC += ../folder/file.v
-
-run:
-	$(CMPLR) $(VSRC) 
-	./a.out
-
-clean:
-	@rm -f ./a.out *.vcd
-
-.PHONY: clean
-```
-
 ### Generate Value change dump ###
 Type `make VCD=1`
