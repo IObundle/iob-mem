@@ -1,5 +1,7 @@
 `timescale 1ns / 1ps
 
+`define T 10
+
 `define DATA_W 8
 `define ADDR_W 4
 
@@ -59,7 +61,17 @@ module iob_2p_mem_tb;
 	 @(posedge clk) #1;
       end
 
-      #50$finish;
+      // Test
+      for(i=0; i < 16; i = i + 1) begin
+         if(data_in!=i) begin
+           $display("Test failed on vector %d: %x / %x", i, data_in, i);
+           $finish;
+         end
+      @(posedge clk) #1;
+      end
+      #(5*T)
+      $display("Test completed sucessfully.")
+      $finish;
 
    end
 
@@ -81,6 +93,6 @@ module iob_2p_mem_tb;
         );
 
    //Clock
-   always #5 clk = ~clk;
+   always #(T/2) clk = ~clk;
 
 endmodule
