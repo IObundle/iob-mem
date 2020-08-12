@@ -12,7 +12,7 @@ module sfifo_tb;
    	reg read;
    	reg write;
    	
-   	//Ouptuts
+   	//Outputs
    	wire [`DATA_W-1:0] data_out;
    	wire empty_out;
    	wire full_out;
@@ -38,7 +38,7 @@ module sfifo_tb;
         write = 0;
 
          //Write all the locations of FIFO
-        #10;
+        #clk_per;
         @(posedge clk) #1; 
         reset = 1;
         @(posedge clk) #1;
