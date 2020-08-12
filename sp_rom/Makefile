@@ -7,6 +7,6 @@ run:
 	./a.out
 
 clean:
-	@rm -f ./a.out *.vcd tb.hex
+	@rm -f ./a.out *.vcd *.hex
 
 .PHONY: clean
