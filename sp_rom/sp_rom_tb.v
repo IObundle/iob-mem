@@ -53,6 +53,9 @@ module sp_rom_tb;
             end
         end
 
+        @(posedge clk) #1;
+        r_en = 0;
+        
         #clk_per
         $display("Test completed successfully.");
         #(5*clk_per) $finish;
