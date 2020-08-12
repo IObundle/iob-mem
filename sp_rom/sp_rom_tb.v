@@ -2,7 +2,7 @@
 
 `define DATA_W 8
 `define ADDR_W 4
-`define hex_file "tb.hex"
+`define hex_file "tb1.hex"
 
 module sp_rom_tb;
 	
