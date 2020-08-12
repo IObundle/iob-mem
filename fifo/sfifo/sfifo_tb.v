@@ -12,7 +12,7 @@ module sfifo_tb;
    	reg read;
    	reg write;
    	
-   	//Ouptuts
+   	//Outputs
    	wire [`DATA_W-1:0] data_out;
    	wire empty_out;
    	wire full_out;
@@ -38,7 +38,7 @@ module sfifo_tb;
         write = 0;
 
          //Write all the locations of FIFO
-        #10;
+        #clk_per;
         @(posedge clk) #1; 
         reset = 1;
         @(posedge clk) #1;
@@ -87,8 +87,8 @@ module sfifo_tb;
 
    	// Instantiate the Unit Under Test (UUT)
     iob_sync_fifo #(
-    	.DATA_WIDTH(8), 
-    	.ADDRESS_WIDTH(4),
+    	.DATA_WIDTH(`DATA_W), 
+    	.ADDRESS_WIDTH(`ADDR_W),
     	.USE_RAM(0)
 	) uut (
 		.clk(clk), 
