@@ -1,9 +1,8 @@
 include ../mem.mk
 
-# generate .hex file from string, checks from rom if string is valid
+# generate .hex file from string, checks from ram if string is valid
 run:
-	@echo "!IObundle 2020!" | od -A n -t x1 > tb1.hex
-	@echo "10 9 8 7 5 4 32" | od -A n -t x1 > tb2.hex
+	$(GEN_HEX1) && $(GEN_HEX2)
 	$(CMPLR)
 	./a.out
 
