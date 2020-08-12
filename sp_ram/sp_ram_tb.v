@@ -73,7 +73,7 @@ module sp_ram_tb;
 
         @(posedge clk) #1;
         we = 0;
-        
+
         @(posedge clk) #1;
         for(i = 0; i < 16; i = i + 1) begin
             addr = i;
@@ -83,6 +83,9 @@ module sp_ram_tb;
                 $finish;
             end
         end
+
+        @(posedge clk) #1;
+        en = 0;
 
         #clk_per
         $display("Test completed successfully.");
