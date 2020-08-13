@@ -53,10 +53,23 @@ module iob_2p_mem_tb;
     w_en = 0; 	 
     @(posedge clk) #1;
 
-    r_en = 1;
+    r_en = 0;
     @(posedge clk) #1;
 
     //Read all the locations of RAM with r_en = 0
+    for(i = 0; i < 16; i = i + 1) begin
+        r_addr = i;
+        @(posedge clk) #1;
+        if(data_out==i+32) begin
+            $display("Test failed: with r_en = 0, at position %d, data_out should be 0 but is %d", i, data_out);
+            $finish;
+        end
+    end
+
+    r_en = 1;
+    @(posedge clk) #1;
+
+    //Read all the locations of RAM with r_en = 1
     for(i = 0; i < 16; i = i + 1) begin
         r_addr = i;
         @(posedge clk) #1;
