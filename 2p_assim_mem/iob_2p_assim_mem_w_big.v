@@ -11,7 +11,8 @@ module iob_2p_assim_mem_w_big
 		parameter W_DATA_W = 16,
 		parameter W_ADDR_W = 6,
 		parameter R_DATA_W = 8,
-		parameter R_ADDR_W = 7
+		parameter R_ADDR_W = 7,
+		parameter USE_RAM = 1
 	) 
 	(
 		//Inputs
@@ -38,9 +39,15 @@ module iob_2p_assim_mem_w_big
 	reg [log2RATIO-1:0] lsbaddr;
 	
 	//reading from the RAM
-	always@(posedge clk)
-		if (r_en)
-			data_out <= ram[r_addr];
+	generate
+           if(USE_RAM)
+              always@(posedge clk)  begin
+                 if(r_en)
+                    data_out <= ram[r_addr];
+              end
+           else //use reg file
+              always@* data_out = ram[r_addr];
+        endgenerate
 	
 	//writing to the RAM
 	always@(posedge clk) begin
