@@ -37,7 +37,7 @@ module sp_ram_be_tb;
         clk = 1;
         en = 0;
         for(i=0; i<`NUM_COL; i = i + 1)
-            we = 0;
+            we[i] = 0;
         addr = 0;
 
         // store file for comparison
