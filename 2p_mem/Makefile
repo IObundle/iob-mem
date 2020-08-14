@@ -4,8 +4,10 @@ include ../mem.mk
 run:
 	$(CMPLR)
 	./a.out
+	$(CMPLR) $(RAM)
+	./a.out
 
 clean:
-	@rm -f ./a.out *.vcd
+	@rm -f *.out *.vcd
 
 .PHONY: clean
