@@ -9,7 +9,6 @@ module iob_2p_mem_tb;
     // Inputs
     reg clk;
 
-    //UUT 1 (with RAM)
     //write signals
     reg w_en;
     reg [`DATA_W-1:0] data_in;
