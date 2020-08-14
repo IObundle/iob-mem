@@ -1,6 +1,10 @@
+defmacro := -D
+
+RAM += $(defmacro)USE_RAM
+
 # optional VCD
 ifeq ($(VCD),1)
-	DEFINE += -DVCD
+	DEFINE += $(defmacro)VCD
 endif
 
 # simulator flags

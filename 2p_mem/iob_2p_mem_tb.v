@@ -9,7 +9,6 @@ module iob_2p_mem_tb;
     // Inputs
     reg clk;
 
-
     //write signals
     reg w_en;
     reg [`DATA_W-1:0] data_in;
@@ -21,75 +20,120 @@ module iob_2p_mem_tb;
     reg [`ADDR_W-1:0] r_addr;
     wire [`DATA_W-1:0] data_out;
 
-
     integer i;
 
     parameter clk_per = 10; // clk period = 10 timeticks
 
     initial begin
-    // optional VCD
-    `ifdef VCD
-        $dumpfile("2p_mem.vcd");
-        $dumpvars();
-    `endif
+        clk = 1;
+        r_en = 0;
+        w_en = 0;
+        r_addr = 0;
+        w_addr = 0;
+        data_in = 0;
 
-    clk = 1;
-    r_en = 0;
-    w_en = 0;
-    r_addr = 0;
-    w_addr = 0;
-    data_in = 0;
+        //            //
+        //  With RAM  //
+        //            //
 
-    @(posedge clk) #1;
-    w_en = 1;
+        `ifdef USE_RAM
+            // optional VCD
+            `ifdef VCD
+                $dumpfile("2p_mem_ram.vcd");
+                $dumpvars();
+            `endif
 
-    //Write all the locations of RAM 
-    for(i = 0; i < 16; i = i + 1) begin
-        data_in = i + 32;
-        w_addr = i;
-        @(posedge clk) #1;
-    end
+            @(posedge clk) #1;
+            w_en = 1;
 
-    w_en = 0; 	 
-    @(posedge clk) #1;
+            //Write all the locations of RAM 
+            for(i = 0; i < 16; i = i + 1) begin
+                data_in = i + 32;
+                w_addr = i;
+                @(posedge clk) #1;
+            end
 
-    r_en = 0;
-    @(posedge clk) #1;
+            w_en = 0; 	 
+            @(posedge clk) #1;
 
-    //Read all the locations of RAM with r_en = 0
-    for(i = 0; i < 16; i = i + 1) begin
-        r_addr = i;
-        @(posedge clk) #1;
-        if(data_out==i+32) begin
-            $display("Test failed: with r_en = 0, at position %d, data_out should be 0 but is %d", i, data_out);
-            $finish;
-        end
-    end
 
-    r_en = 1;
-    @(posedge clk) #1;
+            //Read all the locations of RAM with r_en = 0
+            r_en = 0;
+            @(posedge clk) #1;
 
-    //Read all the locations of RAM with r_en = 1
-    for(i = 0; i < 16; i = i + 1) begin
-        r_addr = i;
-        @(posedge clk) #1;
-        if(data_out!=i+32) begin
-            $display("Test failed: on position %d, data_out is %d where it should be %d", i, data_out, i+32);
-            $finish;
-        end
-    end
+            for(i = 0; i < 16; i = i + 1) begin
+                r_addr = i;
+                @(posedge clk) #1;
+                if(data_out==i+32) begin
+                    $display("Test 1 failed: with r_en = 0, at position %d, data_out should be 0 but is %d", i, data_out);
+                    $finish;
+                end
+            end
 
-    #(5*clk_per);
-    $display("Test completed sucessfully.");
-    $finish;
+            r_en = 1;
+            @(posedge clk) #1;
 
+            //Read all the locations of RAM with r_en = 1
+            for(i = 0; i < 16; i = i + 1) begin
+                r_addr = i;
+                @(posedge clk) #1;
+                if(data_out!=i+32) begin
+                    $display("Test 2 failed: on position %d, data_out is %d where it should be %d", i, data_out, i+32);
+                    $finish;
+                end
+            end
+
+            r_en = 0;
+        `endif
+
+
+        //               //
+        //  Without RAM  //
+        //               //
+
+        `ifndef USE_RAM
+            `define USE_RAM 0
+
+            // optional VCD
+            `ifdef VCD
+                $dumpfile("2p_mem.vcd");
+                $dumpvars();
+            `endif
+
+            @(posedge clk) #1;
+            w_en = 1;
+
+            //Write all the locations of reg 
+            for(i = 0; i < 16; i = i + 1) begin
+                data_in = i + 32;
+                w_addr = i;
+                @(posedge clk) #1;
+            end
+
+            w_en = 0;    
+            @(posedge clk) #1;
+
+            //Read all the locations of reg
+            for(i = 0; i < 16; i = i + 1) begin
+                r_addr = i;
+                @(posedge clk) #1;
+                if(data_out!=i+32) begin
+                    $display("Test 3 failed: on position %d, data_out is %d where it should be %d", i, data_out, i+32);
+                    $finish;
+                end
+            end
+        `endif
+
+        #(5*clk_per);
+        $display("Test completed sucessfully.");
+        $finish;
     end
 
     // Instantiate the Unit Under Test (UUT)
     iob_2p_mem #(
         .DATA_W(`DATA_W),
         .ADDR_W(`ADDR_W),
-        .USE_RAM(0)
+        .USE_RAM(`USE_RAM)
     ) uut (
         .clk(clk), 
         .w_en(w_en),
