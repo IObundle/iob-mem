@@ -70,7 +70,7 @@ module iob_2p_mem_tb;
                 r_addr = i;
                 @(posedge clk) #1;
                 if(data_out!=0) begin
-                    $display("Test 1 failed: with r_en = 0, at position %d, data_out should be 0 but is %d", i, data_out);
+                    $display("Test 1 failed: with r_en = 0, at position %0d, data_out should be 0 but is %d", i, data_out);
                     $finish;
                 end
             end
@@ -84,7 +84,7 @@ module iob_2p_mem_tb;
             r_addr = i;
             @(posedge clk) #1;
             if(data_out!=i+32) begin
-                $display("Test 2 failed: on position %d, data_out is %d where it should be %d", i, data_out, i+32);
+                $display("Test 2 failed: on position %0d, data_out is %d where it should be %0d", i, data_out, i+32);
                 $finish;
             end
         end

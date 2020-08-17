@@ -77,7 +77,7 @@ module sfifo_tb;
         for(i=0; i < 16; i = i + 1) begin
             // Result will only be available in the next cycle
             if(data_out != i+32) begin
-                $display("Test 2 failed: read error in data_out.\n \t i=%d; data=%d when it should have been %d", i, data_out, i+32);
+                $display("Test 2 failed: read error in data_out.\n \t i=%0d; data=%d when it should have been %0d", i, data_out, i+32);
                 $finish;
             end
             @(posedge clk) #1;
