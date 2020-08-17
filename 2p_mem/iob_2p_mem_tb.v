@@ -24,7 +24,7 @@ module iob_2p_mem_tb;
     reg [`ADDR_W-1:0] r_addr;
     wire [`DATA_W-1:0] data_out;
 
-    integer i, ram_en = `USE_RAM;
+    integer i;
 
     parameter clk_per = 10; // clk period = 10 timeticks
 
@@ -38,11 +38,11 @@ module iob_2p_mem_tb;
 
         // optional VCD
         `ifdef VCD
-            if(ram_en == 1) begin
+            if(`USE_RAM == 1) begin
                 $dumpfile("2p_mem_ram.vcd");
                 $dumpvars();
             end
-            if(ram_en == 0) begin
+            if(`USE_RAM == 0) begin
                 $dumpfile("2p_mem.vcd");
                 $dumpvars();
             end
@@ -65,7 +65,7 @@ module iob_2p_mem_tb;
         r_en = 0;
         @(posedge clk) #1;
 
-        if(ram_en == 1) begin
+        if(`USE_RAM == 1) begin
             for(i = 0; i < 16; i = i + 1) begin
                 r_addr = i;
                 @(posedge clk) #1;

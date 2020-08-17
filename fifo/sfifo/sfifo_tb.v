@@ -22,7 +22,7 @@ module sfifo_tb;
    	wire full_out;
     reg [31:0] fifo_occupancy;
 
-    integer i, ram_en = `USE_RAM;
+    integer i;
 
     parameter clk_per = 10; // clk period = 10 timeticks
     
@@ -30,11 +30,11 @@ module sfifo_tb;
     initial begin
         // optional VCD
         `ifdef VCD
-            if(ram_en==0) begin
+            if(`USE_RAM==0) begin
                 $dumpfile("sfifo.vcd");
                 $dumpvars();
             end
-            if(ram_en==1) begin
+            if(`USE_RAM==1) begin
                 $dumpfile("sfifo_ram.vcd");
                 $dumpvars();
             end
@@ -73,7 +73,7 @@ module sfifo_tb;
         read=1;
 
         //Read all the locations of RAM. 
-        if(ram_en==1) @(posedge clk) #1; // why is this delay necessary when USE_RAM=1?
+        if(`USE_RAM==1) @(posedge clk) #1;
         for(i=0; i < 16; i = i + 1) begin
             // Result will only be available in the next cycle
             if(data_out != i+32) begin
