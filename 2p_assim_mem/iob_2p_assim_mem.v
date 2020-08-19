@@ -1,3 +1,5 @@
+`timescale 1ns / 1ps
+
 module iob_2p_assim_mem 
 	#(
 		parameter W_DATA_W = 16,
