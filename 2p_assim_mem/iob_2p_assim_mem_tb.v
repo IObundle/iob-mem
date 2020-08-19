@@ -89,8 +89,8 @@ module iob_2p_assim_mem_tb;
             for(i = 0 ; i < 4; i = i + 1) begin
                 r_addr = i;
                 @(posedge clk) #1;
-                if(data_out[7:0]!=i*4+seq_ini && data_out[15:8]!=i*4+1+seq_ini && 
-                    data_out[23:16]!=i*4+2+seq_ini && data_out[31:24]!=i*4+3+seq_ini) begin
+                if(data_out[7:0]!=i*4+seq_ini || data_out[15:8]!=i*4+1+seq_ini || 
+                    data_out[23:16]!=i*4+2+seq_ini || data_out[31:24]!=i*4+3+seq_ini) begin
                     $display("Test 1 failed: read error in data_out.\n\t");
                     $finish;
                 end
