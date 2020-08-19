@@ -28,7 +28,7 @@ module iob_2p_assim_mem_tb;
     // Outputs
     wire [`R_DATA-1:0] data_out;
 
-    integer i, j, seq_ini;
+    integer i, seq_ini;
 
     parameter clk_per = 10; // clk period = 10 timeticks
 
@@ -60,7 +60,9 @@ module iob_2p_assim_mem_tb;
         r_en = 0;
         data_in = 0;
         r_addr = 0; 
-        seq_ini = 32; // number from which to start the sequence to write into the RAM
+
+        // Number from which to start the incremental sequence to write into the RAM
+        seq_ini = 32;
 
         // Read data > write data
         if(`R_BIG==1) begin
@@ -73,7 +75,7 @@ module iob_2p_assim_mem_tb;
 
             //Write all the locations of RAM 
             w_en = 1; 
-            for(i = 0; i < (2**`W_ADDR); i = i + 1) begin
+            for(i = 0; i < 16; i = i + 1) begin
                 w_addr = i;
                 data_in = i+seq_ini;
                 @(posedge clk) #1;
@@ -84,16 +86,13 @@ module iob_2p_assim_mem_tb;
 
             //Read all the locations of RAM
             r_en = 1;
-            for(i = 0 ; i < (2**`R_ADDR); i = i + 1) begin
+            for(i = 0 ; i < 4; i = i + 1) begin
                 r_addr = i;
                 @(posedge clk) #1;
-                for( j = 0; j < (2**`R_ADDR); j = j + 1 ) begin
-                    //$display("data_out = %h", data_out[(j+1)*`W_DATA-1 -: `W_DATA]);
-                    if(data_out[(j+1)*`W_DATA-1 -: `W_DATA] != j+seq_ini + i*(2**`R_ADDR)) begin
-                        $display( "Test failed: read error in data_out.\n \t i=%0d; data = %h when it should have been %0h", 
-                            (j+1)*(2**`R_ADDR)+i*(2**`R_ADDR), data_out, j+seq_ini + i*(2**`R_ADDR) );
-                        $finish;
-                    end
+                if(data_out[7:0]!=i*4+seq_ini && data_out[15:8]!=i*4+1+seq_ini && 
+                    data_out[23:16]!=i*4+2+seq_ini && data_out[31:24]!=i*4+3+seq_ini) begin
+                    $display("Test 1 failed: read error in data_out.\n\t");
+                    $finish;
                 end
             end
             r_en = 0;
@@ -114,8 +113,6 @@ module iob_2p_assim_mem_tb;
                 data_in[15:8] = i*4+1   +seq_ini;
                 data_in[23:16] = i*4+2  +seq_ini;
                 data_in[31:24] = i*4+3  +seq_ini;
-                end
-                $display("%h", data_in);
                 w_addr = i;
                 @(posedge clk) #1;
             end
@@ -136,7 +133,6 @@ module iob_2p_assim_mem_tb;
             @(posedge clk) #1;
             r_en = 0;
         end
-
 
         #clk_per
         $display("Test completed successfully.");
