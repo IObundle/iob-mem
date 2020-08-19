@@ -1,6 +1,7 @@
 defmacro := -D
 
-RAM += $(defmacro)USE_RAM
+RAM = $(defmacro)USE_RAM
+R_BIG = $(defmacro)R_BIG
 
 # optional VCD
 ifeq ($(VCD),1)
@@ -8,8 +9,8 @@ ifeq ($(VCD),1)
 endif
 
 # simulator flags
-VSRC += *.v
-VLOG := iverilog -W all -g2005-sv $(DEFINE)
+VSRC = *.v
+VLOG = iverilog -W all -g2005-sv $(DEFINE)
 CMPLR := $(VLOG) $(VSRC)
 
 # hex files generation for tb
