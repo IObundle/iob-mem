@@ -2,7 +2,7 @@ include ../mem.mk
 
 #run the simulator
 run:
-	$(CMPLR) $(defmacro)R_BIG
+	$(CMPLR) $(R_BIG)
 	./a.out
 	$(CMPLR)
 	./a.out
