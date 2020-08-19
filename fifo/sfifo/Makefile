@@ -8,6 +8,8 @@ VSRC = $(2P_MEM)
 run:
 	$(CMPLR) $(VSRC) 
 	./a.out
+	$(CMPLR) $(VSRC) $(RAM)
+	./a.out
 
 clean:
 	@rm -f ./a.out *.vcd
