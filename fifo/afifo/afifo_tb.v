@@ -50,13 +50,17 @@ module async_fifo_tb;
        @(posedge wclk) #1;
        write = 1;
        for(i=0; i < 15; i = i + 1) begin
+           if(level_w !=i ) begin
+               $display("Test failed: write error in data_in.\n \t i=%0d; data=%0d; level_w=%0d", i, data_in, level_w);
+               $finish;
+           end
            data_in = i;
            @(posedge wclk) #1;
        end
      
        @(posedge wclk) #1;
        write = 0; //Fifo is now full
-       if(full_out!=1 && level_w!=15) begin
+       if(full_out!=1 || level_w!=15) begin
            $display("Test failed: fifo not full.");
            $finish;
        end
@@ -68,7 +72,7 @@ module async_fifo_tb;
        for(i=0; i < 15; i = i + 1) begin
            // Result will only be available in the next cycle
            @(posedge rclk) #1;
-           if(data_out != i) begin
+           if(data_out != i || level_r != 14-i) begin
                $display("Test failed: read error in data_out.\n \t i=%0d; data=%0d", i, data_out);
                $finish;
            end
@@ -77,7 +81,7 @@ module async_fifo_tb;
        @(posedge rclk) #1;
        read = 0; //Fifo is now empty
        @(posedge rclk) #1;
-       if(empty_out!=1 && level_r!=0) begin
+       if(empty_out!=1 || level_r!=0) begin
            $display("Test failed: fifo not empty.\n \t");
            $finish;
        end
@@ -111,4 +115,3 @@ module async_fifo_tb;
    always #(clk_per/2) rclk = ~rclk;
 
 endmodule // afifo_tb
-
