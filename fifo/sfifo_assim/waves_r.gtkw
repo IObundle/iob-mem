@@ -1,0 +1,36 @@
+[*]
+[*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
+[*] Thu Aug 20 11:01:07 2020
+[*]
+[dumpfile] "/home/josejoaquimsarmento/Documents/IObundle/mem_fork/fifo/sfifo_assim/sfifo_assim_r.vcd"
+[dumpfile_mtime] "Thu Aug 20 10:59:38 2020"
+[dumpfile_size] 4951
+[savefile] "/home/josejoaquimsarmento/Documents/IObundle/mem_fork/fifo/sfifo_assim/waves.gtkw"
+[timestart] 16000
+[size] 1843 600
+[pos] -46 -1
+*-15.284392 16000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 233
+[signals_width] 254
+[sst_expanded] 1
+[sst_vpaned_height] 144
+@28
+sfifo_assim_tb.clk
+sfifo_assim_tb.write
+@22
+sfifo_assim_tb.data_in[31:0]
+@29
+sfifo_assim_tb.read
+@22
+sfifo_assim_tb.data_out[7:0]
+@28
+sfifo_assim_tb.empty_out
+sfifo_assim_tb.full_out
+@22
+sfifo_assim_tb.fifo_occupancy[31:0]
+@420
+sfifo_assim_tb.i
+@28
+sfifo_assim_tb.reset
+[pattern_trace] 1
+[pattern_trace] 0
