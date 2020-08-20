@@ -1,0 +1,41 @@
+[*]
+[*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
+[*] Thu Aug 20 10:04:27 2020
+[*]
+[dumpfile] "/home/josejoaquimsarmento/Documents/IObundle/mem_fork/reg_file/reg_file.vcd"
+[dumpfile_mtime] "Thu Aug 20 10:04:19 2020"
+[dumpfile_size] 5471
+[savefile] "/home/josejoaquimsarmento/Documents/IObundle/mem_fork/reg_file/waves.gtkw"
+[timestart] 0
+[size] 1840 600
+[pos] -1 -1
+*-16.345009 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 233
+[signals_width] 198
+[sst_expanded] 1
+[sst_vpaned_height] 144
+@28
+iob_reg_file_tb.clk
+iob_reg_file_tb.en[1:0]
+@420
+iob_reg_file_tb.i
+@c00022
+>19200
+iob_reg_file_tb.addr[3:0]
+@28
+>0
+(0)iob_reg_file_tb.addr[3:0]
+(1)iob_reg_file_tb.addr[3:0]
+(2)iob_reg_file_tb.addr[3:0]
+(3)iob_reg_file_tb.addr[3:0]
+@1401200
+>19200
+-group_end
+@22
+>0
+iob_reg_file_tb.wdata[7:0]
+iob_reg_file_tb.rdata[7:0]
+@28
+iob_reg_file_tb.rst
+[pattern_trace] 1
+[pattern_trace] 0

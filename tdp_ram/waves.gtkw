@@ -1,0 +1,36 @@
+[*]
+[*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
+[*] Wed Aug 19 16:54:21 2020
+[*]
+[dumpfile] "/home/josejoaquimsarmento/Documents/IObundle/mem_fork/tdp_ram/sp_ram.vcd"
+[dumpfile_mtime] "Wed Aug 19 16:52:31 2020"
+[dumpfile_size] 8390
+[savefile] "/home/josejoaquimsarmento/Documents/IObundle/mem_fork/tdp_ram/waves.gtkw"
+[timestart] 0
+[size] 1842 600
+[pos] -46 -1
+*-16.318104 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 233
+[signals_width] 146
+[sst_expanded] 1
+[sst_vpaned_height] 144
+@28
+tdp_ram_tb.clk
+tdp_ram_tb.en_a
+@29
+tdp_ram_tb.we_a
+@22
+tdp_ram_tb.addr_a[3:0]
+tdp_ram_tb.data_a[7:0]
+tdp_ram_tb.q_a[7:0]
+@420
+tdp_ram_tb.i
+@28
+tdp_ram_tb.en_b
+tdp_ram_tb.we_b
+@22
+tdp_ram_tb.addr_b[3:0]
+tdp_ram_tb.data_b[7:0]
+tdp_ram_tb.q_b[7:0]
+[pattern_trace] 1
+[pattern_trace] 0

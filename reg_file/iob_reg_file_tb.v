@@ -46,16 +46,30 @@ module iob_reg_file_tb;
 
         //Write and real all the locations
         for(i=0; i < 16; i = i + 1) begin
+            addr = i;
             wdata = i;
             @(posedge clk) #1;
             if(rdata != i) begin
-                $display("Test failed: read error in rdata.\n \t i=%d; data=%d", i, rdata);
+                $display("Test 1 failed: read error in rdata.\n \t i=%0d; data=%0d", i, rdata);
                 $finish;
             end
+            @(posedge clk) #1;
         end
 
         @(posedge clk) #1;
         en = 0;
+        addr = 0;
+
+        //Read all the locations and check if still stored
+        for(i=0; i < 16; i = i + 1) begin
+            addr = i;
+            @(posedge clk) #1;
+            if(rdata != i) begin
+                $display("Test 2 failed: read error in rdata.\n \t i=%0d; data=%0d", i, rdata);
+                $finish;
+            end
+            @(posedge clk) #1;
+        end
 
         //Resets the entire memory
         @(posedge clk) #1; 
@@ -66,8 +80,10 @@ module iob_reg_file_tb;
 
         //Read all the locations and check if reset worked
         for(i=0; i < 16; i = i + 1) begin
+            addr = i;
+            @(posedge clk) #1;
             if(rdata != 0) begin
-                $display("Test failed: rdata is not null");
+                $display("Test 3 failed: rdata is not null");
                 $finish;
             end
             @(posedge clk) #1;

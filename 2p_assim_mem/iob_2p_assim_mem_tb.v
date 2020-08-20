@@ -94,6 +94,7 @@ module iob_2p_assim_mem_tb;
                     $display("Test 1 failed: read error in data_out.\n\t");
                     $finish;
                 end
+                @(posedge clk) #1;
             end
             r_en = 0;
         end
@@ -114,6 +115,7 @@ module iob_2p_assim_mem_tb;
                 data_in[23:16] = i*4+2  +seq_ini;
                 data_in[31:24] = i*4+3  +seq_ini;
                 w_addr = i;
+                #(clk_per);
                 @(posedge clk) #1;
             end
             w_en = 0;
