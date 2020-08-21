@@ -3,8 +3,8 @@ include $(ROOT_DIR)/mem.mk
 
 #run the simulator
 run:
-	$(CMPLR)
-	./a.out
+	@$(CMPLR)
+	@./a.out
 
 sim:
 	$(CMPLR) $(VCD)

@@ -12,10 +12,10 @@ endif
 
 #run the simulator
 run:
-	$(CMPLR) $(R_BIG)
-	./a.out
-	$(CMPLR)
-	./a.out
+	@$(CMPLR) $(R_BIG)
+	@./a.out
+	@$(CMPLR)
+	@./a.out
 
 sim:
 	$(CMPLR) $(VCD)
