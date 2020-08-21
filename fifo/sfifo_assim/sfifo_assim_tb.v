@@ -72,7 +72,7 @@ module sfifo_assim_tb;
         if(`R_BIG==0) begin
             // optional VCD
             `ifdef VCD
-                $dumpfile("sfifo_assim_r.vcd");
+                $dumpfile("sfifo_assim_w.vcd");
                 $dumpvars();
             `endif
 
@@ -103,7 +103,7 @@ module sfifo_assim_tb;
         if(`R_BIG==1) begin
             // optional VCD
             `ifdef VCD
-                $dumpfile("sfifo_assim_w.vcd");
+                $dumpfile("sfifo_assim_r.vcd");
                 $dumpvars();
             `endif
 

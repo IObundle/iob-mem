@@ -6,6 +6,12 @@ run:
 	$(CMPLR)
 	./a.out
 
+sim:
+	$(GEN_HEX1) && $(GEN_HEX2)
+	$(CMPLR) $(VCD)
+	./a.out
+	$(GTKW) $(WSRC)
+
 clean:
 	@rm -f ./a.out *.vcd *.hex
 
