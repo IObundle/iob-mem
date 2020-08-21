@@ -2,8 +2,8 @@
 
 #run the simulator
 run:
-	$(CMPLR)
-	./a.out
+	@$(CMPLR)
+	@./a.out
 
 sim:
 	$(CMPLR) $(VCD)

@@ -7,10 +7,10 @@ endif
 
 #run the simulator
 run:
-	$(CMPLR) $(USE_RAM)
-	./a.out
-	$(CMPLR)
-	./a.out
+	@$(CMPLR) $(USE_RAM)
+	@./a.out
+	@$(CMPLR)
+	@./a.out
 
 sim:
 	$(CMPLR) $(VCD)

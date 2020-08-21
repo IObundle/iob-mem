@@ -2,9 +2,9 @@
 
 # generate .hex file from string, checks from rom if string is valid
 run:
-	$(GEN_HEX1)
-	$(CMPLR)
-	./a.out
+	@$(GEN_HEX1)
+	@$(CMPLR)
+	@./a.out
 
 sim:
 	$(GEN_HEX1)
