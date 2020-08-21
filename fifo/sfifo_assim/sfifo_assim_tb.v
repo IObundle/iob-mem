@@ -72,7 +72,7 @@ module sfifo_assim_tb;
         if(`R_BIG==0) begin
             // optional VCD
             `ifdef VCD
-                $dumpfile("sfifo_assim_r.vcd");
+                $dumpfile("sfifo_assim_w.vcd");
                 $dumpvars();
             `endif
 
@@ -103,7 +103,7 @@ module sfifo_assim_tb;
         if(`R_BIG==1) begin
             // optional VCD
             `ifdef VCD
-                $dumpfile("sfifo_assim_w.vcd");
+                $dumpfile("sfifo_assim_r.vcd");
                 $dumpvars();
             `endif
 
@@ -139,7 +139,9 @@ module sfifo_assim_tb;
         end
 
         #clk_per
+        $display("%c[1;34m",27);
         $display("Test completed successfully.");
+        $display("%c[0m",27);
         #(5*clk_per) $finish;
     end
 endmodule // sfifo_assim_tb

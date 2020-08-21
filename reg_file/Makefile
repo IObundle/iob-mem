@@ -1,9 +1,14 @@
  include ../mem.mk
 
-# generate .hex file from string, checks from rom if string is valid
+#run the simulator
 run:
-	$(CMPLR)
+	@$(CMPLR)
+	@./a.out
+
+sim:
+	$(CMPLR) $(VCD)
 	./a.out
+	$(GTKW) $(WSRC)
 
 clean:
 	@rm -f ./a.out *.vcd

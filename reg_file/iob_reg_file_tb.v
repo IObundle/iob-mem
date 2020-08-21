@@ -90,7 +90,9 @@ module iob_reg_file_tb;
         end
 
         #clk_per
+        $display("%c[1;34m",27);
         $display("Test completed successfully.");
+        $display("%c[0m",27);
         #(5*clk_per) $finish;
 
     end
