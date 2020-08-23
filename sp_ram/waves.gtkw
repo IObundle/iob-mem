@@ -1,0 +1,30 @@
+[*]
+[*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
+[*] Wed Aug 19 16:47:18 2020
+[*]
+[dumpfile] "/home/josejoaquimsarmento/Documents/IObundle/mem_fork/sp_ram/sp_ram.vcd"
+[dumpfile_mtime] "Wed Aug 19 16:45:10 2020"
+[dumpfile_size] 4400
+[savefile] "/home/josejoaquimsarmento/Documents/IObundle/mem_fork/sp_ram/waves.gtkw"
+[timestart] 0
+[size] 1840 600
+[pos] -46 -1
+*-16.416416 170100 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 233
+[signals_width] 153
+[sst_expanded] 1
+[sst_vpaned_height] 144
+@28
+sp_ram_tb.clk
+@420
+sp_ram_tb.i
+@28
+sp_ram_tb.en
+sp_ram_tb.we
+@23
+sp_ram_tb.addr[3:0]
+@22
+sp_ram_tb.data_in[7:0]
+sp_ram_tb.data_out[7:0]
+[pattern_trace] 1
+[pattern_trace] 0

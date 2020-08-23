@@ -1,0 +1,36 @@
+[*]
+[*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
+[*] Thu Aug 20 10:55:12 2020
+[*]
+[dumpfile] "/home/josejoaquimsarmento/Documents/IObundle/mem_fork/fifo/afifo/afifo.vcd"
+[dumpfile_mtime] "Thu Aug 20 10:53:44 2020"
+[dumpfile_size] 10409
+[savefile] "/home/josejoaquimsarmento/Documents/IObundle/mem_fork/fifo/afifo/waves.gtkw"
+[timestart] 0
+[size] 1843 600
+[pos] -46 -1
+*-15.928679 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 233
+[signals_width] 159
+[sst_expanded] 1
+[sst_vpaned_height] 144
+@28
+async_fifo_tb.wclk
+async_fifo_tb.write
+@22
+async_fifo_tb.level_w[3:0]
+async_fifo_tb.data_in[7:0]
+async_fifo_tb.level_r[3:0]
+@421
+async_fifo_tb.i
+@28
+async_fifo_tb.rclk
+async_fifo_tb.read
+@22
+async_fifo_tb.data_out[7:0]
+@28
+async_fifo_tb.empty_out
+async_fifo_tb.full_out
+async_fifo_tb.reset
+[pattern_trace] 1
+[pattern_trace] 0

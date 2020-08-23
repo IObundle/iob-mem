@@ -1,14 +1,8 @@
-include ../mem.mk
-
-WSRC = waves.gtkw 2p_mem.vcd
-ifeq ($(RAM),1)
-	WSRC = waves_ram.gtkw 2p_mem_ram.vcd
-endif
+ROOT_DIR := ../..
+include $(ROOT_DIR)/mem.mk
 
 #run the simulator
 run:
-	@$(CMPLR) $(USE_RAM)
-	@./a.out
 	@$(CMPLR)
 	@./a.out
 

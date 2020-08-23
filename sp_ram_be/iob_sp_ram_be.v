@@ -1,4 +1,4 @@
-// True-Dual-Port BRAM with Byte-wide Write Enable
+// Single-Port BRAM with Byte-wide Write Enable
 // Read-First mode 
 
 `timescale 1 ns / 1 ps

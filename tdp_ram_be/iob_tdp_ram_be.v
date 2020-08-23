@@ -35,7 +35,7 @@ module iob_tdp_ram_be
    // Initialize the RAM
    initial
      if(mem_init_file_int != "none")
-       $readmemh(mem_init_file_int, ram_block, 0, 2**AADR_WIDTH - 1);
+       $readmemh(mem_init_file_int, ram_block, 0, 2**ADDR_WIDTH - 1);
    
    integer                        i;  
    
