@@ -28,7 +28,8 @@ module iob_2p_mem_tiled_tb;
     // Instantiate the Unit Under Test (UUT)
     iob_2p_mem_tiled #(
         .DATA_W(`DATA_W),
-        .N_WORDS(`N_WORDS)
+        .N_WORDS(`N_WORDS),
+        .USE_RAM(`USE_RAM)
     ) uut (
         .clk(clk), 
         .w_en(w_en),
