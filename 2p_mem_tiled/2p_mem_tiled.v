@@ -5,6 +5,7 @@ module iob_2p_mem_tiled
         parameter DATA_W  = 32,                         // data width
         parameter N_WORDS = 8192,                       // number of words (each word has 'DATA_W/8' bytes)
         parameter ADDR_W  = $clog2(N_WORDS*DATA_W/8.0), // address width
+        parameter TILE_ADDR_W = 11,                     // log2 of block size
         parameter USE_RAM = 0
     )
     (
@@ -20,7 +21,7 @@ module iob_2p_mem_tiled
     );
 
     // Number of BRAMs to generate, each containing 2048 bytes maximum
-    localparam K = $ceil(2**(ADDR_W-11)); // 2**11 == 2048
+    localparam K = $ceil(2**(ADDR_W-TILE_ADDR_W)); // 2**11 == 2048
 
     // Address decoder: enables write on selected BRAM
     wire [K-1:0] addr_en;   // address decoder output

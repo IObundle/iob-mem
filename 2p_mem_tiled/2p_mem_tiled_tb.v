@@ -5,8 +5,9 @@
 `endif
 
 `define DATA_W 16
-`define N_WORDS 8192
+`define N_WORDS 8000
 `define ADDR_W $clog2(`N_WORDS*`DATA_W/8)
+`define TILE_ADDR_W 13
 
 module iob_2p_mem_tiled_tb;
 
@@ -29,7 +30,8 @@ module iob_2p_mem_tiled_tb;
     iob_2p_mem_tiled #(
         .DATA_W(`DATA_W),
         .N_WORDS(`N_WORDS),
-        .USE_RAM(`USE_RAM)
+        .USE_RAM(`USE_RAM),
+        .TILE_ADDR_W(`TILE_ADDR_W)
     ) uut (
         .clk(clk), 
         .w_en(w_en),
