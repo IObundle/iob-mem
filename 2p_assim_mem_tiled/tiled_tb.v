@@ -11,9 +11,14 @@
     `define R_DATA 8
 `endif
 
+`ifndef USE_RAM
+    `define USE_RAM 0
+`endif
+
 `define WORDS 8192
-`define W_ADDR $clog2(`WORDS*`W_DATA)
-`define R_ADDR $clog2(`WORDS*`R_DATA)
+`define W_ADDR $clog2(`WORDS*`W_DATA/8)
+`define R_ADDR $clog2(`WORDS*`R_DATA/8)
+`define TILE_ADDR_W 11
 
 module iob_2p_assim_mem_tiled_tb;
 
@@ -37,7 +42,9 @@ module iob_2p_assim_mem_tiled_tb;
     iob_2p_assim_mem_tiled #(
         .DATA_W_A(`W_DATA),
         .DATA_W_B(`R_DATA),
-        .WORDS(`WORDS)
+        .N_WORDS(`WORDS),
+        .TILE_ADDR_W(`TILE_ADDR_W),
+        .USE_RAM(`USE_RAM)
     ) uut (
         .clk(clk), 
         .w_en(w_en),
