@@ -31,12 +31,12 @@ module iob_2p_mem_tiled
         .dec_out(addr_en)
     );
 
-    // Vector containing all BRAM outputs
-    wire [K*DATA_W-1:0] data_out_vec;
 
     // Generate K BRAMs
     genvar i;
     generate
+        // Vector containing all BRAM outputs
+        wire [DATA_W-1:0] data_out_vec [K-1:0];
         for(i = 0; i < K; i = i + 1) begin
             iob_2p_mem #(
                 .DATA_W(DATA_W),
@@ -91,19 +91,14 @@ module muxN
     )
     (
         // Inputs
-        input   [W-1:0]   data_in,  // input port
+        input   [INPUT_W-1:0]   data_in [N_INPUTS-1:0],  // input port
         input   [S-1:0]   sel,      // selection port
 
         // Outputs
         output reg [INPUT_W-1:0]   data_out  // output port
     );
-
-    integer i;
-    reg [INPUT_W-1:0] tmp;
  
     always @* begin
-        for(i = 0; i < INPUT_W; i = i + 1)
-            tmp[i] = data_in[INPUT_W*sel + i];
-        data_out = tmp;
+        data_out = data_in[sel];
     end
 endmodule
