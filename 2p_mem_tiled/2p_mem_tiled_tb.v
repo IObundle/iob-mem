@@ -55,11 +55,11 @@ module iob_2p_mem_tiled_tb;
         // optional VCD
         `ifdef VCD
             if(`USE_RAM == 1) begin
-                $dumpfile("2p_mem_ram.vcd");
+                $dumpfile("tiled_ram.vcd");
                 $dumpvars();
             end
             if(`USE_RAM == 0) begin
-                $dumpfile("2p_mem.vcd");
+                $dumpfile("tiled.vcd");
                 $dumpvars();
             end
         `endif
