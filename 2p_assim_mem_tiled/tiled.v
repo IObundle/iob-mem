@@ -45,7 +45,8 @@ module iob_2p_assim_mem_tiled
                 .W_DATA_W(DATA_W_A),
                 .W_ADDR_W(ADDR_W_A - $clog2(K)),
                 .R_DATA_W(DATA_W_B),
-                .R_ADDR_W(ADDR_W_B - $clog2(K))
+                .R_ADDR_W(ADDR_W_B - $clog2(K)),
+                .USE_RAM(USE_RAM)
             ) bram (
                 .clk(clk),
                 .w_en(w_en & addr_en[i]),

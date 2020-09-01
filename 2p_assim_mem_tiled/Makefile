@@ -15,6 +15,10 @@ endif
 run:
 	@$(CMPLR)
 	@./a.out
+	@$(CMPLR) $(USE_RAM)
+	@./a.out
+	@$(CMPLR) $(R_BIG)
+	@./a.out
 
 sim:
 	$(CMPLR) $(VCD)
