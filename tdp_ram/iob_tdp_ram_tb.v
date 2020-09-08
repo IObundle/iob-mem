@@ -34,7 +34,7 @@ module tdp_ram_tb;
     initial begin
         // optional VCD
         `ifdef VCD
-           $dumpfile("sp_ram.vcd");
+           $dumpfile("tdp_ram.vcd");
            $dumpvars();
         `endif
         
