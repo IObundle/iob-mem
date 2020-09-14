@@ -48,9 +48,6 @@ module iob_async_fifo
     input                       wclk
     );
 
-   //FIFO memory
-   reg [DATA_WIDTH-1:0]         mem [FIFO_DEPTH-1:0];
-
    //WRITE DOMAIN 
    wire [ADDRESS_WIDTH-1:0]     wptr;
    reg [ADDRESS_WIDTH-1:0]      rptr_sync[1:0];
@@ -89,9 +86,9 @@ module iob_async_fifo
    assign write_en_int = write_en & ~full;
    
    //write
-   always @ (posedge wclk)
-     if (write_en_int)
-       mem[wptr] <= data_in;
+   // always @ (posedge wclk)
+   //   if (write_en_int)
+   //     mem[wptr] <= data_in;
 
    gray_counter #(ADDRESS_WIDTH) wptr_counter (
                                                .clk(wclk),
@@ -117,9 +114,9 @@ module iob_async_fifo
    assign read_en_int  = read_en & ~empty;
    
    //read
-   always @ (posedge rclk)
-     if (read_en_int)
-       data_out <= mem[rptr];
+   // always @ (posedge rclk)
+   //   if (read_en_int)
+   //     data_out <= mem[rptr];
 
    gray_counter #(ADDRESS_WIDTH) rptr_counter (
                                                .clk(rclk),
@@ -134,6 +131,25 @@ module iob_async_fifo
 
    assign empty = (level_r == 0);
    
+   //
+   // FIFO memory
+   //
 
+   iob_2p_assim_async_mem #(
+   			    .W_DATA_W(DATA_WIDTH),
+   			    .W_ADDR_W(ADDRESS_WIDTH),
+   			    .R_DATA_W(DATA_WIDTH),
+   			    .R_ADDR_W(ADDRESS_WIDTH)
+   			    ) afifo_2p_assim_async_mem (
+   							.wclk(wclk),
+   							.w_en(write_en_int),
+   							.data_in(data_in),
+   							.w_addr(wptr),
+   							.rclk(rclk),
+   							.r_addr(rptr),
+   							.r_en(read_en_int),
+   							.data_out(data_out)
+   							);
+   
 endmodule
    

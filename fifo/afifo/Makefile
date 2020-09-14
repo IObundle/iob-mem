@@ -1,6 +1,9 @@
 ROOT_DIR := ../..
 include $(ROOT_DIR)/mem.mk
 
+# include iob_2p_assim_async_mem sources
+VSRC+=$(filter-out $(wildcard $(ROOT_DIR)/2p_assim_async_mem/*_tb.v), $(wildcard $(ROOT_DIR)/2p_assim_async_mem/*.v))
+
 #run the simulator
 run:
 	@$(CMPLR)
