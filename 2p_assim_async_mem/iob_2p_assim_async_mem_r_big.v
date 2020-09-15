@@ -41,47 +41,16 @@ module iob_2p_assim_async_mem_r_big
 	//writing to the RAM
 	always@(posedge wclk)
 		if (w_en)
-			ram[gray2binW(w_addr, W_ADDR_W)] <= data_in;
+			ram[w_addr] <= data_in;
 	
 	//reading from the RAM
 	always@(posedge rclk) begin
 		if (r_en) begin
 			for (i = 0; i < RATIO; i = i+1) begin
 				lsbaddr = i;
-				data_out[(i+1)*minDATA_W-1 -: minDATA_W] <= ram[{gray2binR(r_addr, R_ADDR_W), lsbaddr}];
+				data_out[(i+1)*minDATA_W-1 -: minDATA_W] <= ram[{r_addr, lsbaddr}];
 			end
 		end
 	end
-
-      //convert gray to binary code - Write addresses
-   function [W_ADDR_W-1:0] gray2binW;
-      input reg [W_ADDR_W-1:0] gr;
-      input integer 	       N;
-      begin: g2b
-	 reg [W_ADDR_W-1:0] bi;
-	 integer 	    i;
-	 
-	 bi[N-1] = gr[N-1];
-	 for (i=N-2;i>=0;i=i-1)
-           bi[i] = gr[i] ^ bi[i+1];
-	 
-	 gray2binW = bi;
-      end
-   endfunction
-   //convert gray to binary code - Read addresses
-   function [R_ADDR_W-1:0] gray2binR;
-      input reg [R_ADDR_W-1:0] gr;
-      input integer 	       N;
-      begin: g2b
-	 reg [R_ADDR_W-1:0] bi;
-	 integer 	    i;
-	 
-	 bi[N-1] = gr[N-1];
-	 for (i=N-2;i>=0;i=i-1)
-           bi[i] = gr[i] ^ bi[i+1];
-	 
-	 gray2binR = bi;
-      end
-   endfunction
 
 endmodule   
