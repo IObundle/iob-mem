@@ -92,6 +92,17 @@ module iob_2p_assim_mem_tiled_tb;
             w_en = 0;
 
             @(posedge clk) #1;
+
+            if(`USE_RAM == 1) begin
+                for(i = 0; i < 16; i = i + 1) begin
+                    r_addr = i;
+                    @(posedge clk) #1;
+                    if(data_out!=0) begin
+                        $display("Test 1 failed: with r_en = 0, at position %0d, data_out should be 0 but is %d", i, data_out);
+                        $finish;
+                    end
+                end
+            end
             
             //Read all the locations of RAM
             r_en = 1; 
@@ -132,7 +143,7 @@ module iob_2p_assim_mem_tiled_tb;
                 @(posedge clk) #1;
                 if(data_out[7:0]!=i*4+seq_ini || data_out[15:8]!=i*4+1+seq_ini || 
                     data_out[23:16]!=i*4+2+seq_ini || data_out[31:24]!=i*4+3+seq_ini) begin
-                    $display("Test 1 failed: read error in data_out.\n\t");
+                    $display("Test 3 failed: read error in data_out.\n\t");
                     $finish;
                 end
                 @(posedge clk) #1;
