@@ -201,9 +201,9 @@ module iob_afifo_assim
    							.wclk(wclk),
    							.w_en(write_en_int),
    							.data_in(data_in),
-   							.w_addr(wptr),
+   							.w_addr(gray2binW(wptr, W_ADDR_W)),
    							.rclk(rclk),
-   							.r_addr(rptr),
+   							.r_addr(gray2binR(rptr, R_ADDR_W)),
    							.r_en(read_en_int),
    							.data_out(data_out)
    							);
