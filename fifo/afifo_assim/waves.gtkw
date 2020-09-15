@@ -1,0 +1,40 @@
+[*]
+[*] GTKWave Analyzer v3.3.61 (w)1999-2014 BSI
+[*] Tue Sep 15 15:48:16 2020
+[*]
+[dumpfile] "/home/pmiranda/sandbox/iob-mem/fifo/afifo_assim/afifo.vcd"
+[dumpfile_mtime] "Tue Sep 15 15:44:48 2020"
+[dumpfile_size] 12488
+[savefile] "/home/pmiranda/sandbox/iob-mem/fifo/afifo_assim/waves.gtkw"
+[timestart] 0
+[size] 1920 1023
+[pos] -1921 -15
+*-15.928679 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] afifo_assim_tb.
+[treeopen] afifo_assim_tb.uut.
+[sst_width] 233
+[signals_width] 159
+[sst_expanded] 1
+[sst_vpaned_height] 283
+@28
+afifo_assim_tb.uut.rst
+@22
+afifo_assim_tb.uut.data_out[7:0]
+@28
+afifo_assim_tb.uut.empty
+@22
+afifo_assim_tb.uut.level_r[3:0]
+@28
+afifo_assim_tb.uut.read_en
+afifo_assim_tb.uut.rclk
+@22
+afifo_assim_tb.uut.data_in[7:0]
+@28
+afifo_assim_tb.uut.full
+@22
+afifo_assim_tb.uut.level_w[3:0]
+@28
+afifo_assim_tb.uut.write_en
+afifo_assim_tb.uut.wclk
+[pattern_trace] 1
+[pattern_trace] 0
