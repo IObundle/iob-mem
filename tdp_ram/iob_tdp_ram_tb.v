@@ -32,12 +32,12 @@ module tdp_ram_tb;
     parameter clk_per = 10; // clk period = 10 timeticks
 
     initial begin
-        // optional VCD
-        `ifdef VCD
-           $dumpfile("tdp_ram.vcd");
-           $dumpvars();
-        `endif
-        
+       // optional VCD
+`ifdef VCD
+       $dumpfile("tdp_ram.vcd");
+       $dumpvars(1,tdp_ram_tb);
+`endif
+       
         //Initialize Inputs
         clk = 1;
 
