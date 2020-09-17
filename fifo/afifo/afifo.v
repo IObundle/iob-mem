@@ -122,7 +122,7 @@ module iob_async_fifo
    //   if (read_en_int)
    //     data_out <= mem[rptr];
 
-   gray_counter #(.COUNTER_WIDTH(R_ADDR_W)) rptr_counter (
+   gray_counter #(.COUNTER_WIDTH(ADDRESS_WIDTH)) rptr_counter (
                                                .clk(rclk),
                                                .rst(rst), 
                                                .en(read_en_int),
