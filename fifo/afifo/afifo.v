@@ -28,22 +28,27 @@ module iob_async_fifo
   #(parameter 
     DATA_WIDTH = 8, 
     ADDRESS_WIDTH = 4, 
-    FIFO_DEPTH = (1 << ADDRESS_WIDTH)
+    FIFO_DEPTH = (1 << ADDRESS_WIDTH),
+    R_DATA_W = DATA_WIDTH,
+    R_ADDR_W = ADDRESS_WIDTH,
+    W_DATA_W = DATA_WIDTH,
+    W_ADDR_W = ADDRESS_WIDTH,
+    W_FIFO_DEPTH = (1 << W_ADDR_W)
     )
    (
     input                       rst,
 
     //read port
-    output reg [DATA_WIDTH-1:0] data_out, 
+    output reg [R_DATA_W:0] data_out, 
     output                      empty,
-    output [ADDRESS_WIDTH-1:0]  level_r,
+    output [R_ADDR_W-1:0]  level_r,
     input                       read_en,
     input                       rclk, 
 
     //write port	 
-    input [DATA_WIDTH-1:0]      data_in, 
+    input [W_DATA_W-1:0]      data_in, 
     output                      full,
-    output [ADDRESS_WIDTH-1:0]  level_w,
+    output [W_ADDR_W-1:0]  level_w,
     input                       write_en,
     input                       wclk
     );
@@ -52,13 +57,13 @@ module iob_async_fifo
    reg [DATA_WIDTH-1:0] 	mem [FIFO_DEPTH-1:0];
       
    //WRITE DOMAIN 
-   wire [ADDRESS_WIDTH-1:0]     wptr;
-   reg [ADDRESS_WIDTH-1:0]      rptr_sync[1:0];
+   wire [W_ADDR_W-1:0]     wptr;
+   reg [W_ADDR_W-1:0]      rptr_sync[1:0];
    wire                         write_en_int;
    
    //READ DOMAIN    
-   wire [ADDRESS_WIDTH-1:0]     rptr;
-   reg [ADDRESS_WIDTH-1:0]      wptr_sync[1:0];
+   wire [R_ADDR_W-1:0]     rptr;
+   reg [R_ADDR_W-1:0]      wptr_sync[1:0];
    wire                         read_en_int;
 
    //convert gray to binary code
@@ -93,14 +98,14 @@ module iob_async_fifo
      if (write_en_int)
        mem[wptr] <= data_in;
 
-   gray_counter #(ADDRESS_WIDTH) wptr_counter (
+   gray_counter #(.COUNTER_WIDTH(W_ADDR_W)) wptr_counter (
                                                .clk(wclk),
                                                .rst(rst), 
                                                .en(write_en_int),
                                                .data_out(wptr)
                                                );
    //compute binary pointer difference
-   assign level_w = gray2bin(wptr, ADDRESS_WIDTH) - gray2bin(rptr_sync[1], ADDRESS_WIDTH);
+   assign level_w = gray2bin(wptr, W_ADDR_W) - gray2bin(rptr_sync[1], W_ADDR_W);
    
    assign full = (level_w == (FIFO_DEPTH-1));
 
@@ -117,11 +122,11 @@ module iob_async_fifo
    assign read_en_int  = read_en & ~empty;
    
    //read
-   always @ (posedge rclk)
-     if (read_en_int)
-       data_out <= mem[rptr];
+   // always @ (posedge rclk)
+   //   if (read_en_int)
+   //     data_out <= mem[rptr];
 
-   gray_counter #(ADDRESS_WIDTH) rptr_counter (
+   gray_counter #(.COUNTER_WIDTH(R_ADDR_W)) rptr_counter (
                                                .clk(rclk),
                                                .rst(rst), 
                                                .en(read_en_int),
@@ -129,10 +134,26 @@ module iob_async_fifo
                                               );
    
    //compute binary pointer difference
-   assign level_r = gray2bin(wptr_sync[1], ADDRESS_WIDTH) - gray2bin(rptr, ADDRESS_WIDTH);
+   assign level_r = gray2bin(wptr_sync[1], R_ADDR_W) - gray2bin(rptr, R_ADDR_W);
    
 
    assign empty = (level_r == 0);
+
+   iob_2p_assim_async_mem #(
+            .W_DATA_W(W_DATA_W),
+            .W_ADDR_W(W_ADDR_W),
+            .R_DATA_W(R_DATA_W),
+            .R_ADDR_W(R_ADDR_W)
+            ) afifo_2p_assim_async_mem (
+                .wclk(wclk),
+                .w_en(write_en_int),
+                .data_in(data_in),
+                .w_addr(W_ADDR_W),
+                .rclk(rclk),
+                .r_addr(R_ADDR_W),
+                .r_en(read_en_int),
+                .data_out(data_out)
+                );
       
 endmodule
    
