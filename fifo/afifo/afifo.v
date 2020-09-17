@@ -53,7 +53,7 @@ module iob_async_fifo
    reg [DATA_WIDTH-1:0] 	mem [FIFO_DEPTH-1:0];
       
    //WRITE DOMAIN 
-   wire [W_ADDR_W-1:0]     wptr;
+   wire [ADDRESS_WIDTH-1:0]     wptr;
    reg [W_ADDR_W-1:0]      rptr_sync[1:0];
    wire                         write_en_int;
    
