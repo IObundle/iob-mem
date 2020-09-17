@@ -130,7 +130,7 @@ module iob_async_fifo
                                               );
    
    //compute binary pointer difference
-   assign level_r = gray2bin(wptr_sync[1], R_ADDR_W) - gray2bin(rptr, R_ADDR_W);
+   assign level_r = gray2bin(wptr_sync[1], ADDRESS_WIDTH) - gray2bin(rptr, ADDRESS_WIDTH);
    
 
    assign empty = (level_r == 0);
