@@ -101,7 +101,7 @@ module iob_async_fifo
                                                .data_out(wptr)
                                                );
    //compute binary pointer difference
-   assign level_w = gray2bin(wptr, W_ADDR_W) - gray2bin(rptr_sync[1], W_ADDR_W);
+   assign level_w = gray2bin(wptr, ADDRESS_WIDTH) - gray2bin(rptr_sync[1], ADDRESS_WIDTH);
    
    assign full = (level_w == (FIFO_DEPTH-1));
 
