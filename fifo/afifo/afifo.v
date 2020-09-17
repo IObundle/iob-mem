@@ -58,8 +58,8 @@ module iob_async_fifo
    wire                         write_en_int;
    
    //READ DOMAIN    
-   wire [R_ADDR_W-1:0]     rptr;
-   reg [R_ADDR_W-1:0]      wptr_sync[1:0];
+   wire [ADDRESS_WIDTH-1:0]     rptr;
+   reg [ADDRESS_WIDTH-1:0]      wptr_sync[1:0];
    wire                         read_en_int;
 
    //convert gray to binary code
