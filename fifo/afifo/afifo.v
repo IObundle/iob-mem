@@ -116,11 +116,6 @@ module iob_async_fifo
 
    //effective read enable
    assign read_en_int  = read_en & ~empty;
-   
-   //read
-   // always @ (posedge rclk)
-   //   if (read_en_int)
-   //     data_out <= mem[rptr];
 
    gray_counter #(.COUNTER_WIDTH(ADDRESS_WIDTH)) rptr_counter (
                                                .clk(rclk),
