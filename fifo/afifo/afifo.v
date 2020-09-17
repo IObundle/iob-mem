@@ -28,9 +28,9 @@ module iob_async_fifo
   #(parameter 
     DATA_WIDTH = 8, 
     ADDRESS_WIDTH = 4, 
-    FIFO_DEPTH = (1 << ADDRESS_WIDTH),
+    FIFO_DEPTH = (1 << ADDRESS_WIDTH)
 // For simetric fifo, we don't need to distinguish between DATA_W and ADDR_W for write and read
-    )
+  )
    (
     input                       rst,
 
@@ -41,7 +41,7 @@ module iob_async_fifo
     input                       read_en,
     input                       rclk, 
 
-    //write port	 
+    //write port   
     input [DATA_WIDTH-1:0]      data_in, 
     output                      full,
     output [ADDRESS_WIDTH-1:0]  level_w,
@@ -50,7 +50,7 @@ module iob_async_fifo
     );
 
    //FIFO memory
-   reg [DATA_WIDTH-1:0] 	mem [FIFO_DEPTH-1:0];
+   reg [DATA_WIDTH-1:0]   mem [FIFO_DEPTH-1:0];
       
    //WRITE DOMAIN 
    wire [ADDRESS_WIDTH-1:0]     wptr;
@@ -67,14 +67,14 @@ module iob_async_fifo
       input reg [ADDRESS_WIDTH-1:0] gr;
       input integer                 N;
       begin: g2b
-	 reg [ADDRESS_WIDTH-1:0] bi;
-	 integer                 i;
-	 
-	 bi[N-1] = gr[N-1];
-	 for (i=N-2;i>=0;i=i-1)
+   reg [ADDRESS_WIDTH-1:0] bi;
+   integer                 i;
+   
+   bi[N-1] = gr[N-1];
+   for (i=N-2;i>=0;i=i-1)
            bi[i] = gr[i] ^ bi[i+1];
-	 
-	 gray2bin = bi;
+   
+   gray2bin = bi;
       end
    endfunction
    
@@ -147,4 +147,3 @@ module iob_async_fifo
                 );
       
 endmodule
-   
