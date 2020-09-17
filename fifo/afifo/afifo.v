@@ -94,7 +94,7 @@ module iob_async_fifo
      if (write_en_int)
        mem[wptr] <= data_in;
 
-   gray_counter #(.COUNTER_WIDTH(W_ADDR_W)) wptr_counter (
+   gray_counter #(.COUNTER_WIDTH(ADDRESS_WIDTH)) wptr_counter (
                                                .clk(wclk),
                                                .rst(rst), 
                                                .en(write_en_int),
