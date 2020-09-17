@@ -136,10 +136,10 @@ module iob_async_fifo
    assign empty = (level_r == 0);
 
    iob_2p_assim_async_mem #(
-            .W_DATA_W(W_DATA_W),
-            .W_ADDR_W(W_ADDR_W),
-            .R_DATA_W(R_DATA_W),
-            .R_ADDR_W(R_ADDR_W)
+            .W_DATA_W(DATA_WIDTH),
+            .W_ADDR_W(ADDRESS_WIDTH),
+            .R_DATA_W(DATA_WIDTH),
+            .R_ADDR_W(ADDRESS_WIDTH)
             ) afifo_2p_assim_async_mem (
                 .wclk(wclk),
                 .w_en(write_en_int),
