@@ -29,7 +29,8 @@ module iob_async_fifo
     DATA_WIDTH = 8, 
     ADDRESS_WIDTH = 4, 
     FIFO_DEPTH = (1 << ADDRESS_WIDTH)
-    )
+// For simetric fifo, we don't need to distinguish between DATA_W and ADDR_W for write and read
+  )
    (
     input                       rst,
 
@@ -40,7 +41,7 @@ module iob_async_fifo
     input                       read_en,
     input                       rclk, 
 
-    //write port	 
+    //write port   
     input [DATA_WIDTH-1:0]      data_in, 
     output                      full,
     output [ADDRESS_WIDTH-1:0]  level_w,
@@ -49,7 +50,7 @@ module iob_async_fifo
     );
 
    //FIFO memory
-   reg [DATA_WIDTH-1:0] 	mem [FIFO_DEPTH-1:0];
+   reg [DATA_WIDTH-1:0]   mem [FIFO_DEPTH-1:0];
       
    //WRITE DOMAIN 
    wire [ADDRESS_WIDTH-1:0]     wptr;
@@ -66,14 +67,14 @@ module iob_async_fifo
       input reg [ADDRESS_WIDTH-1:0] gr;
       input integer                 N;
       begin: g2b
-	 reg [ADDRESS_WIDTH-1:0] bi;
-	 integer                 i;
-	 
-	 bi[N-1] = gr[N-1];
-	 for (i=N-2;i>=0;i=i-1)
+   reg [ADDRESS_WIDTH-1:0] bi;
+   integer                 i;
+   
+   bi[N-1] = gr[N-1];
+   for (i=N-2;i>=0;i=i-1)
            bi[i] = gr[i] ^ bi[i+1];
-	 
-	 gray2bin = bi;
+   
+   gray2bin = bi;
       end
    endfunction
    
@@ -93,7 +94,7 @@ module iob_async_fifo
      if (write_en_int)
        mem[wptr] <= data_in;
 
-   gray_counter #(ADDRESS_WIDTH) wptr_counter (
+   gray_counter #(.COUNTER_WIDTH(ADDRESS_WIDTH)) wptr_counter (
                                                .clk(wclk),
                                                .rst(rst), 
                                                .en(write_en_int),
@@ -115,13 +116,8 @@ module iob_async_fifo
 
    //effective read enable
    assign read_en_int  = read_en & ~empty;
-   
-   //read
-   always @ (posedge rclk)
-     if (read_en_int)
-       data_out <= mem[rptr];
 
-   gray_counter #(ADDRESS_WIDTH) rptr_counter (
+   gray_counter #(.COUNTER_WIDTH(ADDRESS_WIDTH)) rptr_counter (
                                                .clk(rclk),
                                                .rst(rst), 
                                                .en(read_en_int),
@@ -133,6 +129,21 @@ module iob_async_fifo
    
 
    assign empty = (level_r == 0);
+
+   iob_2p_assim_async_mem #(
+            .W_DATA_W(DATA_WIDTH),
+            .W_ADDR_W(ADDRESS_WIDTH),
+            .R_DATA_W(DATA_WIDTH),
+            .R_ADDR_W(ADDRESS_WIDTH)
+            ) afifo_2p_assim_async_mem (
+                .wclk(wclk),
+                .w_en(write_en_int),
+                .data_in(data_in),
+                .w_addr(W_ADDR_W),
+                .rclk(rclk),
+                .r_addr(R_ADDR_W),
+                .r_en(read_en_int),
+                .data_out(data_out)
+                );
       
 endmodule
-   
