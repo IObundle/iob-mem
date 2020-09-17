@@ -37,7 +37,7 @@ module iob_async_fifo
     //read port
     output reg [DATA_WIDTH-1:0] data_out, 
     output                      empty,
-    output [R_ADDR_W-1:0]  level_r,
+    output [ADDRESS_WIDTH-1:0]  level_r,
     input                       read_en,
     input                       rclk, 
 
