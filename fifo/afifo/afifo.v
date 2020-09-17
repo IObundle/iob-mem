@@ -29,11 +29,7 @@ module iob_async_fifo
     DATA_WIDTH = 8, 
     ADDRESS_WIDTH = 4, 
     FIFO_DEPTH = (1 << ADDRESS_WIDTH),
-    R_DATA_W = DATA_WIDTH,
-    R_ADDR_W = ADDRESS_WIDTH,
-    W_DATA_W = DATA_WIDTH,
-    W_ADDR_W = ADDRESS_WIDTH,
-    W_FIFO_DEPTH = (1 << W_ADDR_W)
+// For simetric fifo, we don't need to distinguish between DATA_W and ADDR_W for write and read
     )
    (
     input                       rst,
