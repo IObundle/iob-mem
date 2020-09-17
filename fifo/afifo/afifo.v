@@ -44,7 +44,7 @@ module iob_async_fifo
     //write port	 
     input [DATA_WIDTH-1:0]      data_in, 
     output                      full,
-    output [W_ADDR_W-1:0]  level_w,
+    output [ADDRESS_WIDTH-1:0]  level_w,
     input                       write_en,
     input                       wclk
     );
