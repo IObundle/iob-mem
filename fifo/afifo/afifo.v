@@ -42,7 +42,7 @@ module iob_async_fifo
     input                       rclk, 
 
     //write port	 
-    input [W_DATA_W-1:0]      data_in, 
+    input [DATA_WIDTH-1:0]      data_in, 
     output                      full,
     output [W_ADDR_W-1:0]  level_w,
     input                       write_en,
