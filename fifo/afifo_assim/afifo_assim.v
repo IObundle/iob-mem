@@ -4,7 +4,7 @@
 `define min(a,b) {(a) < (b) ? (a) : (b)}
 
 
-module gray_counter #(
+module gray_counter_assim #(
 		      parameter   COUNTER_WIDTH = 4
  		      ) (
     input wire                 rst, //Count reset.
@@ -143,7 +143,7 @@ module iob_afifo_assim
    //   if (write_en_int)
    //     mem[wptr] <= data_in;
 
-   gray_counter #(
+   gray_counter_assim #(
 		  .COUNTER_WIDTH(W_ADDR_W)
 		  ) wptr_counter (
                                                .clk(wclk),
@@ -173,7 +173,7 @@ module iob_afifo_assim
    //   if (read_en_int)
    //     data_out <= mem[rptr];
 
-   gray_counter #(
+   gray_counter_assim #(
 		  .COUNTER_WIDTH(maxADDR_W)
 		  ) rptr_counter (
                                                .clk(rclk),
