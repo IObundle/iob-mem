@@ -31,14 +31,9 @@ endmodule
 
 module iob_afifo_assim
   #(parameter 
-    DATA_WIDTH = 8, 
-    ADDRESS_WIDTH = 4, 
-    FIFO_DEPTH = (1 << ADDRESS_WIDTH),
-    R_DATA_W = DATA_WIDTH,
-    R_ADDR_W = ADDRESS_WIDTH,
-    W_DATA_W = DATA_WIDTH,
-    W_ADDR_W = ADDRESS_WIDTH,
-    W_FIFO_DEPTH = (1 << W_ADDR_W)
+    R_DATA_W = 32,
+    W_DATA_W = 32,
+    ADDR_W = 8 // ADDR_W of smallest DATA_W size
     )
    (
     input 		      rst,
@@ -59,11 +54,13 @@ module iob_afifo_assim
     );
 
    //local variables
-   localparam maxADDR_W = `max(W_ADDR_W, R_ADDR_W);
-   localparam minADDR_W = `min(W_ADDR_W, R_ADDR_W);
-   localparam ADDR_W_DIFF = maxADDR_W - minADDR_W;
-   localparam W_COUNTER_STEP = (W_DATA_W/`min(W_DATA_W, R_DATA_W));
-   localparam R_COUNTER_STEP = (R_DATA_W/`min(W_DATA_W, R_DATA_W));
+   localparam NAR_ADDR_W = ADDR_W-$clog2(`max(W_DATA_W, R_DATA_W)/`min(W_DATA_W, R_DATA_W));
+   localparam R_ADDR_W = (`max(R_DATA_W, W_DATA_W) == R_DATA_W) ? NAR_ADDR_W : ADDR_W;
+   localparam W_ADDR_W = (`max(R_DATA_W, W_DATA_W) == W_DATA_W) ? NAR_ADDR_W : ADDR_W;
+   localparam ADDR_W_DIFF = ADDR_W - NAR_ADDR_W;
+   localparam W_FIFO_DEPTH = (1 << W_ADDR_W);
+      
+
    
    //WRITE DOMAIN 
    wire [W_ADDR_W-1:0] 	      wptr;
@@ -138,11 +135,6 @@ module iob_afifo_assim
    //effective write enable
    assign write_en_int = write_en & ~full;
    
-   //write
-   // always @ (posedge wclk)
-   //   if (write_en_int)
-   //     mem[wptr] <= data_in;
-
    gray_counter_assim #(
 		  .COUNTER_WIDTH(W_ADDR_W)
 		  ) wptr_counter (
@@ -168,13 +160,8 @@ module iob_afifo_assim
    //effective read enable
    assign read_en_int  = read_en & ~empty;
    
-   //read
-   // always @ (posedge rclk)
-   //   if (read_en_int)
-   //     data_out <= mem[rptr];
-
    gray_counter_assim #(
-		  .COUNTER_WIDTH(maxADDR_W)
+		  .COUNTER_WIDTH(R_ADDR_W)
 		  ) rptr_counter (
                                                .clk(rclk),
                                                .rst(rst), 

@@ -7,16 +7,23 @@
 // `define WR_RATIO 4
 `ifdef WR_RATIO
  `define W_DATA_W (`DATA_W*`WR_RATIO)
- `define W_ADDR_W (`ADDR_W)
  `define R_DATA_W (`DATA_W)
- `define R_ADDR_W (`ADDR_W+$clog2(`WR_RATIO))
+ `define FIFO_ADDR_W (`ADDR_W+$clog2(`WR_RATIO))
+
+// TB defines
+ `define W_ADDR_W (`ADDR_W)
+ `define R_ADDR_W (`FIFO_ADDR_W)
 `endif
 
 `ifdef RW_RATIO
  `define W_DATA_W (`DATA_W)
- `define W_ADDR_W (`ADDR_W+$clog2(`RW_RATIO))
+ `define FIFO_ADDR_W (`ADDR_W+$clog2(`RW_RATIO))
  `define R_DATA_W (`DATA_W*`RW_RATIO)
+
+// TB defines
  `define R_ADDR_W (`ADDR_W)
+ `define W_ADDR_W (`FIFO_ADDR_W)
+
 `endif
 
 // `define R_RATIO (`W_DATA_W/`R_DATA_W)
@@ -139,9 +146,8 @@ module afifo_assim_tb;
       // Instantiate the Unit Under Test (UUT)
    iob_afifo_assim #(
 		    .W_DATA_W(`W_DATA_W),
-		    .W_ADDR_W(`W_ADDR_W),
 		    .R_DATA_W(`R_DATA_W),
-		    .R_ADDR_W(`R_ADDR_W)
+		    .ADDR_W(`FIFO_ADDR_W)
    ) uut (
        .rst(reset),
        .data_out(data_out),
