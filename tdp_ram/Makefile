@@ -1,7 +1,7 @@
 include ../mem.mk
 
-VCD2DROM = python vcd2wavedrom.py --input tdp_ram.vcd --config tdp_ram.json --output tdp_ram.drom
-PNG = npx wavedrom-cli -i tdp_ram.drom -p tdp_ram_print.png
+VCD2DROM = vcd2wavedrom.py --config tdp_ram_config.json --input tdp_ram.vcd --output tdp_ram.drom
+PNG = npx wavedrom-cli -i tdp_ram.drom -p tdp_ram.png
 
 # generate .hex file from string, checks from ram if string is valid
 run:
@@ -13,12 +13,12 @@ sim:
 	$(GEN_HEX1) && $(GEN_HEX2)
 	$(CMPLR) $(VCD)
 	./a.out
-	$(VCD2DROM) && $(PNG)
+	$(VCD2DROM)
+	$(PNG)
 	$(GTKW) $(WSRC)
 
 
-
 clean:
-	@rm -f ./a.out *.vcd *.hex *.drom *.png *~ *.pyc
+	@rm -f ./a.out *.vcd *.hex *.drom
 
 .PHONY: clean
