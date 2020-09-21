@@ -15,7 +15,7 @@
         "tdp_ram_tb.q_b[7:0]"
     ],
     "offset": 0,
-    "samplerate": 20000,
-    "clocks": ["clk"],
-    "maxtime": 100000
+    "samplerate": 10000,
+    "clocks": ["tdp_ram_tb.clk"],
+    "maxtime": 200000
 }
