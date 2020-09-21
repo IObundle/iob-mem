@@ -27,8 +27,7 @@ endmodule
 module iob_async_fifo
   #(parameter 
     DATA_WIDTH = 8, 
-    ADDRESS_WIDTH = 4, 
-    FIFO_DEPTH = (1 << ADDRESS_WIDTH)
+    ADDRESS_WIDTH = 4
     )
    (
     input                       rst,
@@ -48,6 +47,8 @@ module iob_async_fifo
     input                       wclk
     );
 
+   localparam FIFO_DEPTH = (1 << ADDRESS_WIDTH);
+   
    //FIFO memory
    reg [DATA_WIDTH-1:0] 	mem [FIFO_DEPTH-1:0];
       
