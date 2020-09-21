@@ -37,6 +37,7 @@ module tdp_ram_tb;
            $dumpfile("tdp_ram.vcd");
            $dumpvars();
         `endif
+        $dumpoff();
         
         //Initialize Inputs
         clk = 1;
@@ -60,6 +61,7 @@ module tdp_ram_tb;
         @(posedge clk) #1;
         en_a = 1;
 
+        $dumpon();
         // read from file stored in port A
         @(posedge clk) #1;
         for(i = 0; i < 16; i = i + 1) begin
@@ -70,7 +72,7 @@ module tdp_ram_tb;
                 $finish;
             end
         end
-        
+
         #clk_per
 
         @(posedge clk) #1;
@@ -87,7 +89,8 @@ module tdp_ram_tb;
                 $finish;
             end
         end
-        
+        $dumpoff();
+
         #clk_per
 
         $readmemh(`hex_file2, filemem);

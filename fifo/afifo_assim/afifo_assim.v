@@ -64,16 +64,17 @@ module iob_afifo_assim
    
    //WRITE DOMAIN 
    wire [W_ADDR_W-1:0] 	      wptr;
-   reg [W_ADDR_W-1:0] 	      rptr_sync[1:0];
+   reg [R_ADDR_W-1:0] 	      rptr_sync[1:0];
    wire 		      write_en_int;
+   wire [R_ADDR_W-1:0] 	      rptr_bin;
    wire [W_ADDR_W-1:0] 	      rptr_wire;
    
-
    
    //READ DOMAIN    
    wire [R_ADDR_W-1:0] 	      rptr;
-   reg [R_ADDR_W-1:0] 	      wptr_sync[1:0];
+   reg [W_ADDR_W-1:0] 	      wptr_sync[1:0];
    wire 		      read_en_int;
+   wire [W_ADDR_W-1:0] 	      wptr_bin;
    wire [R_ADDR_W-1:0] 	      wptr_wire;
    
    
@@ -109,16 +110,19 @@ module iob_afifo_assim
    endfunction
    
    //convert pointers to other domain ADDR_W
+   assign rptr_bin = gray2binR(rptr_sync[1], R_ADDR_W);
+   assign wptr_bin = gray2binW(wptr_sync[1], W_ADDR_W);
+
    generate
       if(W_ADDR_W > R_ADDR_W) begin
-	 assign rptr_wire = {rptr, {ADDR_W_DIFF{1'b0}}};
-	 assign wptr_wire = wptr[W_ADDR_W-1:ADDR_W_DIFF];
+	 assign rptr_wire = {rptr_bin, {ADDR_W_DIFF{1'b0}}};
+	 assign wptr_wire = wptr_bin[W_ADDR_W-1:ADDR_W_DIFF];
       end else if (W_ADDR_W == R_ADDR_W) begin
-	 assign rptr_wire = rptr;
-	 assign wptr_wire = wptr;
+	 assign rptr_wire = rptr_bin;
+	 assign wptr_wire = wptr_bin;
       end else begin
-	 assign rptr_wire = rptr[R_ADDR_W-1:ADDR_W_DIFF];
-	 assign wptr_wire = {wptr, {ADDR_W_DIFF{1'b0}}};	 
+	 assign rptr_wire = rptr_bin[R_ADDR_W-1:ADDR_W_DIFF];
+	 assign wptr_wire = {wptr_bin, {ADDR_W_DIFF{1'b0}}};
       end
    endgenerate
 
@@ -128,7 +132,7 @@ module iob_afifo_assim
 
    //sync read pointer
    always @ (posedge wclk) begin 
-      rptr_sync[0] <= rptr_wire;
+      rptr_sync[0] <= rptr;
       rptr_sync[1] <= rptr_sync[0];
    end
    
@@ -144,7 +148,7 @@ module iob_afifo_assim
                                                .data_out(wptr)
                                                );
    //compute binary pointer difference
-   assign level_w = gray2binW(wptr, W_ADDR_W) - gray2binW(rptr_sync[1], W_ADDR_W);
+   assign level_w = gray2binW(wptr, W_ADDR_W) - rptr_wire;
    
    assign full = (level_w == (W_FIFO_DEPTH-1));
 
@@ -153,7 +157,7 @@ module iob_afifo_assim
 
    //sync write pointer
    always @ (posedge rclk) begin 
-      wptr_sync[0] <= wptr_wire;
+      wptr_sync[0] <= wptr;
       wptr_sync[1] <= wptr_sync[0];
    end
 
@@ -170,7 +174,7 @@ module iob_afifo_assim
                                               );
    
    //compute binary pointer difference
-   assign level_r = gray2binR(wptr_sync[1], R_ADDR_W) - gray2binR(rptr, R_ADDR_W);
+   assign level_r = wptr_wire - gray2binR(rptr, R_ADDR_W);
    
 
    assign empty = (level_r == 0);

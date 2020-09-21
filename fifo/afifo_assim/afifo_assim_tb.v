@@ -7,16 +7,23 @@
 // `define WR_RATIO 4
 `ifdef WR_RATIO
  `define W_DATA_W (`DATA_W*`WR_RATIO)
- `define W_ADDR_W (`ADDR_W)
  `define R_DATA_W (`DATA_W)
- `define R_ADDR_W (`ADDR_W+$clog2(`WR_RATIO))
+ `define FIFO_ADDR_W (`ADDR_W+$clog2(`WR_RATIO))
+
+// TB defines
+ `define W_ADDR_W (`ADDR_W)
+ `define R_ADDR_W (`FIFO_ADDR_W)
 `endif
 
 `ifdef RW_RATIO
  `define W_DATA_W (`DATA_W)
- `define W_ADDR_W (`ADDR_W+$clog2(`RW_RATIO))
+ `define FIFO_ADDR_W (`ADDR_W+$clog2(`RW_RATIO))
  `define R_DATA_W (`DATA_W*`RW_RATIO)
+
+// TB defines
  `define R_ADDR_W (`ADDR_W)
+ `define W_ADDR_W (`FIFO_ADDR_W)
+
 `endif
 
 // `define R_RATIO (`W_DATA_W/`R_DATA_W)
@@ -101,11 +108,11 @@ module afifo_assim_tb;
        read=1;
 `ifdef WR_RATIO
        //Read all the locations of RAM.
-       for(i=0; i < `WR_RATIO*(2**`W_ADDR_W)-1; i = i + 1) begin
+       for(i=0; i < `WR_RATIO*((2**`W_ADDR_W)-1); i = i + 1) begin
            // Result will only be available in the next cycle
            @(posedge rclk) #1;
-	  if(data_out != i/`WR_RATIO*((i%`WR_RATIO)==0) || level_r != ((2**`W_ADDR_W)*`WR_RATIO-2)-i) begin
-               $display("Test failed: read error in data_out.\n \t i=%0d; data=%0d", i, data_out);
+	  if(data_out != i/`WR_RATIO*((i%`WR_RATIO)==0) || level_r != (((2**`W_ADDR_W)-1)*`WR_RATIO)-1-i) begin
+               $display("Test failed: read error in data_out.\n \t i=%0d; data=%0d; exp=%0d; lvl=%0d, levl=%0d", i, data_out, i/`WR_RATIO*((i%`WR_RATIO)==0), (((2**`W_ADDR_W)-1)*`WR_RATIO)-i, level_r);
                // $finish;
            end
        end
@@ -139,9 +146,8 @@ module afifo_assim_tb;
       // Instantiate the Unit Under Test (UUT)
    iob_afifo_assim #(
 		    .W_DATA_W(`W_DATA_W),
-		    .W_ADDR_W(`W_ADDR_W),
 		    .R_DATA_W(`R_DATA_W),
-		    .R_ADDR_W(`R_ADDR_W)
+		    .ADDR_W(`FIFO_ADDR_W)
    ) uut (
        .rst(reset),
        .data_out(data_out),
