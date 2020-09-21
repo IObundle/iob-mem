@@ -30,7 +30,7 @@ module iob_2p_async_mem
 	//reading from the RAM
 	generate
            if(USE_RAM)
-              always@(posedge wclk)  begin
+              always@(posedge rclk)  begin
                  if(r_en)
                     data_out <= ram[r_addr];
               end
@@ -39,7 +39,7 @@ module iob_2p_async_mem
         endgenerate
 	
 	//writing to the RAM
-	always@(posedge rclk) begin
+	always@(posedge wclk) begin
 	   if(w_en)    //check if write enable is ON
 	     ram[w_addr] <= data_in;
 	end

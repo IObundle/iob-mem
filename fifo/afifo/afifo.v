@@ -27,10 +27,8 @@ endmodule
 module iob_async_fifo
   #(parameter 
     DATA_WIDTH = 8, 
-    ADDRESS_WIDTH = 4, 
-    FIFO_DEPTH = (1 << ADDRESS_WIDTH)
-// For simetric fifo, we don't need to distinguish between DATA_W and ADDR_W for write and read
-  )
+    ADDRESS_WIDTH = 4
+    )
    (
     input                       rst,
 
@@ -49,9 +47,8 @@ module iob_async_fifo
     input                       wclk
     );
 
-   //FIFO memory
-   reg [DATA_WIDTH-1:0]   mem [FIFO_DEPTH-1:0];
-      
+   localparam FIFO_DEPTH = (1 << ADDRESS_WIDTH);
+         
    //WRITE DOMAIN 
    wire [ADDRESS_WIDTH-1:0]     wptr;
    reg [ADDRESS_WIDTH-1:0]      rptr_sync[1:0];
@@ -89,11 +86,6 @@ module iob_async_fifo
    //effective write enable
    assign write_en_int = write_en & ~full;
    
-   //write
-   always @ (posedge wclk)
-     if (write_en_int)
-       mem[wptr] <= data_in;
-
    gray_counter #(.COUNTER_WIDTH(ADDRESS_WIDTH)) wptr_counter (
                                                .clk(wclk),
                                                .rst(rst), 
