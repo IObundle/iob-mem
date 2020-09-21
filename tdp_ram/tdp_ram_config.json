@@ -1,0 +1,21 @@
+{
+    "signal": {},
+    "replace": {},
+    "filter": [
+        "tdp_ram_tb.clk",
+        "tdp_ram_tb.data_a[7:0]",
+        "tdp_ram_tb.addr_a[3:0]",
+        "tdp_ram_tb.en_a",
+        "tdp_ram_tb.we_a",
+        "tdp_ram_tb.q_a[7:0]",
+        "tdp_ram_tb.data_b[7:0]",
+        "tdp_ram_tb.addr_b[3:0]",
+        "tdp_ram_tb.en_b",
+        "tdp_ram_tb.we_b",
+        "tdp_ram_tb.q_b[7:0]"
+    ],
+    "offset": 0,
+    "samplerate": 10000,
+    "clocks": ["tdp_ram_tb.clk"],
+    "maxtime": 200000
+}

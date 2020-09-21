@@ -42,7 +42,7 @@ module iob_2p_assim_async_mem_w_big
 	//reading from the RAM
 	generate
            if(USE_RAM)
-              always@(posedge wclk)  begin
+              always@(posedge rclk)  begin
                  if(r_en)
                     data_out <= ram[r_addr];
               end
@@ -51,7 +51,7 @@ module iob_2p_assim_async_mem_w_big
         endgenerate
 	
 	//writing to the RAM
-	always@(posedge rclk) begin
+	always@(posedge wclk) begin
 		for (i = 0; i < RATIO; i = i+1) begin
 			lsbaddr = i;
 			if(w_en)    //check if write enable is ON
