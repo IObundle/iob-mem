@@ -33,7 +33,10 @@ module iob_afifo_assim
   #(parameter 
     R_DATA_W = 32,
     W_DATA_W = 32,
-    ADDR_W = 8 // ADDR_W of smallest DATA_W size
+    ADDR_W = 8, // ADDR_W of smallest DATA_W size
+    NAR_ADDR_W = ADDR_W-$clog2(`max(W_DATA_W, R_DATA_W)/`min(W_DATA_W, R_DATA_W)),
+    W_ADDR_W = (`max(R_DATA_W, W_DATA_W) == W_DATA_W) ? NAR_ADDR_W : ADDR_W,
+    R_ADDR_W = (`max(R_DATA_W, W_DATA_W) == R_DATA_W) ? NAR_ADDR_W : ADDR_W
     )
    (
     input 		      rst,
@@ -54,9 +57,6 @@ module iob_afifo_assim
     );
 
    //local variables
-   localparam NAR_ADDR_W = ADDR_W-$clog2(`max(W_DATA_W, R_DATA_W)/`min(W_DATA_W, R_DATA_W));
-   localparam R_ADDR_W = (`max(R_DATA_W, W_DATA_W) == R_DATA_W) ? NAR_ADDR_W : ADDR_W;
-   localparam W_ADDR_W = (`max(R_DATA_W, W_DATA_W) == W_DATA_W) ? NAR_ADDR_W : ADDR_W;
    localparam ADDR_W_DIFF = ADDR_W - NAR_ADDR_W;
    localparam W_FIFO_DEPTH = (1 << W_ADDR_W);
       
