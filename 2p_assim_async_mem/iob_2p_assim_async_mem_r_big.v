@@ -38,12 +38,12 @@ module iob_2p_assim_async_mem_r_big
    reg [minDATA_W-1:0] 	      ram [2**maxADDR_W-1:0];
    
    integer 		      i;
-   reg [log2RATIO-1:0] 	      lsbaddr;
+   //reg [log2RATIO-1:0] 	      lsbaddr;
    
    //writing to the RAM
-      always@(posedge wclk)
-	if (w_en)
-	  ram[w_addr] <= data_in;
+   always@(posedge wclk)
+     if (w_en)
+       ram[w_addr] <= data_in;
    
    //reading from the RAM
    generate
@@ -51,8 +51,8 @@ module iob_2p_assim_async_mem_r_big
 	 always@(posedge rclk) begin
 	    if (r_en) begin
 	       for (i = 0; i < RATIO; i = i+1) begin
-		  lsbaddr = i;
-		  data_out[(i+1)*minDATA_W-1 -: minDATA_W] <= ram[{r_addr, lsbaddr}];
+		  //lsbaddr <= i[log2RATIO-1:0];
+		  data_out[(i+1)*minDATA_W-1 -: minDATA_W] <= ram[{r_addr, i[log2RATIO-1:0]}];
 	       end
 	    end
 	 end
