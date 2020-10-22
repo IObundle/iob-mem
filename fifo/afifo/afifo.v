@@ -131,9 +131,9 @@ module iob_async_fifo
                 .wclk(wclk),
                 .w_en(write_en_int),
                 .data_in(data_in),
-                .w_addr(W_ADDR_W),
+                .w_addr(gray2bin(wptr, ADDRESS_WIDTH)),
                 .rclk(rclk),
-                .r_addr(R_ADDR_W),
+                .r_addr(gray2bin(rptr, ADDRESS_WIDTH)),
                 .r_en(read_en_int),
                 .data_out(data_out)
                 );
