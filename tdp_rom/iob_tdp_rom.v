@@ -22,20 +22,20 @@ module iob_tdp_rom
    localparam mem_init_file_int = MEM_INIT_FILE;
 
    
-   // Declare the RAM
-   reg [DATA_W-1:0] 			       ram[2**ADDR_W-1:0];
+   // Declare the ROM
+   reg [DATA_W-1:0] 			       rom[2**ADDR_W-1:0];
 
-   // Initialize the RAM
+   // Initialize the ROM
    initial 
      if(mem_init_file_int != "none")
-       $readmemh(MEM_INIT_FILE, ram, 0, 2**ADDR_W - 1);
+       $readmemh(MEM_INIT_FILE, rom, 0, 2**ADDR_W - 1);
 
    always @ (posedge clk) // Port A
      if (r_en_a)
-       q_a <= ram[addr_a];
+       q_a <= rom[addr_a];
 
    always @ (posedge clk) // Port B
      if (r_en_b)
-       q_b <= ram[addr_b];
+       q_b <= rom[addr_b];
 
  endmodule
