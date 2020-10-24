@@ -1,10 +1,11 @@
 `timescale 1ns / 1ps
 
-module iob_sp_ram #(
-		    parameter FILE="none",
-		    parameter DATA_W=8,
-		    parameter ADDR_W=14
-		    )
+module sp_ram 
+  #(
+    parameter FILE="none",
+    parameter DATA_W=8,
+    parameter ADDR_W=14
+    )
    (
     input                     clk,
     input                     en, 
