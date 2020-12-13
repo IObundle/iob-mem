@@ -1,0 +1,34 @@
+[*]
+[*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
+[*] Mon Aug 31 17:21:14 2020
+[*]
+[dumpfile] "/home/josejoaquimsarmento/Documents/IObundle/mem_fork/2p_mem_tiled/tiled_ram.vcd"
+[dumpfile_mtime] "Mon Aug 31 17:20:48 2020"
+[dumpfile_size] 14186
+[savefile] "/home/josejoaquimsarmento/Documents/IObundle/mem_fork/2p_mem_tiled/waves_ram.gtkw"
+[timestart] 0
+[size] 1840 600
+[pos] -1 -1
+*-15.354420 215300 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 233
+[signals_width] 191
+[sst_expanded] 1
+[sst_vpaned_height] 144
+@28
+iob_2p_mem_tiled_tb.clk
+@22
+iob_2p_mem_tiled_tb.addr[13:0]
+@28
+iob_2p_mem_tiled_tb.w_en
+@22
+iob_2p_mem_tiled_tb.data_in[15:0]
+@421
+iob_2p_mem_tiled_tb.i
+@28
+iob_2p_mem_tiled_tb.r_en
+@22
+iob_2p_mem_tiled_tb.data_out[15:0]
+@420
+iob_2p_mem_tiled_tb.seq_ini
+[pattern_trace] 1
+[pattern_trace] 0

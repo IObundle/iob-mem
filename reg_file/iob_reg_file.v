@@ -21,7 +21,7 @@ module iob_reg_file #(
    
    generate
       for (i = 0; i < NUM_COL; i=i+1)
-        begin
+        begin : column
 
            reg [COL_WIDTH-1:0]             regfile [2**ADDR_WIDTH-1:0]; 
            

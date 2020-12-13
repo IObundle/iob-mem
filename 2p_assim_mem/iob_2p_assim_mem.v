@@ -1,9 +1,12 @@
+`timescale 1ns / 1ps
+
 module iob_2p_assim_mem 
 	#(
 		parameter W_DATA_W = 16,
 		parameter W_ADDR_W = 6,
 		parameter R_DATA_W = 8,
-		parameter R_ADDR_W = 7
+		parameter R_ADDR_W = 7,
+        parameter USE_RAM = 1
 	)
 	(
 		//Inputs
@@ -24,7 +27,8 @@ module iob_2p_assim_mem
     			.W_DATA_W(W_DATA_W),
     		 	.W_ADDR_W(W_ADDR_W),
     		 	.R_DATA_W(R_DATA_W),
-    		 	.R_ADDR_W(R_ADDR_W)
+    		 	.R_ADDR_W(R_ADDR_W),
+                .USE_RAM(USE_RAM)
     		 ) two_port_mem (
     		 	.clk(clk),
     		 	.w_en(w_en),

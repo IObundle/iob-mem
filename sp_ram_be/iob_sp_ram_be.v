@@ -1,4 +1,4 @@
-// True-Dual-Port BRAM with Byte-wide Write Enable
+// Single-Port BRAM with Byte-wide Write Enable
 // Read-First mode 
 
 `timescale 1 ns / 1 ps
@@ -22,7 +22,7 @@ module iob_sp_ram_be
      ); 
 
    //this allows ISE 14.7 to work; do not remove
-   parameter mem_init_file_int = FILE;
+   localparam mem_init_file_int = FILE;
 
    // Core Memory 
    reg [DATA_WIDTH-1:0]           ram_block[(2**ADDR_WIDTH)-1:0]; 

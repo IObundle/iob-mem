@@ -1,0 +1,35 @@
+[*]
+[*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
+[*] Thu Aug 20 10:35:59 2020
+[*]
+[dumpfile] "/home/josejoaquimsarmento/Documents/IObundle/mem_fork/2p_assim_mem/2p_assim_mem_r.vcd"
+[dumpfile_mtime] "Thu Aug 20 10:35:47 2020"
+[dumpfile_size] 3529
+[savefile] "/home/josejoaquimsarmento/Documents/IObundle/mem_fork/2p_assim_mem/waves.gtkw"
+[timestart] 0
+[size] 1848 600
+[pos] -1 -1
+*-15.535195 186200 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 233
+[signals_width] 210
+[sst_expanded] 1
+[sst_vpaned_height] 144
+@28
+iob_2p_assim_mem_tb.clk
+@22
+iob_2p_assim_mem_tb.seq_ini
+@28
+iob_2p_assim_mem_tb.w_en
+@23
+iob_2p_assim_mem_tb.w_addr[3:0]
+@22
+iob_2p_assim_mem_tb.data_in[7:0]
+@420
+iob_2p_assim_mem_tb.i
+@28
+iob_2p_assim_mem_tb.r_en
+iob_2p_assim_mem_tb.r_addr[1:0]
+@22
+iob_2p_assim_mem_tb.data_out[31:0]
+[pattern_trace] 1
+[pattern_trace] 0

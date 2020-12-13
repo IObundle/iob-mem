@@ -1,0 +1,15 @@
+{
+    "signal": {
+    },
+    "filter": [
+        "clk",
+	"en_a",
+	"addr_a"
+    ],
+    "replace": {
+    },
+    "offset": 0,
+    "samplerate": 10000,
+    "clocks": ["clk"],
+    "maxtime": 300000
+}

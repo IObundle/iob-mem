@@ -1,29 +1,21 @@
-# README #
+# IOb-mem #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+### Test all memory modules ###
 
-### What is this repository for? ###
+From the top directory, type `make`.
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+### Test a specific memory module ###
 
-### How do I get set up? ###
+Go to the memory folder and type `make`.
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+### Simulate a specific memory module ###
 
-### Contribution guidelines ###
+In the memory folder, type `make sim`.
 
-* Writing tests
-* Code review
-* Other guidelines
+### Parameter configuration ###
 
-### Who do I talk to? ###
+For specific memory modules, there are parameters that can be configured.
 
-* Repo owner or admin
-* Other community or team contact
+**RAM**: `RAM=1` to use RAM; `RAM=0` otherwise (default). 
+
+**R**: `R=1` for READ_DATA > WRITE_DATA; `R=0` otherwise (default).
