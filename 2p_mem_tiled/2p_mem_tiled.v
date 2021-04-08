@@ -39,7 +39,7 @@ module iob_2p_mem_tiled
         // Vector containing all BRAM outputs
         wire [DATA_W-1:0] data_out_vec [K-1:0];
         for(i = 0; i < K; i = i + 1) begin
-            iob_2p_mem #(
+            dp_ram #(
                 .DATA_W(DATA_W),
                 .ADDR_W(ADDR_W - $clog2(K)),
                 .USE_RAM(USE_RAM)
