@@ -1,7 +1,7 @@
 include ../mem.mk
 
-2P_MEM = ../2p_mem
-VSRC += $(2P_MEM)/iob_2p_mem.v
+2P_MEM = ../dp_ram
+VSRC += $(2P_MEM)/dp_ram.v
 
 WSRC = waves.gtkw tiled.vcd
 
