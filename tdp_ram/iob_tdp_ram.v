@@ -35,15 +35,22 @@ module iob_tdp_ram
        $readmemh(MEM_INIT_FILE, ram, 0, 2**ADDR_W - 1);
 
    always @ (posedge clk) begin// Port A
-     if (en_a)
-       if (we_a)
-	      ram[addr_a] <= data_a;
-     q_a <= ram[addr_a];
+      if (en_a)
+        if (we_a)
+	        ram[addr_a] <= data_a;
+      `ifdef IS_CYCLONEV
+        else
+      `endif
+      q_a <= ram[addr_a];
     end
+
    always @ (posedge clk) begin // Port B
-     if (en_b)
-       if (we_b)
-	      ram[addr_b] <= data_b;
-	   q_b <= ram[addr_b];
+      if (en_b)
+        if (we_b)
+	        ram[addr_b] <= data_b;
+      `ifdef IS_CYCLONEV
+        else
+      `endif
+	    q_b <= ram[addr_b];
     end
  endmodule
