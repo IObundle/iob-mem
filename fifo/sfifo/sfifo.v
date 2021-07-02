@@ -36,12 +36,13 @@ module iob_sync_fifo
    always @ (posedge clk or posedge rst)
      if (rst) begin
         fifo_ocupancy <= 0;
-        empty <= 1'b0;
+        empty <= 1'b1;
+        full <= 1'b0;
      end else if (write_en_int & !read_en_int) begin
        fifo_ocupancy <= fifo_ocupancy+1;
-        if (fifo_ocupancy == (FIFO_DEPT-1))
+        if (fifo_ocupancy == (FIFO_DEPTH-1))
           full <= 1'b1;
-        if (empty) parvo
+        if (empty)
           empty <= 1'b0;
      end else if (read_en_int & !write_en_int) begin
        fifo_ocupancy <= fifo_ocupancy-1;
