@@ -7,12 +7,12 @@
  write port data width and that they are multiples of eachother
  */
 module iob_2p_assim_mem_r_big
-  #( 
+  #(
      parameter W_DATA_W = 16,
      parameter W_ADDR_W = 6,
      parameter R_DATA_W = 8,
      parameter R_ADDR_W = 7
-     ) 
+     )
    (
     //Inputs
     input                     clk,
@@ -30,24 +30,25 @@ module iob_2p_assim_mem_r_big
    localparam minDATA_W = `min(W_DATA_W, R_DATA_W);
    localparam RATIO = maxDATA_W / minDATA_W;
    localparam log2RATIO = $clog2(RATIO);
-   
+
    //memory declaration
    reg [minDATA_W-1:0]        ram [2**maxADDR_W-1:0];
-   
+
    integer                    i;
    reg [log2RATIO-1:0]        lsbaddr;
-   
+
    //writing to the RAM
    always@(posedge clk)
      if (w_en)
        ram[w_addr] <= data_in;
-   
+
    //reading from the RAM
    always@(posedge clk)
-     if (r_en) begin
-	for (i = 0; i < RATIO; i = i+1) begin
-	   lsbaddr = i;
-	   data_out[(i+1)*minDATA_W-1 -: minDATA_W] <= ram[{r_addr, lsbaddr}];
-	end
+    if (r_en) begin
+	    for (i = 0; i < RATIO; i = i+1) begin
+	    lsbaddr = i;
+	    data_out[(i+1)*minDATA_W-1 -: minDATA_W] <= ram[{r_addr, lsbaddr}];
+      end
+    end
 
-endmodule   
+endmodule
