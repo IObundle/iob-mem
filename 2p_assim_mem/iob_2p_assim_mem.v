@@ -1,25 +1,25 @@
 `timescale 1ns / 1ps
 
-module iob_2p_assim_mem 
+module iob_2p_assim_mem
 	#(
 		parameter W_DATA_W = 16,
 		parameter W_ADDR_W = 6,
 		parameter R_DATA_W = 8,
 		parameter R_ADDR_W = 7,
-        parameter USE_RAM = 1
+    parameter USE_RAM = 1
 	)
 	(
 		//Inputs
 		input 				clk,
-        input 				w_en,    //write enable
-        input [W_DATA_W-1:0] 	data_in, //Input data to write port
-        input [W_ADDR_W-1:0] 	w_addr,  //address for write port
-        input [R_ADDR_W-1:0] 	r_addr,  //address for read port
-        input				r_en,
-        //Outputs
-        output [R_DATA_W-1:0] data_out //output port
+    input 				w_en,    //write enable
+    input [W_DATA_W-1:0] 	data_in, //Input data to write port
+    input [W_ADDR_W-1:0] 	w_addr,  //address for write port
+    input [R_ADDR_W-1:0] 	r_addr,  //address for read port
+    input				  r_en,
+    //Outputs
+    output [R_DATA_W-1:0] data_out //output port
     );
-    
+
     generate
     	if (W_DATA_W > R_DATA_W)
     	begin
@@ -58,4 +58,3 @@ module iob_2p_assim_mem
     	end
     endgenerate
 endmodule
-    
