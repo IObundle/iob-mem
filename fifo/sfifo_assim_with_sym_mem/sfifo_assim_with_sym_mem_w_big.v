@@ -107,7 +107,7 @@ module iob_sync_assim_fifo_with_sym_mem_w_big
   generate
   // Vector containing all BRAM outputs
     wire [R_DATA_W-1:0] data_out_vec [RATIO-1:0];
-    for(i = 0; i < RATIO; i = i + 1) begin
+    for(i = 0; i < RATIO; i = i + 1) begin : fifo_memory
       //FIFO memory
       dp_ram #(
         .DATA_W(minDATA_W),
