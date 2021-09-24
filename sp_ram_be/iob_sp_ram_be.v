@@ -22,7 +22,7 @@ module iob_sp_ram_be
    localparam DATA_WIDTH = NUM_COL*COL_WIDTH;  // Data Width in bits
 
    // Operation
-`ifdef BYTE_EN
+`ifdef MEM_BYTE_EN
    // this allows ISE 14.7 to work; do not remove
    localparam mem_init_file_int = FILE;
 
@@ -48,8 +48,8 @@ module iob_sp_ram_be
    end
 
    assign dout = dout_int;
-`else // !BYTE_EN
-   localparam file_suffix = {"9","8","7","6","5","4","3","2","1","0"};
+`else // !MEM_BYTE_EN
+   localparam file_suffix = {"7","6","5","4","3","2","1","0"};
 
    genvar                    i;
    generate
