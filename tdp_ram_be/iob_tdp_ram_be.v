@@ -4,59 +4,106 @@
 `timescale 1 ns / 1 ps
 
 module iob_tdp_ram_be
-  #(parameter FILE = "none",
-    parameter NUM_COL = 4,
-    parameter COL_WIDTH = 8,
-    parameter ADDR_WIDTH = 10,  
-    //Addr Width in bits : 2*ADDR_WIDTH = RAM Depth
-    parameter DATA_WIDTH = NUM_COL*COL_WIDTH  //Data Width in bits
-    ) 
-   ( 
-     input                        clkA, 
-     input                        enaA, 
-     input [NUM_COL-1:0]          weA, 
-     input [ADDR_WIDTH-1:0]       addrA, 
-     input [DATA_WIDTH-1:0]       dinA, 
-     output reg [DATA_WIDTH-1:0]  doutA, 
-     input                        clkB, 
-     input                        enaB,
-     input [NUM_COL-1:0]          weB, 
-     input [ADDR_WIDTH-1:0]       addrB, 
-     input [DATA_WIDTH-1:0]       dinB, 
-     output reg [DATA_WIDTH-1 :0] doutB 
-     ); 
+  #(
+    parameter FILE = "none",
+    parameter ADDR_WIDTH = 10, // Addr Width in bits : 2*ADDR_WIDTH = RAM Depth
+    parameter DATA_WIDTH = 32  // Data Width in bits
+    )
+   (
+    input                    clk,
 
-   //this allow ISE 14.7 to work; do not remove
-   localparam mem_init_file_int = FILE;
+    // Port A
+    input                    enA,
+    input [NUM_COL-1:0]      weA,
+    input [ADDR_WIDTH-1:0]   addrA,
+    input [DATA_WIDTH-1:0]   dinA,
+    output [DATA_WIDTH-1:0]  doutA,
 
-   // Core Memory 
-   reg [DATA_WIDTH-1:0]           ram_block[(2**ADDR_WIDTH)-1:0]; 
+    // Port B
+    input                    enB,
+    input [NUM_COL-1:0]      weB,
+    input [ADDR_WIDTH-1:0]   addrB,
+    input [DATA_WIDTH-1:0]   dinB,
+    output [DATA_WIDTH-1 :0] doutB
+    );
+
+   localparam COL_WIDTH = 8;
+   localparam NUM_COL = DATA_WIDTH/COL_WIDTH;
+
+`ifdef MEM_BYTE_EN
+   // this allow ISE 14.7 to work; do not remove
+   localparam mem_init_file_int = {FILE, ".hex"};
+
+   // Core Memory
+   reg [DATA_WIDTH-1:0]      ram_block[(2**ADDR_WIDTH)-1:0];
 
    // Initialize the RAM
    initial
      if(mem_init_file_int != "none")
        $readmemh(mem_init_file_int, ram_block, 0, 2**ADDR_WIDTH - 1);
-   
-   integer                        i;  
-   
-   //Port-A Operation 
-   always @ (posedge clkA) begin 
-      if(enaA) begin 
-         for(i=0;i<NUM_COL;i=i+1) begin 
-            if(weA[i]) begin 
-               ram_block[addrA][i*COL_WIDTH +: COL_WIDTH] <= dinA[i*COL_WIDTH +: COL_WIDTH]; 
-            end 
-         end doutA <= ram_block[addrA]; //Send Feedback
-      end    
-   end
-   
-   //Port-B Operation: 
-   always @ (posedge clkB) begin 
-      if(enaB) begin
-         for(i=0;i<NUM_COL;i=i+1) begin 
-            if(weB[i]) begin
-               ram_block[addrB][i*COL_WIDTH +: COL_WIDTH] <= dinB[i*COL_WIDTH +: COL_WIDTH]; end end doutB <= ram_block[addrB]; 
+
+   // Port-A Operation
+   reg [DATA_WIDTH-1:0]      doutA_int;
+   integer                   i;
+   always @(posedge clk) begin
+      if (enA) begin
+         for (i=0; i < NUM_COL; i=i+1) begin
+            if (weA[i]) begin
+               ram_block[addrA][i*COL_WIDTH +: COL_WIDTH] <= dinA[i*COL_WIDTH +: COL_WIDTH];
+            end
+         end
+         doutA_int <= ram_block[addrA]; // Send Feedback
       end
    end
-   
+
+   assign doutA = doutA_int;
+
+   // Port-B Operation
+   reg [DATA_WIDTH-1:0]      doutB_int;
+   integer                   j;
+   always @(posedge clk) begin
+      if (enB) begin
+         for (j=0; j < NUM_COL; j=j+1) begin
+            if (weB[j]) begin
+               ram_block[addrB][j*COL_WIDTH +: COL_WIDTH] <= dinB[j*COL_WIDTH +: COL_WIDTH];
+            end
+         end
+         doutB_int <= ram_block[addrB]; // Send Feedback
+      end
+   end
+
+   assign doutB = doutB_int;
+`else // !MEM_BYTE_EN
+   localparam file_suffix = {"7","6","5","4","3","2","1","0"};
+
+   genvar                    i;
+   generate
+      for (i=0; i < NUM_COL; i=i+1) begin
+         iob_tdp_ram
+             #(
+ `ifdef INIT_MEM
+               .MEM_INIT_FILE({FILE, "_", file_suffix[8*(i+1)-1 -: 8], ".hex"}),
+ `endif
+               .ADDR_W(ADDR_WIDTH),
+               .DATA_W(COL_WIDTH)
+               ) ram_col
+           (
+            .clk    (clk),
+
+            .en_a   (enA),
+            .addr_a (addrA),
+            .data_a (dinA[i*COL_WIDTH +: COL_WIDTH]),
+            .we_a   (weA[i]),
+            .q_a    (doutA[i*COL_WIDTH +: COL_WIDTH]),
+
+            .en_b   (enB),
+            .addr_b (addrB),
+            .data_b (dinB[i*COL_WIDTH +: COL_WIDTH]),
+            .we_b   (weB[i]),
+            .q_b    (doutB[i*COL_WIDTH +: COL_WIDTH])
+            );
+      end
+   endgenerate
+`endif
+
 endmodule
