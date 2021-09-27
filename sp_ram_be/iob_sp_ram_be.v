@@ -10,12 +10,12 @@ module iob_sp_ram_be
     parameter DATA_WIDTH = 32  // Data Width in bits
     ) 
    ( 
-     input                   clk,
-     input                   en,
-     input [NUM_COL-1:0]     we,
-     input [ADDR_WIDTH-1:0]  addr,
-     input [DATA_WIDTH-1:0]  din,
-     output [DATA_WIDTH-1:0] dout
+     input                    clk,
+     input                    en,
+     input [DATA_WIDTH/8-1:0] we,
+     input [ADDR_WIDTH-1:0]   addr,
+     input [DATA_WIDTH-1:0]   din,
+     output [DATA_WIDTH-1:0]  dout
      );
 
    localparam COL_WIDTH = 8;
@@ -27,15 +27,15 @@ module iob_sp_ram_be
    localparam mem_init_file_int = {FILE, ".hex"};
 
    // Core Memory
-   reg [DATA_WIDTH-1:0]      ram_block[(2**ADDR_WIDTH)-1:0];
+   reg [DATA_WIDTH-1:0]       ram_block[(2**ADDR_WIDTH)-1:0];
 
    // Initialize the RAM
    initial
      if(mem_init_file_int != "none")
        $readmemh(mem_init_file_int, ram_block, 0, 2**ADDR_WIDTH - 1);
 
-   reg [DATA_WIDTH-1:0]      dout_int;
-   integer                   i;
+   reg [DATA_WIDTH-1:0]       dout_int;
+   integer                    i;
    always @ (posedge clk) begin
       if(en) begin
          for(i=0; i < NUM_COL; i=i+1) begin
@@ -51,7 +51,7 @@ module iob_sp_ram_be
 `else // !MEM_BYTE_EN
    localparam file_suffix = {"7","6","5","4","3","2","1","0"};
 
-   genvar                    i;
+   genvar                     i;
    generate
       for (i=0; i < NUM_COL; i=i+1) begin
          localparam mem_init_file_int = (FILE != "none")? {FILE, "_", file_suffix[8*(i+1)-1 -: 8], ".hex"}: "none";

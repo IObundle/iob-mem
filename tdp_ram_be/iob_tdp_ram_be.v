@@ -14,14 +14,14 @@ module iob_tdp_ram_be
 
     // Port A
     input                    enA,
-    input [NUM_COL-1:0]      weA,
+    input [DATA_WIDTH/8-1:0] weA,
     input [ADDR_WIDTH-1:0]   addrA,
     input [DATA_WIDTH-1:0]   dinA,
     output [DATA_WIDTH-1:0]  doutA,
 
     // Port B
     input                    enB,
-    input [NUM_COL-1:0]      weB,
+    input [DATA_WIDTH/8-1:0] weB,
     input [ADDR_WIDTH-1:0]   addrB,
     input [DATA_WIDTH-1:0]   dinB,
     output [DATA_WIDTH-1 :0] doutB
