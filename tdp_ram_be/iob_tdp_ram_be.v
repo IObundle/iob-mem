@@ -82,7 +82,7 @@ module iob_tdp_ram_be
          iob_tdp_ram
              #(
  `ifdef INIT_MEM
-               .MEM_INIT_FILE({FILE, "_", file_suffix[8*(i+1)-1 -: 8], ".hex"}),
+               .FILE({FILE, "_", file_suffix[8*(i+1)-1 -: 8], ".hex"}),
  `endif
                .ADDR_W(ADDR_WIDTH),
                .DATA_W(COL_WIDTH)
