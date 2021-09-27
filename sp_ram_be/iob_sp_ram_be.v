@@ -54,11 +54,11 @@ module iob_sp_ram_be
    genvar                    i;
    generate
       for (i=0; i < NUM_COL; i=i+1) begin
+         localparam mem_init_file_int = (FILE != "none")? {FILE, "_", file_suffix[8*(i+1)-1 -: 8], ".hex"}: "none";
+
          sp_ram
              #(
- `ifdef INIT_MEM
-               .FILE({FILE, "_", file_suffix[8*(i+1)-1 -: 8], ".hex"}),
- `endif
+               .FILE(mem_init_file_int),
                .ADDR_W(ADDR_WIDTH),
                .DATA_W(COL_WIDTH)
                ) ram_col
