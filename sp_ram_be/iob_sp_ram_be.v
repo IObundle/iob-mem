@@ -6,9 +6,8 @@
 module iob_sp_ram_be
   #(
     parameter FILE="none",
-    parameter NUM_COL = 4,
-    parameter COL_WIDTH = 8,
-    parameter ADDR_WIDTH = 10 // Addr Width in bits : 2*ADDR_WIDTH = RAM Depth
+    parameter ADDR_WIDTH = 10, // Addr Width in bits : 2*ADDR_WIDTH = RAM Depth
+    parameter DATA_WIDTH = 32  // Data Width in bits
     ) 
    ( 
      input                   clk,
@@ -19,12 +18,13 @@ module iob_sp_ram_be
      output [DATA_WIDTH-1:0] dout
      );
 
-   localparam DATA_WIDTH = NUM_COL*COL_WIDTH;  // Data Width in bits
+   localparam COL_WIDTH = 8;
+   localparam NUM_COL = DATA_WIDTH/COL_WIDTH;
 
    // Operation
 `ifdef MEM_BYTE_EN
    // this allows ISE 14.7 to work; do not remove
-   localparam mem_init_file_int = FILE;
+   localparam mem_init_file_int = {FILE, ".hex"};
 
    // Core Memory
    reg [DATA_WIDTH-1:0]      ram_block[(2**ADDR_WIDTH)-1:0];
@@ -54,11 +54,11 @@ module iob_sp_ram_be
    genvar                    i;
    generate
       for (i=0; i < NUM_COL; i=i+1) begin
+         localparam mem_init_file_int = (FILE != "none")? {FILE, "_", file_suffix[8*(i+1)-1 -: 8], ".hex"}: "none";
+
          sp_ram
              #(
- `ifdef INIT_MEM
-               .FILE({FILE, "_", file_suffix[8*(i+1)-1 -: 8], ".hex"}),
- `endif
+               .FILE(mem_init_file_int),
                .ADDR_W(ADDR_WIDTH),
                .DATA_W(COL_WIDTH)
                ) ram_col

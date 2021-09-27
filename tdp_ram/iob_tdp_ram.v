@@ -2,7 +2,7 @@
 
 module iob_tdp_ram
   #(
-    parameter MEM_INIT_FILE="none",
+    parameter FILE="none",
     parameter DATA_W=32,
     parameter ADDR_W=11
     )
@@ -23,7 +23,7 @@ module iob_tdp_ram
     );
 
    //this allows ISE 14.7 to work; do not remove
-   localparam mem_init_file_int = MEM_INIT_FILE;
+   localparam mem_init_file_int = FILE;
 
 
    // Declare the RAM
@@ -32,7 +32,7 @@ module iob_tdp_ram
    // Initialize the RAM
    initial
      if(mem_init_file_int != "none")
-       $readmemh(MEM_INIT_FILE, ram, 0, 2**ADDR_W - 1);
+       $readmemh(mem_init_file_int, ram, 0, 2**ADDR_W - 1);
 
    always @ (posedge clk) begin// Port A
       if (en_a)

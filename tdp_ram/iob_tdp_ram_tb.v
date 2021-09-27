@@ -157,7 +157,7 @@ module tdp_ram_tb;
     iob_tdp_ram #(
         .DATA_W(`DATA_W), 
         .ADDR_W(`ADDR_W),
-        .MEM_INIT_FILE(`hex_file1)
+        .FILE(`hex_file1)
     ) uut (
         .clk(clk), 
         .data_a(data_a),
