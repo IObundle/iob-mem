@@ -78,7 +78,7 @@ module iob_tdp_ram_be
 
    genvar                    i;
    generate
-      for (i=0; i < NUM_COL; i=i+1) begin
+      for (i=0; i < NUM_COL; i=i+1) begin: ram_col
          localparam mem_init_file_int = (FILE != "none")? {FILE, "_", file_suffix[8*(i+1)-1 -: 8], ".hex"}: "none";
 
          iob_tdp_ram
@@ -86,7 +86,7 @@ module iob_tdp_ram_be
                .FILE(mem_init_file_int),
                .ADDR_W(ADDR_WIDTH),
                .DATA_W(COL_WIDTH)
-               ) ram_col
+               ) ram
            (
             .clk    (clk),
 
