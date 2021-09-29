@@ -1,9 +1,9 @@
 #!/usr/bin/python
 
-#dpram usage: memwrapper_make tech type Nmems words bits bytes mux
-#tdpram usage: memwrapper_make tech type Nmems words bits bytes mux
-#sram usage: memwrapper_make tech type words bits bytes mux
-#rom usage: memwrapper_make tech type words bits mux romcode
+#dpram usage: memakerwrap tech type Nmems words bits bytes mux
+#tdpram usage: memakerwrap tech type Nmems words bits bytes mux
+#sram usage: memakerwrap tech type words bits bytes mux
+#rom usage: memakerwrap tech type words bits mux romcode
 
 import sys
 
@@ -101,7 +101,7 @@ if type == "SZ":
     #
     print "            input r_en,"
     print "            input [ADDR_W-1:0] r_addr,"
-    print "            output reg [DATA_W-1:0] data_out"
+    print "            output [DATA_W-1:0] data_out"
 elif type == "SJ":
     print "            input clk," #**
     print ""
@@ -149,7 +149,6 @@ if type == "SZ":
     print "   wire wen = ~w_en;"
     print "   wire csnA = ~w_en;"
     print "   wire csnB = ~r_en;"
-    print "   wire [DATA_W-1:0] rdata;"
 elif type == "SJ":
     print "   wire clkA = clk;" #**
     print "   wire clkB = clk;" #**
@@ -190,7 +189,7 @@ for j in range(len(mems)):
     
     if type == "SZ":
         for i in range(bits*bytes):
-            print "    .DO"+str(i)+"(rdata["+str(i)+"]),"
+            print "    .DO"+str(i)+"(data_out["+str(i)+"]),"
         print ""
         for i in range(bits*bytes):
             print "    .DI"+str(i)+"(data_in["+str(i)+"]),"
@@ -283,17 +282,5 @@ for j in range(len(mems)):
     if len(mems) > 1: print "end"
     if (len(mems) - j) > 1: print "else"
     elif len(mems) > 1: print "endgenerate\n"
-
-if type == "SZ":
-    print "generate if (USE_RAM)"
-    print "   always @(posedge clk, posedge rst)"
-    print "      if (rst) begin"
-    print "         data_out <= {DATA_W{1'b0}};"
-    print "      end else begin"
-    print "         data_out <= rdata;"
-    print "      end"
-    print "else"
-    print "   always @* data_out = rdata;"
-    print "endgenerate\n"
 
 print "endmodule"
