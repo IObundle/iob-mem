@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
-#dpram usage: memakerwrap tech type Nmems words bits bytes mux
-#tdpram usage: memakerwrap tech type Nmems words bits bytes mux
+#dpram usage: memakerwrap tech type async Nmems words bits bytes mux
+#tdpram usage: memakerwrap tech type async Nmems words bits bytes mux
 #sram usage: memakerwrap tech type words bits bytes mux
 #rom usage: memakerwrap tech type words bits mux romcode
 
@@ -17,19 +17,21 @@ if sys.argv[1] == "fsc0l_d":
     tech = "LD130"
     if sys.argv[2] == "sz":
         type = "SZ"
-        for i in range(int(sys.argv[3])):
-            words = int(sys.argv[4 + i*4])
-            bits  = int(sys.argv[5 + i*4])
-            bytes = int(sys.argv[6 + i*4])
-            mux   = int(sys.argv[7 + i*4])
+        async = int(sys.argv[3])
+        for i in range(int(sys.argv[4])):
+            words = int(sys.argv[5 + i*4])
+            bits  = int(sys.argv[6 + i*4])
+            bytes = int(sys.argv[7 + i*4])
+            mux   = int(sys.argv[8 + i*4])
             mems.append([words, bits, bytes, mux])
     elif sys.argv[2] == "sj":
         type = "SJ"
-        for i in range(int(sys.argv[3])):
-            words = int(sys.argv[4 + i*4])
-            bits  = int(sys.argv[5 + i*4])
-            bytes = int(sys.argv[6 + i*4])
-            mux   = int(sys.argv[7 + i*4])
+        async = int(sys.argv[3])
+        for i in range(int(sys.argv[4])):
+            words = int(sys.argv[5 + i*4])
+            bits  = int(sys.argv[6 + i*4])
+            bytes = int(sys.argv[7 + i*4])
+            mux   = int(sys.argv[8 + i*4])
             mems.append([words, bits, bytes, mux])
     elif sys.argv[2] == "sh":
         type = "SH"
@@ -87,7 +89,11 @@ elif type == "SP":
 print "    )"
 print "  ("
 if type == "SZ":
-    print "            input clk," #**
+    if async:
+        print "            input wclk,"
+        print "            input rclk,"
+    else:
+        print "            input clk,"
     print ""
     #
     # write port
@@ -103,7 +109,11 @@ if type == "SZ":
     print "            input [ADDR_W-1:0] r_addr,"
     print "            output [DATA_W-1:0] data_out"
 elif type == "SJ":
-    print "            input clk," #**
+    if async:
+        print "            input clk_a,"
+        print "            input clk_b,"
+    else:
+        print "            input clk,"
     print ""
     #
     # port A
@@ -144,14 +154,22 @@ print ""
 #
 
 if type == "SZ":
-    print "   wire clkA = clk;" #**
-    print "   wire clkB = clk;" #**
+    if async:
+        print "   wire clkA = wclk;"
+        print "   wire clkB = rclk;"
+    else:
+        print "   wire clkA = clk;"
+        print "   wire clkB = clk;"
     print "   wire wen = ~w_en;"
     print "   wire csnA = ~w_en;"
     print "   wire csnB = ~r_en;"
 elif type == "SJ":
-    print "   wire clkA = clk;" #**
-    print "   wire clkB = clk;" #**
+    if async:
+        print "   wire clkA = clk_a;"
+        print "   wire clkB = clk_b;"
+    else:
+        print "   wire clkA = clk;"
+        print "   wire clkB = clk;"
     print "   wire wenA = ~we_a;"
     print "   wire wenB = ~we_b;"
     print "   wire oeA = 1'b1; //en_a;"
