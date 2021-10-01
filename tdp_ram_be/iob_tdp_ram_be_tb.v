@@ -193,13 +193,13 @@ module iob_tdp_ram_be_tb;
     	.FILE(`hex_file1)
 	) uut (
 		.clkA(clkA), 
-		.enaA(enaA),
+		.enA(enaA),
         .weA(weA),
         .addrA(addrA),
         .dinA(data_inA),
         .doutA(data_outA),
         .clkB(clkB), 
-        .enaB(enaB),
+        .enB(enaB),
         .weB(weB),
         .addrB(addrB),
         .dinB(data_inB),
