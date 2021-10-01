@@ -10,9 +10,8 @@ module iob_tdp_ram_be
     parameter DATA_WIDTH = 32  // Data Width in bits
     )
    (
-    input                    clk,
-
     // Port A
+    input                    clkA,
     input                    enA,
     input [DATA_WIDTH/8-1:0] weA,
     input [ADDR_WIDTH-1:0]   addrA,
@@ -20,6 +19,7 @@ module iob_tdp_ram_be
     output [DATA_WIDTH-1:0]  doutA,
 
     // Port B
+    input                    clkB,
     input                    enB,
     input [DATA_WIDTH/8-1:0] weB,
     input [ADDR_WIDTH-1:0]   addrB,
@@ -45,7 +45,7 @@ module iob_tdp_ram_be
    // Port-A Operation
    reg [DATA_WIDTH-1:0]      doutA_int;
    integer                   i;
-   always @(posedge clk) begin
+   always @(posedge clkA) begin
       if (enA) begin
          for (i=0; i < NUM_COL; i=i+1) begin
             if (weA[i]) begin
@@ -61,7 +61,7 @@ module iob_tdp_ram_be
    // Port-B Operation
    reg [DATA_WIDTH-1:0]      doutB_int;
    integer                   j;
-   always @(posedge clk) begin
+   always @(posedge clkB) begin
       if (enB) begin
          for (j=0; j < NUM_COL; j=j+1) begin
             if (weB[j]) begin
@@ -88,14 +88,14 @@ module iob_tdp_ram_be
                .DATA_W(COL_WIDTH)
                ) ram
            (
-            .clk    (clk),
-
+            .clk_a  (clkA),
             .en_a   (enA),
             .addr_a (addrA),
             .data_a (dinA[i*COL_WIDTH +: COL_WIDTH]),
             .we_a   (weA[i]),
             .q_a    (doutA[i*COL_WIDTH +: COL_WIDTH]),
 
+            .clk_b  (clkB),
             .en_b   (enB),
             .addr_b (addrB),
             .data_b (dinB[i*COL_WIDTH +: COL_WIDTH]),

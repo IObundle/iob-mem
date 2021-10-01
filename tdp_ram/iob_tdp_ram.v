@@ -7,14 +7,16 @@ module iob_tdp_ram
     parameter ADDR_W=11
     )
    (
-    input                     clk,
-
+    // Port A
+    input                     clk_a,
     input [(DATA_W-1):0]      data_a,
     input [(ADDR_W-1):0]      addr_a,
     input                     en_a,
     input                     we_a,
     output reg [(DATA_W-1):0] q_a,
 
+    // Port B
+    input                     clk_b,
     input [(DATA_W-1):0]      data_b,
     input [(ADDR_W-1):0]      addr_b,
     input                     en_b,
@@ -34,7 +36,7 @@ module iob_tdp_ram
      if(mem_init_file_int != "none")
        $readmemh(mem_init_file_int, ram, 0, 2**ADDR_W - 1);
 
-   always @ (posedge clk) begin// Port A
+   always @ (posedge clk_a) begin// Port A
       if (en_a)
         if (we_a)
 	        ram[addr_a] <= data_a;
@@ -44,7 +46,7 @@ module iob_tdp_ram
       q_a <= ram[addr_a];
     end
 
-   always @ (posedge clk) begin // Port B
+   always @ (posedge clk_b) begin // Port B
       if (en_b)
         if (we_b)
 	        ram[addr_b] <= data_b;

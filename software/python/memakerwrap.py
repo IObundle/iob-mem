@@ -1,8 +1,11 @@
 #!/usr/bin/python
 
-#dpram usage: memakerwrap tech type async Nmems words bits bytes mux
-#tdpram usage: memakerwrap tech type async Nmems words bits bytes mux
-#sram usage: memakerwrap tech type words bits bytes mux
+#tdp_ram usage: memakerwrap tech type Nmems {words bits bytes mux}{Nmems}
+#dp_ram usage: memakerwrap tech type Nmems {words bits bytes mux}{Nmems}
+#t2p_ram usage: memakerwrap tech type Nmems {words bits bytes mux}{Nmems}
+#2p_ram usage: memakerwrap tech type Nmems {words bits bytes mux}{Nmems}
+#sp_ram usage: memakerwrap tech type words bits bytes mux
+
 #rom usage: memakerwrap tech type words bits mux romcode
 
 import sys
@@ -63,13 +66,15 @@ print ""
 #
 
 if type == "SZ":
-    print "module dp_ram"
+    if async: print "module t2p_ram"
+    else: print "module 2p_ram"
     print "  #("
     print "    parameter DATA_W = 8,"
     print "    parameter ADDR_W = 9,"
     print "    parameter USE_RAM = 1"
 elif type == "SJ":
-    print "module tdp_ram"
+    if async: print "module tdp_ram"
+    else: print "module dp_ram"
     print "  #("
     print "    parameter FILE = \"none\","
     print "    parameter DATA_W = 8,"
