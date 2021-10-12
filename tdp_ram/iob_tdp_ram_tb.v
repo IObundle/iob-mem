@@ -5,7 +5,7 @@
 `define hex_file1 "tb1.hex"
 `define hex_file2 "tb2.hex"
 
-module tdp_ram_tb;
+module iob_tdp_ram_tb;
 	
 	//Inputs
 	reg               clk;
@@ -34,7 +34,7 @@ module tdp_ram_tb;
     initial begin
         // optional VCD
         `ifdef VCD
-           $dumpfile("tdp_ram.vcd");
+           $dumpfile("iob_tdp_ram.vcd");
            $dumpvars();
         `endif
         $dumpoff();

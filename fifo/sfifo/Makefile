@@ -1,7 +1,7 @@
 ROOT_DIR = ../..
 include $(ROOT_DIR)/mem.mk
 
-2P_MEM = $(ROOT_DIR)/dp_ram/dp_ram.v
+2P_MEM = $(ROOT_DIR)/2p_ram/iob_2p_ram.v
 VSRC += $(2P_MEM)
 
 WSRC = waves.gtkw sfifo.vcd

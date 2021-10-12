@@ -8,7 +8,7 @@
 `endif
 
 
-module 2p_ram_tb;
+module iob_2p_ram_tb;
 
     // Inputs
     reg clk;
@@ -99,7 +99,7 @@ module 2p_ram_tb;
     end
 
     // Instantiate the Unit Under Test (UUT)
-    2p_ram #(
+    iob_2p_ram #(
         .DATA_W(`DATA_W),
         .ADDR_W(`ADDR_W),
         .USE_RAM(`USE_RAM)

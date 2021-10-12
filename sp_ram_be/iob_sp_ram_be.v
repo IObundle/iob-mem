@@ -30,7 +30,7 @@ module iob_sp_ram_be
       for (i=0; i < NUM_COL; i=i+1) begin: ram_col
          localparam mem_init_file_int = (FILE != "none")? {FILE, "_", file_suffix[8*(i+1)-1 -: 8], ".hex"}: "none";
 
-         sp_ram
+         iob_sp_ram
              #(
                .FILE(mem_init_file_int),
                .ADDR_W(ADDR_WIDTH),
