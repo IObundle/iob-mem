@@ -78,11 +78,10 @@ module iob_sync_fifo
    
    
    //FIFO memory
-   dp_ram
+   iob_2p_ram
      #(
        .DATA_W(DATA_WIDTH), 
-       .ADDR_W(ADDRESS_WIDTH),
-       .USE_RAM(USE_RAM)
+       .ADDR_W(ADDRESS_WIDTH)
        ) fifo_mem 
        (
 	.clk(clk),

@@ -29,7 +29,7 @@ module iob_sp_ram_be_tb;
     initial begin
         // optional VCD
         `ifdef VCD
-      	   $dumpfile("sp_ram.vcd");
+          $dumpfile("iob_sp_ram_be.vcd");
       	   $dumpvars();
         `endif
 
@@ -133,4 +133,4 @@ module iob_sp_ram_be_tb;
     // system clock
 	always #(clk_per/2) clk = ~clk; 
 
-endmodule // sp_ram_tb
+endmodule // iob_sp_ram_be_tb
