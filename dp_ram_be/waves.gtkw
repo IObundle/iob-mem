@@ -1,0 +1,37 @@
+[*]
+[*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
+[*] Thu Aug 20 10:51:59 2020
+[*]
+[dumpfile] "/home/josejoaquimsarmento/Documents/IObundle/mem_fork/tdp_ram_be/td_ram_be.vcd"
+[dumpfile_mtime] "Thu Aug 20 10:50:31 2020"
+[dumpfile_size] 15235
+[savefile] "/home/josejoaquimsarmento/Documents/IObundle/mem_fork/tdp_ram_be/waves.gtkw"
+[timestart] 0
+[size] 1844 600
+[pos] -1 -1
+*-16.298941 45000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 233
+[signals_width] 155
+[sst_expanded] 1
+[sst_vpaned_height] 144
+@28
+iob_tdp_ram_be_tb.clkA
+iob_tdp_ram_be_tb.enaA
+@29
+iob_tdp_ram_be_tb.weA[1:0]
+@22
+iob_tdp_ram_be_tb.addrA[3:0]
+iob_tdp_ram_be_tb.data_inA[7:0]
+iob_tdp_ram_be_tb.data_outA[7:0]
+@420
+iob_tdp_ram_be_tb.i
+@28
+iob_tdp_ram_be_tb.clkB
+iob_tdp_ram_be_tb.weB[1:0]
+iob_tdp_ram_be_tb.enaB
+@22
+iob_tdp_ram_be_tb.addrB[3:0]
+iob_tdp_ram_be_tb.data_inB[7:0]
+iob_tdp_ram_be_tb.data_outB[7:0]
+[pattern_trace] 1
+[pattern_trace] 0
