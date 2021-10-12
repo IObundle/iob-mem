@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module sp_ram 
+module iob_sp_ram 
   #(
     parameter FILE="none",
     parameter DATA_W=8,

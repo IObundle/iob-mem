@@ -7,7 +7,7 @@
 `define hex_file1 "tb1.hex"
 `define hex_file2 "tb2.hex"
 
-module sp_ram_be_tb;
+module iob_sp_ram_be_tb;
 	
 	//Inputs
 	reg clk;

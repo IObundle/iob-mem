@@ -1,10 +1,11 @@
 `timescale 1ns/1ps
 
-module dp_ram
-  #( 
-     parameter DATA_W = 8,
-     parameter ADDR_W = 6
-     )
+module iob_dp_ram
+  #(
+    parameter FILE = "none",
+    parameter DATA_W = 8,
+    parameter ADDR_W = 6
+    )
    (
     input                   clk,
 
