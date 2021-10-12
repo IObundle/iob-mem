@@ -30,7 +30,38 @@ module iob_tdp_ram_be
    localparam COL_WIDTH = 8;
    localparam NUM_COL = DATA_WIDTH/COL_WIDTH;
 
-`ifdef MEM_BYTE_EN
+`ifdef IS_CYCLONEV
+   localparam file_suffix = {"7","6","5","4","3","2","1","0"};
+
+   genvar                    i;
+   generate
+      for (i=0; i < NUM_COL; i=i+1) begin: ram_col
+         localparam mem_init_file_int = (FILE != "none")? {FILE, "_", file_suffix[8*(i+1)-1 -: 8], ".hex"}: "none";
+
+         iob_tdp_ram
+             #(
+               .FILE(mem_init_file_int),
+               .ADDR_W(ADDR_WIDTH),
+               .DATA_W(COL_WIDTH)
+               ) ram
+           (
+            .clk_a  (clkA),
+            .en_a   (enA),
+            .addr_a (addrA),
+            .data_a (dinA[i*COL_WIDTH +: COL_WIDTH]),
+            .we_a   (weA[i]),
+            .q_a    (doutA[i*COL_WIDTH +: COL_WIDTH]),
+
+            .clk_b  (clkB),
+            .en_b   (enB),
+            .addr_b (addrB),
+            .data_b (dinB[i*COL_WIDTH +: COL_WIDTH]),
+            .we_b   (weB[i]),
+            .q_b    (doutB[i*COL_WIDTH +: COL_WIDTH])
+            );
+      end
+   endgenerate
+`else // !IS_CYCLONEV
    // this allow ISE 14.7 to work; do not remove
    localparam mem_init_file_int = {FILE, ".hex"};
 
@@ -73,37 +104,6 @@ module iob_tdp_ram_be
    end
 
    assign doutB = doutB_int;
-`else // !MEM_BYTE_EN
-   localparam file_suffix = {"7","6","5","4","3","2","1","0"};
-
-   genvar                    i;
-   generate
-      for (i=0; i < NUM_COL; i=i+1) begin: ram_col
-         localparam mem_init_file_int = (FILE != "none")? {FILE, "_", file_suffix[8*(i+1)-1 -: 8], ".hex"}: "none";
-
-         iob_tdp_ram
-             #(
-               .FILE(mem_init_file_int),
-               .ADDR_W(ADDR_WIDTH),
-               .DATA_W(COL_WIDTH)
-               ) ram
-           (
-            .clk_a  (clkA),
-            .en_a   (enA),
-            .addr_a (addrA),
-            .data_a (dinA[i*COL_WIDTH +: COL_WIDTH]),
-            .we_a   (weA[i]),
-            .q_a    (doutA[i*COL_WIDTH +: COL_WIDTH]),
-
-            .clk_b  (clkB),
-            .en_b   (enB),
-            .addr_b (addrB),
-            .data_b (dinB[i*COL_WIDTH +: COL_WIDTH]),
-            .we_b   (weB[i]),
-            .q_b    (doutB[i*COL_WIDTH +: COL_WIDTH])
-            );
-      end
-   endgenerate
 `endif
 
 endmodule
