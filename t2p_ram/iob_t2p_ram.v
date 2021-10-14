@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-module t2p_ram
+module iob_t2p_ram
   #( 
      parameter DATA_W = 8,
      parameter ADDR_W = 6,

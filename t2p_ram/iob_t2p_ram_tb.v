@@ -8,10 +8,11 @@
 `endif
 
 
-module 2p_ram_tb;
+module iob_t2p_ram_tb;
 
     // Inputs
-    reg clk;
+    reg wclk;
+    reg rclk;
 
     //write signals
     reg w_en;
@@ -29,7 +30,8 @@ module 2p_ram_tb;
     parameter clk_per = 10; // clk period = 10 timeticks
 
     initial begin
-        clk = 1;
+        wclk = 1;
+        rclk = 1;
         r_en = 0;
         w_en = 0;
         r_addr = 0;
@@ -48,27 +50,28 @@ module 2p_ram_tb;
             end
         `endif
 
-        @(posedge clk) #1;
+        @(posedge wclk) #1;
+        @(posedge rclk) #1;
         w_en = 1;
 
         //Write all the locations of RAM 
         for(i = 0; i < 16; i = i + 1) begin
             data_in = i + 32;
             w_addr = i;
-            @(posedge clk) #1;
+            @(posedge wclk) #1;
         end
 
         w_en = 0; 	 
-        @(posedge clk) #1;
+        @(posedge rclk) #1;
 
         //Read all the locations of RAM with r_en = 0
         r_en = 0;
-        @(posedge clk) #1;
+        @(posedge rclk) #1;
 
         if(`USE_RAM == 1) begin
             for(i = 0; i < 16; i = i + 1) begin
                 r_addr = i;
-                @(posedge clk) #1;
+                @(posedge rclk) #1;
                 if(data_out!=0) begin
                     $display("Test 1 failed: with r_en = 0, at position %0d, data_out should be 0 but is %d", i, data_out);
                     $finish;
@@ -77,12 +80,12 @@ module 2p_ram_tb;
         end
 
         r_en = 1;
-        @(posedge clk) #1;
+        @(posedge rclk) #1;
 
         //Read all the locations of RAM with r_en = 1
         for(i = 0; i < 16; i = i + 1) begin
             r_addr = i;
-            @(posedge clk) #1;
+            @(posedge rclk) #1;
             if(data_out!=i+32) begin
                 $display("Test 2 failed: on position %0d, data_out is %d where it should be %0d", i, data_out, i+32);
                 $finish;
@@ -99,12 +102,13 @@ module 2p_ram_tb;
     end
 
     // Instantiate the Unit Under Test (UUT)
-    2p_ram #(
+    iob_t2p_ram #(
         .DATA_W(`DATA_W),
         .ADDR_W(`ADDR_W),
         .USE_RAM(`USE_RAM)
     ) uut (
-        .clk(clk), 
+        .wclk(wclk),
+        .rclk(rclk), 
         .w_en(w_en),
         .r_en(r_en), 
         .data_in(data_in), 
@@ -114,6 +118,7 @@ module 2p_ram_tb;
     );
 
     //Clock
-    always #(clk_per/2) clk = ~clk;
+    always #(clk_per/2) wclk = ~wclk;
+    always #(clk_per/2) rclk = ~rclk;
 
 endmodule

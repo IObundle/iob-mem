@@ -22,7 +22,32 @@ module iob_sp_ram_be
    localparam NUM_COL = DATA_WIDTH/COL_WIDTH;
 
    // Operation
-`ifdef MEM_BYTE_EN
+`ifdef IS_CYCLONEV
+   localparam file_suffix = {"7","6","5","4","3","2","1","0"};
+
+   genvar                     i;
+   generate
+      for (i=0; i < NUM_COL; i=i+1) begin: ram_col
+         localparam mem_init_file_int = (FILE != "none")? {FILE, "_", file_suffix[8*(i+1)-1 -: 8], ".hex"}: "none";
+
+         iob_sp_ram
+             #(
+               .FILE(mem_init_file_int),
+               .ADDR_W(ADDR_WIDTH),
+               .DATA_W(COL_WIDTH)
+               ) ram
+           (
+            .clk      (clk),
+
+            .en       (en),
+            .addr     (addr),
+            .data_in  (din[i*COL_WIDTH +: COL_WIDTH]),
+            .we       (we[i]),
+            .data_out (dout[i*COL_WIDTH +: COL_WIDTH])
+            );
+      end
+   endgenerate
+`else // !IS_CYCLONEV
    // this allows ISE 14.7 to work; do not remove
    localparam mem_init_file_int = {FILE, ".hex"};
 
@@ -48,31 +73,6 @@ module iob_sp_ram_be
    end
 
    assign dout = dout_int;
-`else // !MEM_BYTE_EN
-   localparam file_suffix = {"7","6","5","4","3","2","1","0"};
-
-   genvar                     i;
-   generate
-      for (i=0; i < NUM_COL; i=i+1) begin: ram_col
-         localparam mem_init_file_int = (FILE != "none")? {FILE, "_", file_suffix[8*(i+1)-1 -: 8], ".hex"}: "none";
-
-         sp_ram
-             #(
-               .FILE(mem_init_file_int),
-               .ADDR_W(ADDR_WIDTH),
-               .DATA_W(COL_WIDTH)
-               ) ram
-           (
-            .clk      (clk),
-
-            .en       (en),
-            .addr     (addr),
-            .data_in  (din[i*COL_WIDTH +: COL_WIDTH]),
-            .we       (we[i]),
-            .data_out (dout[i*COL_WIDTH +: COL_WIDTH])
-            );
-      end
-   endgenerate
 `endif
 
 endmodule
