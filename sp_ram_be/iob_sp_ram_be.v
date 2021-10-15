@@ -56,7 +56,7 @@ module iob_sp_ram_be
 
    // Initialize the RAM
    initial
-     if(mem_init_file_int != "none")
+     if(mem_init_file_int != "none.hex")
        $readmemh(mem_init_file_int, ram_block, 0, 2**ADDR_WIDTH - 1);
 
    reg [DATA_WIDTH-1:0]       dout_int;
