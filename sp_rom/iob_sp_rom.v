@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module sp_rom #(
+module iob_sp_rom #(
              parameter DATA_W = 8,
              parameter ADDR_W = 10,
              parameter FILE = "rom.dat"
