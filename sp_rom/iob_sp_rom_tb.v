@@ -4,7 +4,7 @@
 `define ADDR_W 4
 `define hex_file "tb1.hex"
 
-module sp_rom_tb;
+module iob_sp_rom_tb;
 	
 	//Inputs
 	reg clk;
@@ -25,7 +25,7 @@ module sp_rom_tb;
     initial begin
         // optional VCD
         `ifdef VCD
-      	   $dumpfile("sp_rom.vcd");
+      	   $dumpfile("iob_sp_rom.vcd");
       	   $dumpvars();
         `endif
       	
@@ -65,7 +65,7 @@ module sp_rom_tb;
     end
 
    	// Instantiate the Unit Under Test (UUT)
-    sp_rom #(
+    iob_sp_rom #(
     	.DATA_W(`DATA_W), 
     	.ADDR_W(`ADDR_W),
     	.FILE(`hex_file)
@@ -79,4 +79,4 @@ module sp_rom_tb;
     // system clock
 	always #(clk_per/2) clk = ~clk; 
 
-endmodule // sp_rom_tb
+endmodule // iob_sp_rom_tb
