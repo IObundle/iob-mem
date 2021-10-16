@@ -285,6 +285,7 @@ def instMemory (tech, type, words, bits, bytes, mux):
 
 def instMemories (tech, type) :
     global mems
+    bytes = 0
     
     if len(mems) > 1: print "generate"
     
