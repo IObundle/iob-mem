@@ -6,29 +6,29 @@
 module iob_tdp_ram_be
   #(
     parameter FILE = "none",
-    parameter ADDR_WIDTH = 10, // Addr Width in bits : 2*ADDR_WIDTH = RAM Depth
-    parameter DATA_WIDTH = 32  // Data Width in bits
+    parameter ADDR_W = 10, // Addr Width in bits : 2*ADDR_W = RAM Depth
+    parameter DATA_W = 32  // Data Width in bits
     )
    (
     // Port A
     input                    clkA,
     input                    enA,
-    input [DATA_WIDTH/8-1:0] weA,
-    input [ADDR_WIDTH-1:0]   addrA,
-    input [DATA_WIDTH-1:0]   dinA,
-    output [DATA_WIDTH-1:0]  doutA,
+    input [DATA_W/8-1:0] weA,
+    input [ADDR_W-1:0]   addrA,
+    input [DATA_W-1:0]   dinA,
+    output [DATA_W-1:0]  doutA,
 
     // Port B
     input                    clkB,
     input                    enB,
-    input [DATA_WIDTH/8-1:0] weB,
-    input [ADDR_WIDTH-1:0]   addrB,
-    input [DATA_WIDTH-1:0]   dinB,
-    output [DATA_WIDTH-1 :0] doutB
+    input [DATA_W/8-1:0] weB,
+    input [ADDR_W-1:0]   addrB,
+    input [DATA_W-1:0]   dinB,
+    output [DATA_W-1 :0] doutB
     );
 
-   localparam COL_WIDTH = 8;
-   localparam NUM_COL = DATA_WIDTH/COL_WIDTH;
+   localparam COL_W = 8;
+   localparam NUM_COL = DATA_W/COL_W;
 
 `ifdef IS_CYCLONEV
    localparam file_suffix = {"7","6","5","4","3","2","1","0"};
@@ -41,23 +41,23 @@ module iob_tdp_ram_be
          iob_tdp_ram
              #(
                .FILE(mem_init_file_int),
-               .ADDR_W(ADDR_WIDTH),
-               .DATA_W(COL_WIDTH)
+               .ADDR_W(ADDR_W),
+               .DATA_W(COL_W)
                ) ram
            (
             .clk_a  (clkA),
             .en_a   (enA),
             .addr_a (addrA),
-            .data_a (dinA[i*COL_WIDTH +: COL_WIDTH]),
+            .data_a (dinA[i*COL_W +: COL_W]),
             .we_a   (weA[i]),
-            .q_a    (doutA[i*COL_WIDTH +: COL_WIDTH]),
+            .q_a    (doutA[i*COL_W +: COL_W]),
 
             .clk_b  (clkB),
             .en_b   (enB),
             .addr_b (addrB),
-            .data_b (dinB[i*COL_WIDTH +: COL_WIDTH]),
+            .data_b (dinB[i*COL_W +: COL_W]),
             .we_b   (weB[i]),
-            .q_b    (doutB[i*COL_WIDTH +: COL_WIDTH])
+            .q_b    (doutB[i*COL_W +: COL_W])
             );
       end
    endgenerate
@@ -66,21 +66,21 @@ module iob_tdp_ram_be
    localparam mem_init_file_int = {FILE, ".hex"};
 
    // Core Memory
-   reg [DATA_WIDTH-1:0]      ram_block[(2**ADDR_WIDTH)-1:0];
+   reg [DATA_W-1:0]      ram_block[(2**ADDR_W)-1:0];
 
    // Initialize the RAM
    initial
      if(mem_init_file_int != "none.hex")
-       $readmemh(mem_init_file_int, ram_block, 0, 2**ADDR_WIDTH - 1);
+       $readmemh(mem_init_file_int, ram_block, 0, 2**ADDR_W - 1);
 
    // Port-A Operation
-   reg [DATA_WIDTH-1:0]      doutA_int;
+   reg [DATA_W-1:0]      doutA_int;
    integer                   i;
    always @(posedge clkA) begin
       if (enA) begin
          for (i=0; i < NUM_COL; i=i+1) begin
             if (weA[i]) begin
-               ram_block[addrA][i*COL_WIDTH +: COL_WIDTH] <= dinA[i*COL_WIDTH +: COL_WIDTH];
+               ram_block[addrA][i*COL_W +: COL_W] <= dinA[i*COL_W +: COL_W];
             end
          end
          doutA_int <= ram_block[addrA]; // Send Feedback
@@ -90,13 +90,13 @@ module iob_tdp_ram_be
    assign doutA = doutA_int;
 
    // Port-B Operation
-   reg [DATA_WIDTH-1:0]      doutB_int;
+   reg [DATA_W-1:0]      doutB_int;
    integer                   j;
    always @(posedge clkB) begin
       if (enB) begin
          for (j=0; j < NUM_COL; j=j+1) begin
             if (weB[j]) begin
-               ram_block[addrB][j*COL_WIDTH +: COL_WIDTH] <= dinB[j*COL_WIDTH +: COL_WIDTH];
+               ram_block[addrB][j*COL_W +: COL_W] <= dinB[j*COL_W +: COL_W];
             end
          end
          doutB_int <= ram_block[addrB]; // Send Feedback
