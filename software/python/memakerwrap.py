@@ -41,13 +41,13 @@ def initModule (type, async) :
         print "    parameter DATA_W = 8,"
         print "    parameter ADDR_W = 9"
     elif type == "SH":
-        print "module sp_ram"
+        print "module iob_sp_ram"
         print "  #("
         print "    parameter FILE = \"none\","
         print "    parameter DATA_W = 8,"
         print "    parameter ADDR_W = 14"
     elif type == "SP":
-        print "module sp_rom"
+        print "module iob_sp_rom"
         print "  #("
         print "    parameter DATA_W = 8,"
         print "    parameter ADDR_W = 9,"
