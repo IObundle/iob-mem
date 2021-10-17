@@ -8,13 +8,13 @@
 module iob_tdp_ram_tb;
 	
 	//Inputs
-	reg               clk;
-
+	reg               clkA;
     reg [`DATA_W-1:0] data_a;
     reg [`ADDR_W-1:0] addr_a;
     reg               en_a;
     reg               we_a;
 
+	reg               clkB;
     reg [`DATA_W-1:0] data_b;
     reg [`ADDR_W-1:0] addr_b;
     reg               en_b;
@@ -40,7 +40,8 @@ module iob_tdp_ram_tb;
         $dumpoff();
         
         //Initialize Inputs
-        clk = 1;
+        clkA = 1;
+        clkB = 1;
 
         data_a = 0;
         addr_a = 0;
@@ -54,19 +55,20 @@ module iob_tdp_ram_tb;
 
         // store file for comparison
         #clk_per
-        @(posedge clk) #1;
+        @(posedge clkA) #1;
+        @(posedge clkB) #1;
         $readmemh(`hex_file1, filemem);
 
 
-        @(posedge clk) #1;
+        @(posedge clkA) #1;
         en_a = 1;
 
         $dumpon();
         // read from file stored in port A
-        @(posedge clk) #1;
+        @(posedge clkA) #1;
         for(i = 0; i < 16; i = i + 1) begin
             addr_a = i;
-            @(posedge clk) #1;
+            @(posedge clkA) #1;
             if(filemem[i]!= q_a) begin
                 $display("Test failed: read error in port A position %d, where tb1.hex=%h but q_a=%h", i, filemem[i], q_a);
                 $finish;
@@ -75,15 +77,15 @@ module iob_tdp_ram_tb;
 
         #clk_per
 
-        @(posedge clk) #1;
+        @(posedge clkB) #1;
         en_b = 1;
 
 
           // read from file stored in port B
-        @(posedge clk) #1;
+        @(posedge clkB) #1;
         for(i = 0; i < 16; i = i + 1) begin
             addr_b = i;
-            @(posedge clk) #1;
+            @(posedge clkB) #1;
             if(filemem[i]!= q_b) begin
                 $display("Test failed: read error in port B position %d, where tb1.hex=%h but q_b=%h", i, filemem[i], q_b);
                 $finish;
@@ -96,22 +98,22 @@ module iob_tdp_ram_tb;
         $readmemh(`hex_file2, filemem);
 
         // write into port A and read from it
-        @(posedge clk) #1;
+        @(posedge clkA) #1;
         we_a = 1;
 
         for(i = 0; i < 16; i = i + 1) begin
             addr_a = i;
             data_a = filemem[i];
-            @(posedge clk) #1;
+            @(posedge clkA) #1;
         end
 
-        @(posedge clk) #1;
+        @(posedge clkA) #1;
         we_a = 0;
 
-        @(posedge clk) #1;
+        @(posedge clkA) #1;
         for(i = 0; i < 16; i = i + 1) begin
             addr_a = i;
-            @(posedge clk) #1;
+            @(posedge clkA) #1;
             if(filemem[i]!= q_a) begin
                 $display("Test failed: write error in port A position %d, where tb2.hex=%h but q_a=%h", i, filemem[i], q_a);
                 $finish;
@@ -119,29 +121,29 @@ module iob_tdp_ram_tb;
         end
 
             // write into port B and read from it
-        @(posedge clk) #1;
+        @(posedge clkB) #1;
         we_b = 1;
 
         for(i = 0; i < 16; i = i + 1) begin
             addr_b = i;
             data_b = filemem[i];
-            @(posedge clk) #1;
+            @(posedge clkB) #1;
         end
 
-        @(posedge clk) #1;
+        @(posedge clkB) #1;
         we_b = 0;
 
-        @(posedge clk) #1;
+        @(posedge clkB) #1;
         for(i = 0; i < 16; i = i + 1) begin
             addr_b = i;
-            @(posedge clk) #1;
+            @(posedge clkB) #1;
             if(filemem[i]!= q_b) begin
                 $display("Test failed: write error in port B position %d, where tb2.hex=%h but q_b=%h", i, filemem[i], q_b);
                 $finish;
             end
         end
 
-        @(posedge clk) #1;
+        @(posedge clkB) #1;
         en_a = 0;
         en_b = 0;
 
@@ -159,20 +161,23 @@ module iob_tdp_ram_tb;
         .ADDR_W(`ADDR_W),
         .FILE(`hex_file1)
     ) uut (
-        .clk(clk), 
-        .data_a(data_a),
-        .addr_a(addr_a),
-        .en_a(en_a),
-        .we_a(we_a),
-        .q_a(q_a),
-        .data_b(data_b),
-        .addr_b(addr_b),
-        .en_b(en_b),
-        .we_b(we_b),
-        .q_b(q_b)
+        .clkA(clkA),
+        .dinA(data_a),
+        .addrA(addr_a),
+        .enA(en_a),
+        .weA(we_a),
+        .doutA(q_a),
+
+        .clkB(clkB),
+        .dinB(data_b),
+        .addrB(addr_b),
+        .enB(en_b),
+        .weB(we_b),
+        .doutB(q_b)
     );
     
     // system clock
-    always #(clk_per/2) clk = ~clk; 
+    always #(clk_per/2) clkA = ~clkA;
+    always #(clk_per/2) clkB = ~clkB;
 
 endmodule // tdp_ram_tb

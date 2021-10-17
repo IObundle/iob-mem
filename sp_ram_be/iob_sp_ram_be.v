@@ -10,8 +10,8 @@ module iob_sp_ram_be
     parameter DATA_W = 32  // Data Width in bits
     ) 
    ( 
-     input                    clk,
-     input                    en,
+     input                clk,
+     input                en,
      input [DATA_W/8-1:0] we,
      input [ADDR_W-1:0]   addr,
      input [DATA_W-1:0]   din,
@@ -37,13 +37,13 @@ module iob_sp_ram_be
                .DATA_W(COL_W)
                ) ram
            (
-            .clk      (clk),
+            .clk  (clk),
 
-            .en       (en),
-            .addr     (addr),
-            .data_in  (din[i*COL_W +: COL_W]),
-            .we       (we[i]),
-            .data_out (dout[i*COL_W +: COL_W])
+            .en   (en),
+            .addr (addr),
+            .din  (din[i*COL_W +: COL_W]),
+            .we   (we[i]),
+            .dout (dout[i*COL_W +: COL_W])
             );
       end
    endgenerate

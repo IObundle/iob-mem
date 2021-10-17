@@ -11,16 +11,16 @@ module iob_tdp_ram_be
     )
    (
     // Port A
-    input                    clkA,
-    input                    enA,
+    input                clkA,
+    input                enA,
     input [DATA_W/8-1:0] weA,
     input [ADDR_W-1:0]   addrA,
     input [DATA_W-1:0]   dinA,
     output [DATA_W-1:0]  doutA,
 
     // Port B
-    input                    clkB,
-    input                    enB,
+    input                clkB,
+    input                enB,
     input [DATA_W/8-1:0] weB,
     input [ADDR_W-1:0]   addrB,
     input [DATA_W-1:0]   dinB,
@@ -45,19 +45,19 @@ module iob_tdp_ram_be
                .DATA_W(COL_W)
                ) ram
            (
-            .clk_a  (clkA),
-            .en_a   (enA),
-            .addr_a (addrA),
-            .data_a (dinA[i*COL_W +: COL_W]),
-            .we_a   (weA[i]),
-            .q_a    (doutA[i*COL_W +: COL_W]),
+            .clkA  (clkA),
+            .enA   (enA),
+            .addrA (addrA),
+            .dinA  (dinA[i*COL_W +: COL_W]),
+            .weA   (weA[i]),
+            .doutA (doutA[i*COL_W +: COL_W]),
 
-            .clk_b  (clkB),
-            .en_b   (enB),
-            .addr_b (addrB),
-            .data_b (dinB[i*COL_W +: COL_W]),
-            .we_b   (weB[i]),
-            .q_b    (doutB[i*COL_W +: COL_W])
+            .clkB  (clkB),
+            .enB   (enB),
+            .addrB (addrB),
+            .dinB  (dinB[i*COL_W +: COL_W]),
+            .weB   (weB[i]),
+            .doutB (doutB[i*COL_W +: COL_W])
             );
       end
    endgenerate

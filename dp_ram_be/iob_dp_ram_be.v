@@ -45,19 +45,19 @@ module iob_dp_ram_be
                .DATA_W(COL_W)
                ) ram
            (
-            .clk    (clk),
+            .clk   (clk),
 
-            .en_a   (enA),
-            .addr_a (addrA),
-            .data_a (dinA[i*COL_W +: COL_W]),
-            .we_a   (weA[i]),
-            .q_a    (doutA[i*COL_W +: COL_W]),
+            .enA   (enA),
+            .addrA (addrA),
+            .dinA  (dinA[i*COL_W +: COL_W]),
+            .weA   (weA[i]),
+            .doutA (doutA[i*COL_W +: COL_W]),
 
-            .en_b   (enB),
-            .addr_b (addrB),
-            .data_b (dinB[i*COL_W +: COL_W]),
-            .we_b   (weB[i]),
-            .q_b    (doutB[i*COL_W +: COL_W])
+            .enB   (enB),
+            .addrB (addrB),
+            .dinB  (dinB[i*COL_W +: COL_W]),
+            .weB   (weB[i]),
+            .doutB (doutB[i*COL_W +: COL_W])
             );
       end
    endgenerate

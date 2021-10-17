@@ -11,8 +11,8 @@ module iob_sp_ram
     input                     en, 
     input                     we, 
     input [(ADDR_W-1):0]      addr,
-    output reg [(DATA_W-1):0] data_out,
-    input [(DATA_W-1):0]      data_in
+    output reg [(DATA_W-1):0] dout,
+    input [(DATA_W-1):0]      din
     );
 
    //this allows ISE 14.7 to work; do not remove
@@ -30,8 +30,8 @@ module iob_sp_ram
    always @ (posedge clk)
      if(en)
        if (we)
-         ram[addr] <= data_in;
+         ram[addr] <= din;
        else
-         data_out <= ram[addr];
+         dout <= ram[addr];
 
 endmodule

@@ -10,18 +10,18 @@ module iob_dp_ram
     input                   clk,
 
     // Port A
-    input [DATA_W-1:0]      data_a,
-    input [ADDR_W-1:0]      addr_a,
-    input                   en_a,
-    input                   we_a,
-    output reg [DATA_W-1:0] q_a,
+    input [DATA_W-1:0]      dinA,
+    input [ADDR_W-1:0]      addrA,
+    input                   enA,
+    input                   weA,
+    output reg [DATA_W-1:0] doutA,
 
     // Port B
-    input [DATA_W-1:0]      data_b,
-    input [ADDR_W-1:0]      addr_b,
-    input                   en_b,
-    input                   we_b,
-    output reg [DATA_W-1:0] q_b
+    input [DATA_W-1:0]      dinB,
+    input [ADDR_W-1:0]      addrB,
+    input                   enB,
+    input                   weB,
+    output reg [DATA_W-1:0] doutB
     );
 
    //this allows ISE 14.7 to work; do not remove
@@ -37,23 +37,23 @@ module iob_dp_ram
        $readmemh(mem_init_file_int, ram, 0, 2**ADDR_W - 1);
 
    always @ (posedge clk) begin// Port A
-      if (en_a)
-        if (we_a)
-	        ram[addr_a] <= data_a;
+      if (enA)
+        if (weA)
+	        ram[addrA] <= dinA;
       `ifdef IS_CYCLONEV
         else
       `endif
-      q_a <= ram[addr_a];
+      doutA <= ram[addrA];
     end
 
    always @ (posedge clk) begin // Port B
-      if (en_b)
-        if (we_b)
-	        ram[addr_b] <= data_b;
+      if (enB)
+        if (weB)
+	        ram[addrB] <= dinB;
       `ifdef IS_CYCLONEV
         else
       `endif
-	    q_b <= ram[addr_b];
+	    doutB <= ram[addrB];
     end
 
 endmodule   
