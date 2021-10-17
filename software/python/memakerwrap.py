@@ -3,12 +3,12 @@
 import sys
 
 help_message="""
-       tdp_ram - memakerwrap tech type async Nmems {words bits bytes mux}{Nmems}
-       dp_ram  - memakerwrap tech type async Nmems {words bits bytes mux}{Nmems}
-       t2p_ram - memakerwrap tech type async Nmems {words bits bytes mux}{Nmems}
-       2p_ram  - memakerwrap tech type async Nmems {words bits bytes mux}{Nmems}
-       sp_ram  - memakerwrap tech type words bits bytes mux
-       sp_rom  - memakerwrap tech type words bits mux romcode
+       tdp_ram - memakerwrap tech moduleName type async Nmems {words bits bytes mux}{Nmems}
+       dp_ram  - memakerwrap tech moduleName type async Nmems {words bits bytes mux}{Nmems}
+       t2p_ram - memakerwrap tech moduleName type async Nmems {words bits bytes mux}{Nmems}
+       2p_ram  - memakerwrap tech moduleName type async Nmems {words bits bytes mux}{Nmems}
+       sp_ram  - memakerwrap tech moduleName type words bits bytes mux
+       sp_rom  - memakerwrap tech moduleName type words bits mux romcode
 """
 
 mems = []
@@ -25,33 +25,21 @@ def timeScale () :
 # Initiate module
 #
 
-def initModule (type, async) :
+def initModule (moduleName, type, async) :
+    print "module "+moduleName
+    print "  #("
+    print "    parameter DATA_W = 8,"
+    print "    parameter ADDR_W = 9,"
+    
     if type == "SZ":
-        if async: print "module iob_t2p_ram_be"
-        else: print "module iob_2p_ram_be"
-        print "  #("
-        print "    parameter DATA_W = 8,"
-        print "    parameter ADDR_W = 9,"
         print "    parameter USE_RAM = 1"
     elif type == "SJ":
-        if async: print "module iob_tdp_ram_be"
-        else: print "module iob_dp_ram_be"
-        print "  #("
-        print "    parameter FILE = \"none\","
-        print "    parameter DATA_W = 8,"
-        print "    parameter ADDR_W = 9"
+        print "    parameter FILE = \"none\""
     elif type == "SH":
-        print "module iob_sp_ram_be"
-        print "  #("
-        print "    parameter FILE = \"none\","
-        print "    parameter DATA_W = 8,"
-        print "    parameter ADDR_W = 14"
+        print "    parameter FILE = \"none\""
     elif type == "SP":
-        print "module iob_sp_rom"
-        print "  #("
-        print "    parameter DATA_W = 8,"
-        print "    parameter ADDR_W = 9,"
         print "    parameter FILE = \"rom.dat\""
+    
     print "    )"
 
 #
@@ -109,9 +97,9 @@ def instPinout (type, async) :
         print ""
         print "            input en,"
         print "            input [ADDR_W-1:0] addr,"
-        print "            input [DATA_W-1:0] data_in,"
+        print "            input [DATA_W-1:0] din,"
         print "            input [DATA_W/8-1:0] we,"
-        print "            output [DATA_W-1:0] data_out"
+        print "            output [DATA_W-1:0] dout"
     elif type == "SP":
         print "            input clk,"
         print ""
@@ -229,10 +217,10 @@ def instMemory (tech, type, words, bits, bytes, mux):
         print "    .OEB(oeB),"
     elif type == "SH":
         for i in range(bits*bytes):
-            print "    .DO"+str(i)+"(data_out["+str(i)+"]),"
+            print "    .DO"+str(i)+"(dout["+str(i)+"]),"
         print ""
         for i in range(bits*bytes):
-            print "    .DI"+str(i)+"(data_in["+str(i)+"]),"
+            print "    .DI"+str(i)+"(din["+str(i)+"]),"
         print ""
         if bytes > 1:
             for i in range(bytes):
@@ -313,11 +301,11 @@ def endModule () :
 # Generate wrapper
 #
 
-def generateWrapper (tech, type, async) :
+def generateWrapper (moduleName, tech, type, async) :
     ret = 0
     
     timeScale()
-    initModule(type, async)
+    initModule(moduleName, type, async)
     instPinout(type, async)
     instWires(type, async)
     instMemories(tech, type)
@@ -351,36 +339,37 @@ def main () :
     # extract command line arguments
     if sys.argv[1] == "fsc0l_d":
         tech = "LD130"
-        if sys.argv[2] == "sz":
+        moduleName = sys.argv[2]
+        if sys.argv[3] == "sz":
             type = "SZ"
-            async = int(sys.argv[3])
-            for i in range(int(sys.argv[4])):
-                words = int(sys.argv[5 + i*4])
-                bits  = int(sys.argv[6 + i*4])
-                bytes = int(sys.argv[7 + i*4])
-                mux   = int(sys.argv[8 + i*4])
+            async = int(sys.argv[4])
+            for i in range(int(sys.argv[5])):
+                words = int(sys.argv[6 + i*4])
+                bits  = int(sys.argv[7 + i*4])
+                bytes = int(sys.argv[8 + i*4])
+                mux   = int(sys.argv[9 + i*4])
                 mems.append([words, bits, bytes, mux])
-        elif sys.argv[2] == "sj":
+        elif sys.argv[3] == "sj":
             type = "SJ"
-            async = int(sys.argv[3])
-            for i in range(int(sys.argv[4])):
-                words = int(sys.argv[5 + i*4])
-                bits  = int(sys.argv[6 + i*4])
-                bytes = int(sys.argv[7 + i*4])
-                mux   = int(sys.argv[8 + i*4])
+            async = int(sys.argv[4])
+            for i in range(int(sys.argv[5])):
+                words = int(sys.argv[6 + i*4])
+                bits  = int(sys.argv[7 + i*4])
+                bytes = int(sys.argv[8 + i*4])
+                mux   = int(sys.argv[9 + i*4])
                 mems.append([words, bits, bytes, mux])
-        elif sys.argv[2] == "sh":
+        elif sys.argv[3] == "sh":
             type = "SH"
-            words = int(sys.argv[3])
-            bits  = int(sys.argv[4])
-            bytes = int(sys.argv[5])
-            mux   = int(sys.argv[6])
+            words = int(sys.argv[4])
+            bits  = int(sys.argv[5])
+            bytes = int(sys.argv[6])
+            mux   = int(sys.argv[7])
             mems.append([words, bits, bytes, mux])
-        elif sys.argv[2] == "sp":
+        elif sys.argv[3] == "sp":
             type = "SP"
-            words = int(sys.argv[3])
-            bits  = int(sys.argv[4])
-            mux   = int(sys.argv[5])
+            words = int(sys.argv[4])
+            bits  = int(sys.argv[5])
+            mux   = int(sys.argv[6])
             mems.append([words, bits, mux])
         else:
             sys.exit("Unsupported memory type")
@@ -390,7 +379,7 @@ def main () :
         sys.exit("Unsupported memory technology")
     
     # generate wrapper
-    ret = generateWrapper(tech, type, async)
+    ret = generateWrapper(moduleName, tech, type, async)
     
     # exit
     sys.exit(ret)
