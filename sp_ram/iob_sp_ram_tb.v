@@ -105,8 +105,8 @@ module iob_sp_ram_tb;
 		.en(en),
         .we(we),
         .addr(addr),
-        .data_in(data_in),
-        .data_out(data_out)
+        .din(data_in),
+        .dout(data_out)
 	);
     
     // system clock
