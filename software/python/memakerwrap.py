@@ -27,21 +27,21 @@ def timeScale () :
 
 def initModule (type, async) :
     if type == "SZ":
-        if async: print "module iob_t2p_ram"
-        else: print "module iob_2p_ram"
+        if async: print "module iob_t2p_ram_be"
+        else: print "module iob_2p_ram_be"
         print "  #("
         print "    parameter DATA_W = 8,"
         print "    parameter ADDR_W = 9,"
         print "    parameter USE_RAM = 1"
     elif type == "SJ":
-        if async: print "module iob_tdp_ram"
-        else: print "module iob_dp_ram"
+        if async: print "module iob_tdp_ram_be"
+        else: print "module iob_dp_ram_be"
         print "  #("
         print "    parameter FILE = \"none\","
         print "    parameter DATA_W = 8,"
         print "    parameter ADDR_W = 9"
     elif type == "SH":
-        print "module iob_sp_ram"
+        print "module iob_sp_ram_be"
         print "  #("
         print "    parameter FILE = \"none\","
         print "    parameter DATA_W = 8,"
@@ -82,35 +82,35 @@ def instPinout (type, async) :
         print "            output [DATA_W-1:0] data_out"
     elif type == "SJ":
         if async:
-            print "            input clk_a,"
-            print "            input clk_b,"
+            print "            input clkA,"
+            print "            input clkB,"
         else:
             print "            input clk,"
         print ""
         #
         # port A
         #
-        print "            input en_a,"
-        print "            input [ADDR_W-1:0] addr_a,"
-        print "            input [DATA_W-1:0] data_a,"
-        print "            input we_a,"
-        print "            input [DATA_W-1:0] q_a,"
+        print "            input enA,"
+        print "            input [ADDR_W-1:0] addrA,"
+        print "            input [DATA_W-1:0] dinA,"
+        print "            input [DATA_W/8-1:0] weA,"
+        print "            input [DATA_W-1:0] doutA,"
         print ""
         #
         # port B
         #
-        print "            input en_b,"
-        print "            input [ADDR_W-1:0] addr_b,"
-        print "            input [DATA_W-1:0] data_b,"
-        print "            input we_b,"
-        print "            input [DATA_W-1:0] q_b"
+        print "            input enB,"
+        print "            input [ADDR_W-1:0] addrB,"
+        print "            input [DATA_W-1:0] dinB,"
+        print "            input [DATA_W/8-1:0] weB,"
+        print "            input [DATA_W-1:0] doutB"
     elif type == "SH":
         print "            input clk,"
         print ""
         print "            input en,"
         print "            input [ADDR_W-1:0] addr,"
         print "            input [DATA_W-1:0] data_in,"
-        print "            input we,"
+        print "            input [DATA_W/8-1:0] we,"
         print "            output [DATA_W-1:0] data_out"
     elif type == "SP":
         print "            input clk,"
@@ -135,16 +135,16 @@ def instWires (type, async) :
             print "   wire clkB = clk;"
         print "generate"
         print "if (USE_RAM) begin"
-        print "   wire [ADDR_W-1:0] addr_a = w_addr;"
-        print "   wire [ADDR_W-1:0] addr_b = r_addr;"
-        print "   wire [DATA_W-1:0] data_a = data_in;"
-        print "   wire [DATA_W-1:0] data_b = {DATA_W{1'b0}};"
-        print "   wire [DATA_W-1:0] q_a;"
-        print "   wire [DATA_W-1:0] q_b;"
-        print "   wire wenA = ~w_en;"
-        print "   wire wenB = 1'b1;"
-        print "   wire en_a = w_en;"
-        print "   wire en_b = r_en;"
+        print "   wire [ADDR_W-1:0] addrA = w_addr;"
+        print "   wire [ADDR_W-1:0] addrB = r_addr;"
+        print "   wire [DATA_W-1:0] dinA = data_in;"
+        print "   wire [DATA_W-1:0] dinB = {DATA_W{1'b0}};"
+        print "   wire [DATA_W-1:0] doutA;"
+        print "   wire [DATA_W-1:0] doutB;"
+        print "   wire [DATA_W/8-1:0] wenA = {(DATA_W/8){~w_en}};"
+        print "   wire [DATA_W/8-1:0] wenB = {(DATA_W/8){1'b1}};"
+        print "   wire enA = w_en;"
+        print "   wire enB = r_en;"
         print "   wire oeA = 1'b1; //1'b0;"
         print "   wire oeB = 1'b1; //r_en;"
         print "   assign data_out = q_b;"
@@ -155,18 +155,15 @@ def instWires (type, async) :
         print "end"
         print "endgenerate"
     elif type == "SJ":
-        if async:
-            print "   wire clkA = clk_a;"
-            print "   wire clkB = clk_b;"
-        else:
+        if not async:
             print "   wire clkA = clk;"
             print "   wire clkB = clk;"
-        print "   wire wenA = ~we_a;"
-        print "   wire wenB = ~we_b;"
-        print "   wire oeA = 1'b1; //en_a;"
-        print "   wire oeB = 1'b1; //en_b;"
+        print "   wire [DATA_W/8-1:0] wenA = ~weA;"
+        print "   wire [DATA_W/8-1:0] wenB = ~weB;"
+        print "   wire oeA = 1'b1; //enA;"
+        print "   wire oeB = 1'b1; //enB;"
     elif type == "SH":
-        print "   wire wen = ~we;"
+        print "   wire [DATA_W/8-1:0] wen = ~we;"
         print "   wire oe = 1'b1; //en & ~(|we);"
     elif type == "SP":
         print "   wire oe = 1'b1; //r_en;"
@@ -204,29 +201,29 @@ def instMemory (tech, type, words, bits, bytes, mux):
         print "    .CSBN(csnB),"
     elif type == "SJ":
         for i in range(bits*bytes):
-            print "    .DOA"+str(i)+"(q_a["+str(i)+"]),"
+            print "    .DOA"+str(i)+"(doutA["+str(i)+"]),"
         print ""
         for i in range(bits*bytes):
-            print "    .DOB"+str(i)+"(q_b["+str(i)+"]),"
+            print "    .DOB"+str(i)+"(doutB["+str(i)+"]),"
         print ""
         for i in range(bits*bytes):
-            print "    .DIA"+str(i)+"(data_a["+str(i)+"]),"
+            print "    .DIA"+str(i)+"(dinA["+str(i)+"]),"
         print ""
         for i in range(bits*bytes):
-            print "    .DIB"+str(i)+"(data_b["+str(i)+"]),"
+            print "    .DIB"+str(i)+"(dinB["+str(i)+"]),"
         print ""
         if bytes > 1:
             for i in range(bytes):
-                print "    .WEAN"+str(i)+"(wenA),"
+                print "    .WEAN"+str(i)+"(wenA["+str(i)+"]),"
             print ""
             for i in range(bytes):
-                print "    .WEBN"+str(i)+"(wenB),"
+                print "    .WEBN"+str(i)+"(wenB["+str(i)+"]),"
         else:
             print "    .WEAN(wenA),"
             print "    .WEBN(wenB),"
         print ""
-        print "    .CSA(en_a),"
-        print "    .CSB(en_b),"
+        print "    .CSA(enA),"
+        print "    .CSB(enB),"
         print ""
         print "    .OEA(oeA),"
         print "    .OEB(oeB),"
@@ -239,7 +236,7 @@ def instMemory (tech, type, words, bits, bytes, mux):
         print ""
         if bytes > 1:
             for i in range(bytes):
-                print "    .WEB"+str(i)+"(wen),"
+                print "    .WEB"+str(i)+"(wen["+str(i)+"]),"
         else:
             print "    .WEB(wen),"
         print ""
@@ -263,10 +260,10 @@ def instMemory (tech, type, words, bits, bytes, mux):
         print "    .CKB(clkB)"
     elif type == "SJ":
         for i in range(words):
-            print "    .A"+str(i)+"(addr_a["+str(i)+"]),"
+            print "    .A"+str(i)+"(addrA["+str(i)+"]),"
         print ""
         for i in range(words):
-            print "    .B"+str(i)+"(addr_b["+str(i)+"]),"
+            print "    .B"+str(i)+"(addrB["+str(i)+"]),"
         print ""
         print "    .CKA(clkA),"
         print "    .CKB(clkB)"

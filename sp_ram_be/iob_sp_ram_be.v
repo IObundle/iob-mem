@@ -6,20 +6,20 @@
 module iob_sp_ram_be
   #(
     parameter FILE="none",
-    parameter ADDR_WIDTH = 10, // Addr Width in bits : 2*ADDR_WIDTH = RAM Depth
-    parameter DATA_WIDTH = 32  // Data Width in bits
+    parameter ADDR_W = 10, // Addr Width in bits : 2*ADDR_W = RAM Depth
+    parameter DATA_W = 32  // Data Width in bits
     ) 
    ( 
      input                    clk,
      input                    en,
-     input [DATA_WIDTH/8-1:0] we,
-     input [ADDR_WIDTH-1:0]   addr,
-     input [DATA_WIDTH-1:0]   din,
-     output [DATA_WIDTH-1:0]  dout
+     input [DATA_W/8-1:0] we,
+     input [ADDR_W-1:0]   addr,
+     input [DATA_W-1:0]   din,
+     output [DATA_W-1:0]  dout
      );
 
-   localparam COL_WIDTH = 8;
-   localparam NUM_COL = DATA_WIDTH/COL_WIDTH;
+   localparam COL_W = 8;
+   localparam NUM_COL = DATA_W/COL_W;
 
    // Operation
 `ifdef IS_CYCLONEV
@@ -33,17 +33,17 @@ module iob_sp_ram_be
          iob_sp_ram
              #(
                .FILE(mem_init_file_int),
-               .ADDR_W(ADDR_WIDTH),
-               .DATA_W(COL_WIDTH)
+               .ADDR_W(ADDR_W),
+               .DATA_W(COL_W)
                ) ram
            (
             .clk      (clk),
 
             .en       (en),
             .addr     (addr),
-            .data_in  (din[i*COL_WIDTH +: COL_WIDTH]),
+            .data_in  (din[i*COL_W +: COL_W]),
             .we       (we[i]),
-            .data_out (dout[i*COL_WIDTH +: COL_WIDTH])
+            .data_out (dout[i*COL_W +: COL_W])
             );
       end
    endgenerate
@@ -52,20 +52,20 @@ module iob_sp_ram_be
    localparam mem_init_file_int = {FILE, ".hex"};
 
    // Core Memory
-   reg [DATA_WIDTH-1:0]       ram_block[(2**ADDR_WIDTH)-1:0];
+   reg [DATA_W-1:0]       ram_block[(2**ADDR_W)-1:0];
 
    // Initialize the RAM
    initial
      if(mem_init_file_int != "none.hex")
-       $readmemh(mem_init_file_int, ram_block, 0, 2**ADDR_WIDTH - 1);
+       $readmemh(mem_init_file_int, ram_block, 0, 2**ADDR_W - 1);
 
-   reg [DATA_WIDTH-1:0]       dout_int;
+   reg [DATA_W-1:0]       dout_int;
    integer                    i;
    always @ (posedge clk) begin
       if(en) begin
          for(i=0; i < NUM_COL; i=i+1) begin
             if(we[i]) begin
-               ram_block[addr][i*COL_WIDTH +: COL_WIDTH] <= din[i*COL_WIDTH +: COL_WIDTH];
+               ram_block[addr][i*COL_W +: COL_W] <= din[i*COL_W +: COL_W];
             end
          end
          dout_int <= ram_block[addr]; // Send Feedback

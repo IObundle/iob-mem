@@ -1,8 +1,8 @@
 `timescale 1ns / 1ps
 
 `define NUM_COL 2
-`define COL_WIDTH 4
-`define DATA_W (`NUM_COL * `COL_WIDTH)
+`define COL_W 4
+`define DATA_W (`NUM_COL * `COL_W)
 `define ADDR_W 4
 `define hex_file1 "tb1.hex"
 `define hex_file2 "tb2.hex"
@@ -187,9 +187,9 @@ module iob_tdp_ram_be_tb;
    	// Instantiate the Unit Under Test (UUT)
     iob_tdp_ram_be #(
         .NUM_COL(`NUM_COL),
-        .COL_WIDTH(`COL_WIDTH),
-    	.DATA_WIDTH(`DATA_W), 
-    	.ADDR_WIDTH(`ADDR_W),
+        .COL_W(`COL_W),
+        .DATA_W(`DATA_W),
+        .ADDR_W(`ADDR_W),
     	.FILE(`hex_file1)
 	) uut (
 		.clkA(clkA), 
