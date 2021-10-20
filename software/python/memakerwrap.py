@@ -82,7 +82,7 @@ def instPinout (type, async) :
         print "            input [ADDR_W-1:0] addrA,"
         print "            input [DATA_W-1:0] dinA,"
         print "            input [DATA_W/8-1:0] weA,"
-        print "            input [DATA_W-1:0] doutA,"
+        print "            output [DATA_W-1:0] doutA,"
         print ""
         #
         # port B
@@ -91,7 +91,7 @@ def instPinout (type, async) :
         print "            input [ADDR_W-1:0] addrB,"
         print "            input [DATA_W-1:0] dinB,"
         print "            input [DATA_W/8-1:0] weB,"
-        print "            input [DATA_W-1:0] doutB"
+        print "            output [DATA_W-1:0] doutB"
     elif type == "SH":
         print "            input clk,"
         print ""
@@ -131,11 +131,11 @@ def instWires (type, async) :
         print "   wire [DATA_W-1:0] doutB;"
         print "   wire [DATA_W/8-1:0] wenA = {(DATA_W/8){~w_en}};"
         print "   wire [DATA_W/8-1:0] wenB = {(DATA_W/8){1'b1}};"
-        print "   wire enA = w_en;"
-        print "   wire enB = r_en;"
+        print "   wire csA = 1'b1; //w_en;"
+        print "   wire csB = 1'b1; //r_en;"
         print "   wire oeA = 1'b1; //1'b0;"
         print "   wire oeB = 1'b1; //r_en;"
-        print "   assign data_out = q_b;"
+        print "   assign data_out = doutB;"
         print "end else begin"
         print "   wire wen = ~w_en;"
         print "   wire csnA = ~w_en;"
@@ -148,6 +148,8 @@ def instWires (type, async) :
             print "   wire clkB = clk;"
         print "   wire [DATA_W/8-1:0] wenA = ~weA;"
         print "   wire [DATA_W/8-1:0] wenB = ~weB;"
+        print "   wire csA = 1'b1; //enA"
+        print "   wire csB = 1'b1; //enB"
         print "   wire oeA = 1'b1; //enA;"
         print "   wire oeB = 1'b1; //enB;"
     elif type == "SH":
@@ -210,8 +212,8 @@ def instMemory (tech, type, words, bits, bytes, mux):
             print "    .WEAN(wenA),"
             print "    .WEBN(wenB),"
         print ""
-        print "    .CSA(enA),"
-        print "    .CSB(enB),"
+        print "    .CSA(csA),"
+        print "    .CSB(csB),"
         print ""
         print "    .OEA(oeA),"
         print "    .OEB(oeB),"
@@ -340,7 +342,7 @@ def main () :
     if sys.argv[1] == "fsc0l_d":
         tech = "LD130"
         moduleName = sys.argv[2]
-        if sys.argv[3] == "sz":
+        if sys.argv[3] == "SZ":
             type = "SZ"
             async = int(sys.argv[4])
             for i in range(int(sys.argv[5])):
@@ -349,7 +351,7 @@ def main () :
                 bytes = int(sys.argv[8 + i*4])
                 mux   = int(sys.argv[9 + i*4])
                 mems.append([words, bits, bytes, mux])
-        elif sys.argv[3] == "sj":
+        elif sys.argv[3] == "SJ":
             type = "SJ"
             async = int(sys.argv[4])
             for i in range(int(sys.argv[5])):
@@ -358,14 +360,14 @@ def main () :
                 bytes = int(sys.argv[8 + i*4])
                 mux   = int(sys.argv[9 + i*4])
                 mems.append([words, bits, bytes, mux])
-        elif sys.argv[3] == "sh":
+        elif sys.argv[3] == "SH":
             type = "SH"
             words = int(sys.argv[4])
             bits  = int(sys.argv[5])
             bytes = int(sys.argv[6])
             mux   = int(sys.argv[7])
             mems.append([words, bits, bytes, mux])
-        elif sys.argv[3] == "sp":
+        elif sys.argv[3] == "SP":
             type = "SP"
             words = int(sys.argv[4])
             bits  = int(sys.argv[5])
