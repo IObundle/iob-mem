@@ -3,12 +3,12 @@
 import sys
 
 help_message="""
-       tdp_ram - memakerwrap tech moduleName type async Nmems {words bits bytes mux}{Nmems}
-       dp_ram  - memakerwrap tech moduleName type async Nmems {words bits bytes mux}{Nmems}
-       t2p_ram - memakerwrap tech moduleName type async Nmems {words bits bytes mux}{Nmems}
-       2p_ram  - memakerwrap tech moduleName type async Nmems {words bits bytes mux}{Nmems}
-       sp_ram  - memakerwrap tech moduleName type words bits bytes mux
-       sp_rom  - memakerwrap tech moduleName type words bits mux romcode
+       tdp-ram - memakerwrap tech moduleName type async be Nmems {words bits bytes mux}{Nmems}
+       dp-ram  - memakerwrap tech moduleName type async be Nmems {words bits bytes mux}{Nmems}
+       t2p-ram - memakerwrap tech moduleName type async be Nmems {words bits bytes mux}{Nmems}
+       2p-ram  - memakerwrap tech moduleName type async be Nmems {words bits bytes mux}{Nmems}
+       sp-ram  - memakerwrap tech moduleName type be Nmems {words bits bytes mux}{Nmems}
+       sp-rom  - memakerwrap tech moduleName type Nmems {words bits mux romcode}{Nmems}
 """
 
 mems = []
@@ -46,7 +46,7 @@ def initModule (moduleName, type, async) :
 # Instantiate pinout signals
 #
 
-def instPinout (type, async) :
+def instPinout (type, async, be) :
     print "  ("
     if type == "SZ":
         if async:
@@ -58,14 +58,16 @@ def instPinout (type, async) :
         #
         # write port
         #
-        print "            input w_en,"
+        if be: print "            input [DATA_W/8-1:0] w_en,"
+        else: print "            input w_en,"
         print "            input [ADDR_W-1:0] w_addr,"
         print "            input [DATA_W-1:0] data_in,"
         print ""
         #
         # read port
         #
-        print "            input r_en,"
+        if be: print "            input [DATA_W/8-1:0] r_en,"
+        else: print "            input r_en,"
         print "            input [ADDR_W-1:0] r_addr,"
         print "            output [DATA_W-1:0] data_out"
     elif type == "SJ":
@@ -81,7 +83,8 @@ def instPinout (type, async) :
         print "            input enA,"
         print "            input [ADDR_W-1:0] addrA,"
         print "            input [DATA_W-1:0] dinA,"
-        print "            input [DATA_W/8-1:0] weA,"
+        if be: print "            input [DATA_W/8-1:0] weA,"
+        else: print "            input weA,"
         print "            output [DATA_W-1:0] doutA,"
         print ""
         #
@@ -90,7 +93,8 @@ def instPinout (type, async) :
         print "            input enB,"
         print "            input [ADDR_W-1:0] addrB,"
         print "            input [DATA_W-1:0] dinB,"
-        print "            input [DATA_W/8-1:0] weB,"
+        if be: print "            input [DATA_W/8-1:0] weB,"
+        else: print "            input weB,"
         print "            output [DATA_W-1:0] doutB"
     elif type == "SH":
         print "            input clk,"
@@ -98,7 +102,8 @@ def instPinout (type, async) :
         print "            input en,"
         print "            input [ADDR_W-1:0] addr,"
         print "            input [DATA_W-1:0] din,"
-        print "            input [DATA_W/8-1:0] we,"
+        if be: print "            input [DATA_W/8-1:0] we,"
+        else: print "            input we,"
         print "            output [DATA_W-1:0] dout"
     elif type == "SP":
         print "            input clk,"
@@ -113,7 +118,7 @@ def instPinout (type, async) :
 # Instantiate wires
 #
 
-def instWires (type, async) :
+def instWires (type, async, be) :
     if type == "SZ":
         if async:
             print "   wire clkA = wclk;"
@@ -121,37 +126,42 @@ def instWires (type, async) :
         else:
             print "   wire clkA = clk;"
             print "   wire clkB = clk;"
-        print "generate"
-        print "if (USE_RAM) begin"
         print "   wire [ADDR_W-1:0] addrA = w_addr;"
         print "   wire [ADDR_W-1:0] addrB = r_addr;"
         print "   wire [DATA_W-1:0] dinA = data_in;"
         print "   wire [DATA_W-1:0] dinB = {DATA_W{1'b0}};"
         print "   wire [DATA_W-1:0] doutA;"
         print "   wire [DATA_W-1:0] doutB;"
-        print "   wire [DATA_W/8-1:0] wenA = {(DATA_W/8){~w_en}};"
-        print "   wire [DATA_W/8-1:0] wenB = {(DATA_W/8){1'b1}};"
+        if be:
+            print "   wire [DATA_W/8-1:0] wenA = ~w_en;"
+            print "   wire [DATA_W/8-1:0] wenB = {(DATA_W/8){1'b1}};"
+        else:
+            print "   wire wenA = ~w_en;"
+            print "   wire wenB = 1'b1;"
         print "   wire enA = w_en;"
         print "   wire enB = r_en;"
         print "   wire oeA = 1'b1; //1'b0;"
         print "   wire oeB = 1'b1; //r_en;"
         print "   assign data_out = doutB;"
-        print "end else begin"
-        print "   wire wen = ~w_en;"
+        if be: print "   wire [DATA_W/8-1:0] wen = ~w_en;"
+        else: print "   wire wen = ~w_en;"
         print "   wire csnA = ~w_en;"
         print "   wire csnB = ~r_en;"
-        print "end"
-        print "endgenerate"
     elif type == "SJ":
         if not async:
             print "   wire clkA = clk;"
             print "   wire clkB = clk;"
-        print "   wire [DATA_W/8-1:0] wenA = ~weA;"
-        print "   wire [DATA_W/8-1:0] wenB = ~weB;"
+        if be:
+            print "   wire [DATA_W/8-1:0] wenA = ~weA;"
+            print "   wire [DATA_W/8-1:0] wenB = ~weB;"
+        else:
+            print "   wire wenA = ~weA;"
+            print "   wire wenB = ~weB;"
         print "   wire oeA = 1'b1; //enA;"
         print "   wire oeB = 1'b1; //enB;"
     elif type == "SH":
-        print "   wire [DATA_W/8-1:0] wen = ~we;"
+        if be: print "   wire [DATA_W/8-1:0] wen = ~we;"
+        else: print "   wire wen = ~we;"
         print "   wire oe = 1'b1; //en & ~(|we);"
     elif type == "SP":
         print "   wire oe = 1'b1; //r_en;"
@@ -181,7 +191,7 @@ def instMemory (tech, type, words, bits, bytes, mux):
         print ""
         if bytes > 1:
             for i in range(bytes):
-                print "    .WEB"+str(i)+"(wen),"
+                print "    .WEB"+str(i)+"(wen["+str(i)+"]),"
         else:
             print "    .WEB(wen),"
         print ""
@@ -270,7 +280,7 @@ def instMemory (tech, type, words, bits, bytes, mux):
 
 def instMemories (tech, type) :
     global mems
-    bytes = 0
+    bytes = 1
     
     if len(mems) > 1: print "generate"
     
@@ -278,7 +288,7 @@ def instMemories (tech, type) :
         if type == "SP": [words, bits, mux] = mems[j]
         else: [words, bits, bytes, mux] = mems[j]
         
-        if len(mems) > 1: print "if (ADDR_W == " + str(words) + ") begin"
+        if len(mems) > 1: print "if (ADDR_W == " + str(words) + " && DATA_W == " + str(bits*bytes) + ") begin"
         
         if type == "SZ":
             print "if (USE_RAM)"
@@ -301,13 +311,13 @@ def endModule () :
 # Generate wrapper
 #
 
-def generateWrapper (moduleName, tech, type, async) :
+def generateWrapper (moduleName, tech, type, async, be) :
     ret = 0
     
     timeScale()
     initModule(moduleName, type, async)
-    instPinout(type, async)
-    instWires(type, async)
+    instPinout(type, async, be)
+    instWires(type, async, be)
     instMemories(tech, type)
     endModule()
     
@@ -332,6 +342,7 @@ def usage (message) :
 def main () :
     global mems
     async = 0
+    be = 0
     ret = -1
     
     if (len(sys.argv) < 2): usage("no arguments")
@@ -343,34 +354,39 @@ def main () :
         if sys.argv[3] == "SZ":
             type = "SZ"
             async = int(sys.argv[4])
-            for i in range(int(sys.argv[5])):
-                words = int(sys.argv[6 + i*4])
-                bits  = int(sys.argv[7 + i*4])
-                bytes = int(sys.argv[8 + i*4])
-                mux   = int(sys.argv[9 + i*4])
+            be = int(sys.argv[5])
+            for i in range(int(sys.argv[6])):
+                words = int(sys.argv[7 + i*4])
+                bits  = int(sys.argv[8 + i*4])
+                bytes = int(sys.argv[9 + i*4])
+                mux   = int(sys.argv[10 + i*4])
                 mems.append([words, bits, bytes, mux])
         elif sys.argv[3] == "SJ":
             type = "SJ"
             async = int(sys.argv[4])
+            be = int(sys.argv[5])
+            for i in range(int(sys.argv[6])):
+                words = int(sys.argv[7 + i*4])
+                bits  = int(sys.argv[8 + i*4])
+                bytes = int(sys.argv[9 + i*4])
+                mux   = int(sys.argv[10 + i*4])
+                mems.append([words, bits, bytes, mux])
+        elif sys.argv[3] == "SH":
+            type = "SH"
+            be = int(sys.argv[4])
             for i in range(int(sys.argv[5])):
                 words = int(sys.argv[6 + i*4])
                 bits  = int(sys.argv[7 + i*4])
                 bytes = int(sys.argv[8 + i*4])
                 mux   = int(sys.argv[9 + i*4])
                 mems.append([words, bits, bytes, mux])
-        elif sys.argv[3] == "SH":
-            type = "SH"
-            words = int(sys.argv[4])
-            bits  = int(sys.argv[5])
-            bytes = int(sys.argv[6])
-            mux   = int(sys.argv[7])
-            mems.append([words, bits, bytes, mux])
         elif sys.argv[3] == "SP":
             type = "SP"
-            words = int(sys.argv[4])
-            bits  = int(sys.argv[5])
-            mux   = int(sys.argv[6])
-            mems.append([words, bits, mux])
+            for i in range(int(sys.argv[4])):
+                words = int(sys.argv[5 + i*3])
+                bits  = int(sys.argv[6 + i*3])
+                mux   = int(sys.argv[7 + i*3])
+                mems.append([words, bits, mux])
         else:
             sys.exit("Unsupported memory type")
     elif sys.argv[1] == "--help" or sys.argv[1] == "-h":
@@ -379,7 +395,7 @@ def main () :
         sys.exit("Unsupported memory technology")
     
     # generate wrapper
-    ret = generateWrapper(moduleName, tech, type, async)
+    ret = generateWrapper(moduleName, tech, type, async, be)
     
     # exit
     sys.exit(ret)
