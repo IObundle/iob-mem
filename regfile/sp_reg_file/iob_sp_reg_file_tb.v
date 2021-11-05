@@ -5,7 +5,7 @@
 `define DATA_WIDTH (`NUM_COL * `COL_WIDTH)
 `define ADDR_WIDTH 4
 
-module iob_reg_file_tb;
+module iob_sp_reg_file_tb;
 	
 	//Inputs
 	reg clk;
@@ -24,7 +24,7 @@ module iob_reg_file_tb;
     initial begin
         // optional VCD
         `ifdef VCD
-      	   $dumpfile("reg_file.vcd");
+      	   $dumpfile("iob_sp_reg_file.vcd");
       	   $dumpvars();
         `endif
       	
@@ -98,7 +98,7 @@ module iob_reg_file_tb;
     end
 
    	// Instantiate the Unit Under Test (UUT)
-    iob_reg_file #(
+    iob_sp_reg_file #(
     	.NUM_COL(`NUM_COL), 
     	.COL_WIDTH(`COL_WIDTH),
     	.ADDR_WIDTH(`ADDR_WIDTH),
@@ -115,4 +115,4 @@ module iob_reg_file_tb;
     // system clock
 	always #(clk_per/2) clk = ~clk; 
 
-endmodule // iob_reg_file_tb
+endmodule // iob_sp_reg_file_tb
