@@ -7,7 +7,7 @@
     `define USE_RAM 0
 `endif
 
-module sfifo_tb;
+module iob_sync_fifo_tb;
 	
 	//Inputs
 	reg clk;
@@ -31,11 +31,11 @@ module sfifo_tb;
         // optional VCD
         `ifdef VCD
             if(`USE_RAM==0) begin
-                $dumpfile("sfifo.vcd");
+                $dumpfile("iob_sync_fifo.vcd");
                 $dumpvars();
             end
             if(`USE_RAM==1) begin
-                $dumpfile("sfifo_ram.vcd");
+                $dumpfile("iob_sync_fifo_ram.vcd");
                 $dumpvars();
             end
         `endif
@@ -143,4 +143,4 @@ module sfifo_tb;
     // system clock
 	always #(clk_per/2) clk = ~clk; 
 
-endmodule // sfifo_tb
+endmodule // iob_sync_fifo_tb

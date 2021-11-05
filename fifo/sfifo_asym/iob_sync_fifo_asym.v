@@ -7,7 +7,7 @@
 /* WARNING: This memory assumes that the write port data width and the
  read port data width are multiples of eachother
  */
-module iob_sync_assim_fifo
+module iob_sync_fifo_asym
   #(
     parameter W_DATA_W = 8,
     parameter W_ADDR_W = 7,
@@ -103,7 +103,7 @@ module iob_sync_assim_fifo
   );
 
   //FIFO memory
-  iob_2p_assim_mem #(
+  iob_2p_asym_mem #(
    .W_DATA_W(W_DATA_W),
    .W_ADDR_W(W_ADDR_W),
    .R_ADDR_W(R_ADDR_W),

@@ -5,7 +5,6 @@
     `define W_ADDR 4
     `define R_DATA 32
     `define R_ADDR 2
-    `define USE_RAM 1
 `endif
 
 `ifndef R_BIG
@@ -14,10 +13,9 @@
     `define W_ADDR 2
     `define R_DATA 8
     `define R_ADDR 4
-    `define USE_RAM 1
 `endif
 
-module sfifo_assim_with_sym_mem_tb;
+module iob_sync_fifo_asym_tb;
 
     //Inputs
     reg clk;
@@ -37,26 +35,25 @@ module sfifo_assim_with_sym_mem_tb;
     parameter clk_per = 10; // clk period = 10 timeticks
 
     // Instantiate the Unit Under Test (UUT)
-    iob_sync_assim_fifo_with_sym_mem #(
-        .W_DATA_W(`W_DATA),
+    iob_sync_fifo_asym #(
+        .W_DATA_W(`W_DATA), 
         .W_ADDR_W(`W_ADDR),
         .R_DATA_W(`R_DATA),
-        .R_ADDR_W(`R_ADDR),
-        .USE_RAM(`USE_RAM)
+        .R_ADDR_W(`R_ADDR)
     ) uut (
-        .clk(clk),
-        .rst(reset),
-        .data_in(data_in),
-        .data_out(data_out),
-        .empty(empty_out),
-        .read_en(read),
-        .full(full_out),
+        .clk(clk), 
+        .rst(reset), 
+        .data_in(data_in), 
+        .data_out(data_out), 
+        .empty(empty_out), 
+        .read_en(read), 
+        .full(full_out), 
         .write_en(write),
         .fifo_ocupancy(fifo_occupancy)
     );
 
     always
-    #(clk_per/2) clk = ~clk;
+    #(clk_per/2) clk = ~clk; 
 
     initial begin
         //Initialize Inputs
@@ -75,7 +72,7 @@ module sfifo_assim_with_sym_mem_tb;
         if(`R_BIG==0) begin
             // optional VCD
             `ifdef VCD
-                $dumpfile("sfifo_assim_with_sym_mem_w.vcd");
+                $dumpfile("iob_sync_fifo_asym_w.vcd");
                 $dumpvars();
             `endif
 
@@ -95,7 +92,7 @@ module sfifo_assim_with_sym_mem_tb;
                 $finish;
             end
 
-            //Read all the locations of RAM.
+            //Read all the locations of RAM. 
             read = 1;
             for(i=0; i < 16; i = i + 1) begin
                 @(posedge clk) #1;
@@ -106,7 +103,7 @@ module sfifo_assim_with_sym_mem_tb;
         if(`R_BIG==1) begin
             // optional VCD
             `ifdef VCD
-                $dumpfile("sfifo_assim_with_sym_mem_r.vcd");
+                $dumpfile("iob_sfifo_asym_r.vcd");
                 $dumpvars();
             `endif
 
@@ -123,11 +120,11 @@ module sfifo_assim_with_sym_mem_tb;
                 $finish;
             end
 
-            //Read all the locations of RAM.
+            //Read all the locations of RAM. 
             read = 1;
             for(i=0; i < 4; i = i + 1) begin
                 @(posedge clk) #1;
-                if(data_out[7:0]!=i*4 || data_out[15:8]!=i*4+1 ||
+                if(data_out[7:0]!=i*4 || data_out[15:8]!=i*4+1 || 
                     data_out[23:16]!=i*4+2 || data_out[31:24]!=i*4+3) begin
                     $display("Test failed: read error in data_out.\n\t");
                     $finish;
@@ -147,4 +144,4 @@ module sfifo_assim_with_sym_mem_tb;
         $display("%c[0m",27);
         #(5*clk_per) $finish;
     end
-endmodule // sfifo_assim_tb
+endmodule // iob_sync_fifo_asym_tb

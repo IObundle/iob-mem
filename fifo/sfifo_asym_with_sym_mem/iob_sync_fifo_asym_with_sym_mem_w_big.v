@@ -7,7 +7,7 @@
 /* WARNING: This memory assumes that the write port data width is bigger than the
   read port data width and are multiples of eachother
  */
-module iob_sync_assim_fifo_with_sym_mem_w_big
+module iob_sync_fifo_asym_with_sym_mem_w_big
   #(
     parameter W_DATA_W = 32,
     parameter W_ADDR_W = 5,
@@ -109,7 +109,7 @@ module iob_sync_assim_fifo_with_sym_mem_w_big
     wire [R_DATA_W-1:0] data_out_vec [RATIO-1:0];
     for(i = 0; i < RATIO; i = i + 1) begin : fifo_memory
       //FIFO memory
-      dp_ram #(
+      iob_dp_ram #(
         .DATA_W(minDATA_W),
         .ADDR_W(minADDR_W),
         .USE_RAM(USE_RAM)

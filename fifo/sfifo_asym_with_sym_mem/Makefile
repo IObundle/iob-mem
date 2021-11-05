@@ -1,13 +1,14 @@
 ROOT_DIR = ../..
 include $(ROOT_DIR)/mem.mk
 
-2P_ASSIM_MEM = $(ROOT_DIR)/2p_assim_mem
-VSRC += $(2P_ASSIM_MEM)/*mem.v
-VSRC += $(2P_ASSIM_MEM)/*big.v
+DP_RAM = $(ROOT_DIR)/ram/dp_ram
+FIFO = $(ROOT_DIR)/fifo/
 
-WSRC = waves_w.gtkw sfifo_assim_w.vcd
+VSRC += $(DP_RAM)/iob_dp_ram.v $(FIFO)/bin_counter.v
+
+WSRC = waves_w.gtkw iob_sync_fifo_asym_with_sym_mem_w.vcd
 ifeq ($(R),1)
-	WSRC = waves_r.gtkw sfifo_assim_r.vcd
+	WSRC = waves_r.gtkw iob_sync_fifo_asym_with_sym_mem_r.vcd
 endif
 
 #run the simulator

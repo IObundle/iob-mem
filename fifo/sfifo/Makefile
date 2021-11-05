@@ -1,12 +1,12 @@
 ROOT_DIR = ../..
 include $(ROOT_DIR)/mem.mk
 
-2P_MEM = $(ROOT_DIR)/2p_ram/iob_2p_ram.v
+2P_MEM = $(ROOT_DIR)/ram/2p_ram/iob_2p_ram.v
 VSRC += $(2P_MEM)
 
-WSRC = waves.gtkw sfifo.vcd
+WSRC = waves.gtkw iob_sync_fifo.vcd
 ifeq ($(RAM),1)
-	WSRC = waves_ram.gtkw sfifo_ram.vcd
+	WSRC = waves_ram.gtkw iob_sync_fifo_ram.vcd
 endif
 
 #run the simulator

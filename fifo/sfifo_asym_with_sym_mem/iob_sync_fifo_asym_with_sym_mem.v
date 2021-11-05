@@ -3,7 +3,7 @@
 /* WARNING: This memory assumes that the write port data width and the
  read port data width are multiples of eachother
  */
-module iob_sync_assim_fifo_with_sym_mem
+module iob_sync_fifo_asym_with_sym_mem
   #(
     parameter W_DATA_W = 8,
     parameter W_ADDR_W = 7,
@@ -31,13 +31,13 @@ module iob_sync_assim_fifo_with_sym_mem
 
   generate if (W_DATA_W > R_DATA_W)
   begin
-    iob_sync_assim_fifo_with_sym_mem_w_big #(
+    iob_sync_fifo_asym_with_sym_mem_w_big #(
       .W_DATA_W(W_DATA_W),
       .W_ADDR_W(W_ADDR_W),
       .R_DATA_W(R_DATA_W),
       .R_ADDR_W(R_ADDR_W),
       .USE_RAM(USE_RAM)
-    ) assim_fifo_with_sym_mem (
+    ) asym_fifo_with_sym_mem (
       .rst            (rst),
       .clk            (clk),
       .fifo_ocupancy  (fifo_ocupancy),
@@ -51,13 +51,13 @@ module iob_sync_assim_fifo_with_sym_mem
   end
   else
   begin
-    iob_sync_assim_fifo_with_sym_mem_r_big #(
+    iob_sync_fifo_asym_with_sym_mem_r_big #(
       .W_DATA_W(W_DATA_W),
       .W_ADDR_W(W_ADDR_W),
       .R_DATA_W(R_DATA_W),
       .R_ADDR_W(R_ADDR_W),
       .USE_RAM(USE_RAM)
-    ) assim_fifo_with_sym_mem (
+    ) asym_fifo_with_sym_mem (
       .rst            (rst),
       .clk            (clk),
       .fifo_ocupancy  (fifo_ocupancy),
