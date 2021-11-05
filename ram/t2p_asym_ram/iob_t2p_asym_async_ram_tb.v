@@ -15,7 +15,7 @@
     `define R_ADDR 4
 `endif
 
-module iob_t2p_asym_async_mem_tb;
+module iob_t2p_asym_async_ram_tb;
 
     // Inputs
     bit wclk;
@@ -34,7 +34,7 @@ module iob_t2p_asym_async_mem_tb;
     parameter clk_per = 10; // clk period = 10 timeticks
 
     // Instantiate the Unit Under Test (UUT)
-    iob_2p_asym_async_mem #(
+    iob_t2p_asym_async_ram #(
         .W_DATA_W(`W_DATA),
         .W_ADDR_W(`W_ADDR),
         .R_DATA_W(`R_DATA),
@@ -72,7 +72,7 @@ module iob_t2p_asym_async_mem_tb;
         if(`R_BIG==1) begin
             // optional VCD
             `ifdef VCD
-                $dumpfile("iob_t2p_asym_mem_r.vcd");
+                $dumpfile("iob_t2p_asym_ram_r.vcd");
                 $dumpvars();
             `endif
             @(posedge wclk) #1;
@@ -107,7 +107,7 @@ module iob_t2p_asym_async_mem_tb;
         if(`R_BIG==0) begin
             // optional VCD
             `ifdef VCD
-                $dumpfile("iob_t2p_asym_mem_w.vcd");
+                $dumpfile("iob_t2p_asym_ram_w.vcd");
                 $dumpvars();
             `endif
 

@@ -3,10 +3,10 @@
 `define max(a,b) {(a) > (b) ? (a) : (b)}
 `define min(a,b) {(a) < (b) ? (a) : (b)}
 
-/*WARNING: This memory assumes that the write port data width is bigger than the
- read port data width and that they are multiples of eachother
+/*WARNING: This memory assumes that the read port data width is bigger than the
+ write port data width and that they are multiples of eachother
  */
-module iob_2p_asym_async_mem_w_big
+module iob_t2p_asym_async_ram_r_big
   #( 
      parameter W_DATA_W = 16,
      parameter W_ADDR_W = 6,
@@ -26,6 +26,7 @@ module iob_2p_asym_async_mem_w_big
     //Outputs
     output reg [R_DATA_W-1:0] data_out //output port
     );
+   
    //local variables
    localparam maxADDR_W = `max(W_ADDR_W, R_ADDR_W);
    localparam maxDATA_W = `max(W_DATA_W, R_DATA_W);
@@ -39,24 +40,22 @@ module iob_2p_asym_async_mem_w_big
    integer 		      i;
    //reg [log2RATIO-1:0] 	      lsbaddr;
    
+   //writing to the RAM
+   always@(posedge wclk)
+     if (w_en)
+       ram[w_addr] <= data_in;
+   
    //reading from the RAM
    generate
-      if(USE_RAM)
-        always@(posedge rclk)  begin
-           if(r_en)
-             data_out <= ram[r_addr];
-        end
-      else //use reg file
-        always@* data_out = ram[r_addr];
-   endgenerate
-   
-   //writing to the RAM
-   always@(posedge wclk) begin
-      for (i = 0; i < RATIO; i = i+1) begin
-	 //lsbaddr = i[log2RATIO-1:0];
-	 if(w_en)    //check if write enable is ON
-	   ram[{w_addr, i[log2RATIO-1:0]}] <= data_in[(i+1)*minDATA_W-1 -: minDATA_W];
+      if(USE_RAM) begin
+	 always@(posedge rclk) begin
+	    if (r_en) begin
+	       for (i = 0; i < RATIO; i = i+1) begin
+		  //lsbaddr <= i[log2RATIO-1:0];
+		  data_out[(i+1)*minDATA_W-1 -: minDATA_W] <= ram[{r_addr, i[log2RATIO-1:0]}];
+	       end
+	    end
+	 end
       end
-   end
-   
+   endgenerate
 endmodule   

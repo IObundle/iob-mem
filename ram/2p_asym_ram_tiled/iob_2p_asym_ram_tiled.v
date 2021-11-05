@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-module iob_2p_asym_mem_tiled
+module iob_2p_asym_ram_tiled
     #(
         parameter DATA_W_A  = 32,                       // port A data width
         parameter DATA_W_B  = 16,                       // port B data width
@@ -41,7 +41,7 @@ module iob_2p_asym_mem_tiled
         // Vector containing all BRAM outputs
         wire [DATA_W_B-1:0] data_out_vec [K-1:0];
         for(i = 0; i < K; i = i + 1) begin
-            iob_2p_asym_mem #(
+            iob_2p_asym_ram #(
                 .W_DATA_W(DATA_W_A),
                 .W_ADDR_W(ADDR_W_A - $clog2(K)),
                 .R_DATA_W(DATA_W_B),

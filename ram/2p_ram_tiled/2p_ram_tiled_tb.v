@@ -9,7 +9,7 @@
 `define ADDR_W $clog2(`N_WORDS*`DATA_W/8)
 `define TILE_ADDR_W 13
 
-module iob_2p_mem_tiled_tb;
+module iob_2p_ram_tiled_tb;
 
     // Inputs
     reg clk;
@@ -27,7 +27,7 @@ module iob_2p_mem_tiled_tb;
     parameter clk_per = 10; // clk period = 10 timeticks
 
     // Instantiate the Unit Under Test (UUT)
-    iob_2p_mem_tiled #(
+    iob_2p_ram_tiled #(
         .DATA_W(`DATA_W),
         .N_WORDS(`N_WORDS),
         .USE_RAM(`USE_RAM),

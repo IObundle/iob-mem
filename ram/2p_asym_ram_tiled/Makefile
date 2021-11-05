@@ -1,15 +1,15 @@
 ROOT_DIR:=../..
 include $(ROOT_DIR)/mem.mk
 
-2P_ASYM_MEM=../2p_asym_mem
-VSRC+=$(2P_ASYM_MEM)/iob_2p_asym_mem.v
-VSRC+=$(2P_ASYM_MEM)/iob_2p_asym_mem_w_big.v
-VSRC+=$(2P_ASYM_MEM)/iob_2p_asym_mem_r_big.v
+2P_ASYM_RAM=../2p_asym_ram
+VSRC+=$(2P_ASYM_RAM)/iob_2p_asym_ram.v
+VSRC+=$(2P_ASYM_RAM)/iob_2p_asym_ram_w_big.v
+VSRC+=$(2P_ASYM_RAM)/iob_2p_asym_ram_r_big.v
 
-WSRC = waves_w.gtkw iob_2p_asym_mem_tiled_w.vcd
+WSRC = waves_w.gtkw iob_2p_asym_ram_tiled_w.vcd
 
 ifeq ($(R),1)
-	WSRC = waves_r.gtkw iob_2p_asym_mem_tiled_r.vcd
+	WSRC = waves_r.gtkw iob_2p_asym_ram_tiled_r.vcd
 endif
 
 #run the simulator

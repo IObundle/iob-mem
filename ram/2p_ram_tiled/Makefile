@@ -1,8 +1,8 @@
 ROOT_DIR:=../..
 include $(ROOT_DIR)/mem.mk
 
-2P_MEM=../dp_ram
-VSRC+=$(2P_MEM)/iob_dp_ram.v
+DP_RAM=../dp_ram
+VSRC+=$(DP_RAM)/iob_dp_ram.v
 
 WSRC = waves.gtkw tiled.vcd
 

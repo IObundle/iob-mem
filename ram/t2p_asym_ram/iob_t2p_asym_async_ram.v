@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module iob_2p_asym_async_mem 
+module iob_t2p_asym_async_ram 
 	#(
 		parameter W_DATA_W = 16,
 		parameter W_ADDR_W = 6,
@@ -23,7 +23,7 @@ module iob_2p_asym_async_mem
     generate
     	if (W_DATA_W > R_DATA_W)
     	begin
-    		iob_2p_asym_async_mem_w_big #(
+    		iob_t2p_asym_async_ram_w_big #(
     			.W_DATA_W(W_DATA_W),
     		 	.W_ADDR_W(W_ADDR_W),
     		 	.R_DATA_W(R_DATA_W),
@@ -57,7 +57,7 @@ module iob_2p_asym_async_mem
 	  end // if (W_DATA_W == R_DATA_W)
 	else
     	begin
-    		iob_2p_asym_async_mem_r_big #(
+    		iob_t2p_asym_async_ram_r_big #(
     			.W_DATA_W(W_DATA_W),
     		 	.W_ADDR_W(W_ADDR_W),
     		 	.R_DATA_W(R_DATA_W),
