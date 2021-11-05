@@ -1,4 +1,5 @@
-include ../mem.mk
+ROOT_DIR:=../..
+include $(ROOT_DIR)/mem.mk
 
 VCD2DROM = python vcd2wavedrom.py --config tdp_ram_config.json --input tdp_ram.vcd --output tdp_ram.drom
 PNG = npx wavedrom-cli -i tdp_ram.drom -p tdp_ram.png

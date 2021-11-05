@@ -1,7 +1,8 @@
-include ../mem.mk
+ROOT_DIR:=../..
+include $(ROOT_DIR)/mem.mk
 
-DP_MEM = ../dp_ram
-VSRC += $(DP_MEM)/iob_dp_ram.v
+DP_MEM=../dp_ram
+VSRC+=$(DP_MEM)/iob_dp_ram.v
 
 # generate .hex file from string, checks from ram if string is valid
 run:

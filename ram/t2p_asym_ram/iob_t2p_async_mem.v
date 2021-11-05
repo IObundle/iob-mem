@@ -6,7 +6,7 @@
 /*WARNING: This memory assumes that the write port data width is bigger than the
 read port data width and that they are multiples of eachother
 */
-module iob_2p_async_mem
+module iob_t2p_async_mem
 	#( 
 		parameter DATA_W = 16,
 		parameter ADDR_W = 6,

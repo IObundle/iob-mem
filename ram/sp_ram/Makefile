@@ -1,4 +1,5 @@
-include ../mem.mk
+ROOT_DIR:=../..
+include $(ROOT_DIR)/mem.mk
 
 # generate .hex file from string, checks from ram if string is valid
 run:

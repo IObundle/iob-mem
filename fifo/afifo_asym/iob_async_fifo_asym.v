@@ -4,7 +4,7 @@
 `define min(a,b) {(a) < (b) ? (a) : (b)}
 
 
-module gray_counter_assim #(
+module gray_counter_asym #(
 		      parameter   COUNTER_WIDTH = 4
  		      ) (
     input wire                 rst, //Count reset.
@@ -29,7 +29,7 @@ module gray_counter_assim #(
    
 endmodule
 
-module iob_afifo_assim
+module iob_async_fifo_asym
   #(parameter 
     R_DATA_W = 32,
     W_DATA_W = 32,
@@ -139,7 +139,7 @@ module iob_afifo_assim
    //effective write enable
    assign write_en_int = write_en & ~full;
    
-   gray_counter_assim #(
+   gray_counter_asym #(
 		  .COUNTER_WIDTH(W_ADDR_W)
 		  ) wptr_counter (
                                                .clk(wclk),
@@ -164,7 +164,7 @@ module iob_afifo_assim
    //effective read enable
    assign read_en_int  = read_en & ~empty;
    
-   gray_counter_assim #(
+   gray_counter_asym #(
 		  .COUNTER_WIDTH(R_ADDR_W)
 		  ) rptr_counter (
                                                .clk(rclk),
@@ -183,12 +183,12 @@ module iob_afifo_assim
    // FIFO memory
    //
 
-   iob_2p_assim_async_mem #(
+   iob_2p_asym_async_mem #(
    			    .W_DATA_W(W_DATA_W),
    			    .W_ADDR_W(W_ADDR_W),
    			    .R_DATA_W(R_DATA_W),
    			    .R_ADDR_W(R_ADDR_W)
-   			    ) afifo_2p_assim_async_mem (
+   			    ) fifo_2p_asym_async_mem (
    							.wclk(wclk),
    							.w_en(write_en_int),
    							.data_in(data_in),

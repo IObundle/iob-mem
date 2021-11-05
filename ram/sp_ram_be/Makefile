@@ -1,7 +1,8 @@
-include ../mem.mk
+ROOT_DIR:=../..
+include $(ROOT_DIR)/mem.mk
 
-SP_MEM = ../sp_ram
-VSRC += $(SP_MEM)/sp_ram.v
+SP_RAM=../sp_ram
+VSRC+=$(SP_RAM)/iob_sp_ram.v
 
 # generate .hex file from string, checks from ram if string is valid
 run:
