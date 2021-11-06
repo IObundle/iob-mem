@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module iob_t2p_asym_async_ram 
+module iob_t2p_asym_ram 
 	#(
 		parameter W_DATA_W = 16,
 		parameter W_ADDR_W = 6,
@@ -23,12 +23,12 @@ module iob_t2p_asym_async_ram
     generate
     	if (W_DATA_W > R_DATA_W)
     	begin
-    		iob_t2p_asym_async_ram_w_big #(
+    		iob_t2p_asym_ram_w_big #(
     			.W_DATA_W(W_DATA_W),
     		 	.W_ADDR_W(W_ADDR_W),
     		 	.R_DATA_W(R_DATA_W),
     		 	.R_ADDR_W(R_ADDR_W)
-    		 ) two_port_mem (
+    		 ) two_port_ram (
     		 	.wclk(wclk),
     		 	.w_en(w_en),
     		 	.data_in(data_in),
@@ -41,28 +41,28 @@ module iob_t2p_asym_async_ram
     	end
     	else if (W_DATA_W == R_DATA_W)
 	  begin
-	     iob_2p_async_mem #(
+	     iob_2p_ram #(
 				.DATA_W(W_DATA_W),
 				.ADDR_W(W_ADDR_W)
-				) two_port_mem (
+				) two_port_ram (
 	 					.wclk(wclk),
     		 				.w_en(w_en),
-    		 				.data_in(data_in),
+    		 				.w_data(data_in),
     		 				.w_addr(w_addr),
 						.rclk(rclk),
     		 				.r_addr(r_addr),
     		 				.r_en(r_en),
-    		 				.data_out(data_out)
+    		 				.r_data(data_out)
 						);
 	  end // if (W_DATA_W == R_DATA_W)
 	else
     	begin
-    		iob_t2p_asym_async_ram_r_big #(
+    		iob_t2p_asym_ram_r_big #(
     			.W_DATA_W(W_DATA_W),
     		 	.W_ADDR_W(W_ADDR_W),
     		 	.R_DATA_W(R_DATA_W),
     		 	.R_ADDR_W(R_ADDR_W)
-    		 ) two_port_mem (
+    		 ) two_port_ram (
     		 	.wclk(wclk),
     		 	.w_en(w_en),
     		 	.data_in(data_in),

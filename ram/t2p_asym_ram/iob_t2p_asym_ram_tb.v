@@ -15,7 +15,7 @@
     `define R_ADDR 4
 `endif
 
-module iob_t2p_asym_async_ram_tb;
+module iob_t2p_asym_ram_tb;
 
     // Inputs
     bit wclk;
@@ -34,7 +34,7 @@ module iob_t2p_asym_async_ram_tb;
     parameter clk_per = 10; // clk period = 10 timeticks
 
     // Instantiate the Unit Under Test (UUT)
-    iob_t2p_asym_async_ram #(
+    iob_t2p_asym_ram #(
         .W_DATA_W(`W_DATA),
         .W_ADDR_W(`W_ADDR),
         .R_DATA_W(`R_DATA),
