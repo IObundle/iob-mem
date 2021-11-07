@@ -1,11 +1,7 @@
 include $(MEM_DIR)/core.mk
 
 # Submodules
-ifneq (SPRAM,$(filter SPRAM, $(SUBMODULES)))
-SUBMODULES+=SPRAM
-SPRAM_DIR=$(RAM_DIR)/sp_ram
-VSRC+=$(SPRAM_DIR)/iob_sp_ram.v
-endif
+include $(RAM_DIR)/sp_ram/hardware.mk
 
 # Sources
 ifneq (SPRAM_BE,$(filter SPRAM_BE, $(SUBMODULES)))

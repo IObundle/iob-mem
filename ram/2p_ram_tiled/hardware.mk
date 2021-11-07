@@ -1,11 +1,7 @@
 include $(MEM_DIR)/core.mk
 
 # Submodules
-ifneq (DPRAM,$(filter DPRAM, $(SUBMODULES)))
-SUBMODULES+=DPRAM
-DPRAM_DIR=$(RAM_DIR)/dp_ram
-VSRC+=$(DPRAM_DIR)/iob_dp_ram.v
-endif
+include $(RAM_DIR)/dp_ram/hardware.mk
 
 # Sources
 ifneq (2PRAM_TILED,$(filter 2PRAM_TILED, $(SUBMODULES)))

@@ -1,6 +1,6 @@
 include $(MEM_DIR)/core.mk
 
-#Submodules
+# Submodules
 include $(RAM_DIR)/2p_asym_ram/hardware.mk
 
 # Sources
