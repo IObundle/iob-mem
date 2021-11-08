@@ -35,7 +35,7 @@ AFIFO_DIR ?=$(FIFO_DIR)/afifo
 AFIFO_ASYM_DIR ?=$(FIFO_DIR)/afifo_asym
 SFIFO_DIR ?=$(FIFO_DIR)/sfifo
 FIFO_ASYM_DIR ?=$(FIFO_DIR)/sfifo_asym
-SFIFO_ASYM_SMEM_DIR ?=$(FIFO_DIR)/sfifo_asym_with_sym_mem
+SFIFO_ASYM_SMEM_DIR ?=$(FIFO_DIR)/sfifo_asym_smem
 BIN_COUNTER_DIR ?=$(FIFO_DIR)
 
 # Register files
