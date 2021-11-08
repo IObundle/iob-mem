@@ -4,11 +4,10 @@
 `define ADDR_W 4
 `define hex_file "tb1.hex"
 
-module tdp_rom_tb;
+module dp_rom_tb;
    
    //Inputs
-   reg clk_a;
-   reg clk_b;
+   reg clk;
    reg r_en_a;
    reg [`ADDR_W-1:0] addr_a;
    reg 		     r_en_b;
@@ -34,8 +33,7 @@ module tdp_rom_tb;
 `endif
       
       //Initialize Inputs
-      clk_a = 1;
-      clk_b = 1;
+      clk = 1;
       r_en_a = 0;
       addr_a = 0;
       r_en_b = 0;
@@ -43,20 +41,19 @@ module tdp_rom_tb;
 
       // store file for comparison
       #clk_per
-      @(posedge clk_a) #1;
-      @(posedge clk_b) #1;
+        @(posedge clk) #1;
       $readmemh(`hex_file, filemem);
 
 
-      @(posedge clk_a) #1;
+      @(posedge clk) #1;
       r_en_a = 1;
       r_en_b = 1;
 
-      @(posedge clk_a) #1;
+      @(posedge clk) #1;
       for(i = 0; i < 16; i = i + 1) begin
          addr_a = i;
 	 addr_b = 15-i;
-         @(posedge clk_a) #1;
+         @(posedge clk) #1;
          if(filemem[i]!=r_data_a) begin
             $display("Port A - Test failed: read error in position %d, where tb.hex=%h but r_data=%h", i, filemem[i], r_data_a);
             $finish;
@@ -67,7 +64,7 @@ module tdp_rom_tb;
 	 end
       end
 
-      @(posedge clk_b) #1;
+      @(posedge clk) #1;
       r_en_a = 0;
       r_en_b = 0;
       
@@ -80,13 +77,12 @@ module tdp_rom_tb;
    end
 
    // Instantiate the Unit Under Test (UUT)
-   iob_tdp_rom #(
+   iob_dp_rom #(
     	    .DATA_W(`DATA_W), 
     	    .ADDR_W(`ADDR_W),
     	    .MEM_INIT_FILE(`hex_file)
 	    ) uut (
-		   .clk_a(clk_a),
-		   .clk_b(clk_b),
+		   .clk(clk), 
 		   .r_en_a(r_en_a),
 		   .r_en_b(r_en_b),
 		   .addr_a(addr_a),
@@ -96,7 +92,6 @@ module tdp_rom_tb;
 		   );
    
    // system clock
-   always #(clk_per/2) clk_a = ~clk_a;
-   always #(clk_per/2) clk_b = ~clk_b;
+   always #(clk_per/2) clk = ~clk; 
 
 endmodule // sp_rom_tb
