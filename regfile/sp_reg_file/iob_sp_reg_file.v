@@ -11,14 +11,14 @@ module iob_sp_reg_file
 
     input               we,
     input [ADDR_W-1:0]  addr,
-    input [DATA_W-1:0]  wdata,
-    output [DATA_W-1:0] rdata
+    input [DATA_W-1:0]  w_data,
+    output [DATA_W-1:0] r_data
     );
 
    reg [DATA_W-1:0]     reg_file [2**ADDR_W-1:0];
 
    //read
-   assign rdata = reg_file[addr];
+   assign r_data = reg_file[addr];
 
    //write
    integer              i;
@@ -27,6 +27,6 @@ module iob_sp_reg_file
        for (i=0; i < 2**ADDR_W; i=i+1)
          reg_file[i] <= {DATA_W{1'b0}};
      else if (we)
-       reg_file[addr] <= wdata;
+       reg_file[addr] <= w_data;
 
 endmodule

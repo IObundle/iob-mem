@@ -33,14 +33,14 @@ module iob_async_fifo
     input                       rst,
 
     //read port
-    output reg [DATA_WIDTH-1:0] data_out, 
+    output reg [DATA_WIDTH-1:0] r_data, 
     output                      empty,
     output [ADDRESS_WIDTH-1:0]  level_r,
     input                       read_en,
     input                       rclk, 
 
     //write port   
-    input [DATA_WIDTH-1:0]      data_in, 
+    input [DATA_WIDTH-1:0]      w_data, 
     output                      full,
     output [ADDRESS_WIDTH-1:0]  level_w,
     input                       write_en,
@@ -122,20 +122,20 @@ module iob_async_fifo
 
    assign empty = (level_r == 0);
 
-   iob_2p_asym_async_mem #(
+   iob_t2p_ram #(
             .W_DATA_W(DATA_WIDTH),
             .W_ADDR_W(ADDRESS_WIDTH),
             .R_DATA_W(DATA_WIDTH),
             .R_ADDR_W(ADDRESS_WIDTH)
-            ) fifo_2p_asym_async_mem (
+            ) fifo_t2p_ram (
                 .wclk(wclk),
                 .w_en(write_en_int),
-                .data_in(data_in),
+                .w_data(w_data),
                 .w_addr(gray2bin(wptr, ADDRESS_WIDTH)),
                 .rclk(rclk),
                 .r_addr(gray2bin(rptr, ADDRESS_WIDTH)),
                 .r_en(read_en_int),
-                .data_out(data_out)
+                .r_data(r_data)
                 );
       
 endmodule

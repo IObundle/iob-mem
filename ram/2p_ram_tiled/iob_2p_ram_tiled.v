@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-module iob_2p_mem_tiled
+module iob_2p_ram_tiled
     #(
         parameter DATA_W  = 32,                         // data width
         parameter N_WORDS = 8192,                       // number of words (each word has 'DATA_W/8' bytes)
@@ -13,11 +13,11 @@ module iob_2p_mem_tiled
         input                 clk,
         input                 w_en,
         input                 r_en,
-        input  [DATA_W-1:0]   data_in,    // input data to write port
+        input  [DATA_W-1:0]   w_data,    // input data to write port
         input  [ADDR_W-1:0]   addr,       // address for write/read port
 
         // Outputs
-        output reg [DATA_W-1:0] data_out  //output port
+        output reg [DATA_W-1:0] r_data  //output port
     );
 
     // Number of BRAMs to generate, each containing 2048 bytes maximum
@@ -37,9 +37,9 @@ module iob_2p_mem_tiled
     genvar i;
     generate
         // Vector containing all BRAM outputs
-        wire [DATA_W-1:0] data_out_vec [K-1:0];
+        wire [DATA_W-1:0] r_data_vec [K-1:0];
         for(i = 0; i < K; i = i + 1) begin
-            dp_ram #(
+            2p_ram #(
                 .DATA_W(DATA_W),
                 .ADDR_W(ADDR_W - $clog2(K)),
                 .USE_RAM(USE_RAM)
@@ -47,10 +47,10 @@ module iob_2p_mem_tiled
                 .clk(clk),
                 .w_en(w_en & addr_en[i]),
                 .r_en(r_en & addr_en[i]),
-                .data_in(data_in),
+                .w_data(w_data),
                 .w_addr(addr[ADDR_W-$clog2(K)-1:0]),
                 .r_addr(addr[ADDR_W-$clog2(K)-1:0]),
-                .data_out(data_out_vec[i])
+                .r_data(r_data_vec[i])
             );
         end
     endgenerate
@@ -60,9 +60,9 @@ module iob_2p_mem_tiled
         .N_INPUTS(K),
         .INPUT_W(DATA_W)
     ) bram_out_sel (
-        .data_in(data_out_vec),
+        .data_in(r_data_vec),
         .sel(addr[ADDR_W-1:ADDR_W-$clog2(K)]),
-        .data_out(data_out)
+        .data_out(r_data)
     );
 endmodule
 

@@ -1,7 +1,7 @@
 include $(MEM_DIR)/mem.mk
 
 # Submodules
-include $(DPRAM_DIR)/hardware.mk
+include $(2PRAM_DIR)/hardware.mk
 
 # Sources
 ifneq (2PRAM_TILED,$(filter 2PRAM_TILED, $(SUBMODULES)))

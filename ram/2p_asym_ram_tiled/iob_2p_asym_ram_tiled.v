@@ -15,12 +15,12 @@ module iob_2p_asym_ram_tiled
         input                   clk,
         input                   w_en,
         input                   r_en,
-        input  [DATA_W_A-1:0]   data_in,    // input data to write port
+        input  [DATA_W_A-1:0]   w_data,    // input data to write port
         input  [ADDR_W_A-1:0]   w_addr,       // address for write port
         input  [ADDR_W_B-1:0]   r_addr,       // address for read port
 
         // Outputs
-        output reg [DATA_W_B-1:0] data_out  //output port
+        output reg [DATA_W_B-1:0] r_data  //output port
     );
 
     // Number of BRAMs to generate, each containing 2**TILE_ADDR_W bytes
@@ -39,7 +39,7 @@ module iob_2p_asym_ram_tiled
     genvar i;
     generate
         // Vector containing all BRAM outputs
-        wire [DATA_W_B-1:0] data_out_vec [K-1:0];
+        wire [DATA_W_B-1:0] r_data_vec [K-1:0];
         for(i = 0; i < K; i = i + 1) begin
             iob_2p_asym_ram #(
                 .W_DATA_W(DATA_W_A),
@@ -51,10 +51,10 @@ module iob_2p_asym_ram_tiled
                 .clk(clk),
                 .w_en(w_en & addr_en[i]),
                 .r_en(r_en & addr_en[i]),
-                .data_in(data_in),
+                .w_data(w_data),
                 .w_addr(w_addr[ADDR_W_A-$clog2(K)-1:0]),
                 .r_addr(r_addr[ADDR_W_B-$clog2(K)-1:0]),
-                .data_out(data_out_vec[i])
+                .r_data(r_data_vec[i])
             );
         end
     endgenerate
@@ -64,9 +64,9 @@ module iob_2p_asym_ram_tiled
         .N_INPUTS(K),
         .INPUT_W(DATA_W_B)
     ) bram_out_sel (
-        .data_in(data_out_vec),
+        .data_in(r_data_vec),
         .sel(r_addr[ADDR_W_B-1:ADDR_W_B-$clog2(K)]),
-        .data_out(data_out)
+        .data_out(r_data)
     );
 endmodule
 

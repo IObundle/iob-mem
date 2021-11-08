@@ -7,7 +7,7 @@
 /* WARNING: This memory assumes that the write port data width is smaller than the
   read port data width and are multiples of eachother
  */
-module iob_sync_fifo_asym_with_sym_mem_r_big
+module iob_sync_fifo_asym_smem_r_big
   #(
     parameter W_DATA_W = 8,
     parameter W_ADDR_W = 7,
@@ -23,12 +23,12 @@ module iob_sync_fifo_asym_with_sym_mem_r_big
 
 
     //read port
-    output [R_DATA_W-1:0] data_out,
+    output [R_DATA_W-1:0] r_data,
     output                empty,
     input                 read_en,
 
     //write port
-    input [W_DATA_W-1:0]  data_in,
+    input [W_DATA_W-1:0]  w_data,
     output                full,
     input                 write_en
     );
@@ -110,23 +110,23 @@ module iob_sync_fifo_asym_with_sym_mem_r_big
   genvar i;
   generate
   // Vector containing all BRAM outputs
-    wire [W_DATA_W-1:0] data_out_vec [RATIO-1:0];
+    wire [W_DATA_W-1:0] r_data_vec [RATIO-1:0];
     for(i = 0; i < RATIO; i = i + 1) begin : fifo_memory
       //FIFO memory
-      iob_dp_ram #(
+      iob_2p_ram #(
         .DATA_W(minDATA_W),
         .ADDR_W(minADDR_W),
         .USE_RAM(USE_RAM)
       ) fifo_mem (
         .clk(clk),
         .w_en(write_en_int & wmem_sel[i]),
-        .data_in(data_in),
+        .w_data(w_data),
         .w_addr(wptr),
         .r_addr(rptr),
         .r_en(read_en_int),
-        .data_out(data_out_vec[i])
+        .r_data(r_data_vec[i])
       );
-      assign data_out[minDATA_W*i +: minDATA_W] = data_out_vec[i];
+      assign r_data[minDATA_W*i +: minDATA_W] = r_data_vec[i];
     end
   endgenerate
 

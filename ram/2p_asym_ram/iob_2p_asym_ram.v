@@ -12,12 +12,12 @@ module iob_2p_asym_ram
 		//Inputs
 		input 				clk,
     input 				w_en,    //write enable
-    input [W_DATA_W-1:0] 	data_in, //Input data to write port
+    input [W_DATA_W-1:0] 	w_data, //Input data to write port
     input [W_ADDR_W-1:0] 	w_addr,  //address for write port
     input [R_ADDR_W-1:0] 	r_addr,  //address for read port
     input				  r_en,
     //Outputs
-    output [R_DATA_W-1:0] data_out //output port
+    output [R_DATA_W-1:0] r_data //output port
     );
 
     generate
@@ -32,11 +32,11 @@ module iob_2p_asym_ram
     		 ) two_port_ram (
     		 	.clk(clk),
     		 	.w_en(w_en),
-    		 	.data_in(data_in),
+    		 	.w_data(w_data),
     		 	.w_addr(w_addr),
     		 	.r_addr(r_addr),
     		 	.r_en(r_en),
-    		 	.data_out(data_out)
+    		 	.r_data(r_data)
     		 );
     	end
     	else
@@ -49,11 +49,11 @@ module iob_2p_asym_ram
     		 ) two_port_ram (
     		 	.clk(clk),
     		 	.w_en(w_en),
-    		 	.data_in(data_in),
+    		 	.w_data(w_data),
     		 	.w_addr(w_addr),
     		 	.r_addr(r_addr),
     		 	.r_en(r_en),
-    		 	.data_out(data_out)
+    		 	.r_data(r_data)
     		 );
     	end
     endgenerate

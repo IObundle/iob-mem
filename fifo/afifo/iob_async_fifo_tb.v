@@ -9,12 +9,12 @@ module iob_async_fifo_tb;
    reg reset;
    reg read;
    bit rclk;
-   reg [`DATA_W-1:0] data_in;
+   reg [`DATA_W-1:0] w_data;
    reg write;
    bit wclk;
      
    //Outputs
-   reg [`DATA_W-1:0] data_out;
+   reg [`DATA_W-1:0] r_data;
    wire empty_out;
    wire [`ADDR_W-1:0] level_r;
    wire full_out;
@@ -36,7 +36,7 @@ module iob_async_fifo_tb;
        rclk = 0;
        wclk = 1;
        reset = 0;
-       data_in = 0;
+       w_data = 0;
        read = 0;
        write = 0;
 
@@ -51,10 +51,10 @@ module iob_async_fifo_tb;
        write = 1;
        for(i=0; i < 15; i = i + 1) begin
            if(level_w !=i ) begin
-               $display("Test failed: write error in data_in.\n \t i=%0d; data=%0d; level_w=%0d", i, data_in, level_w);
+               $display("Test failed: write error in w_data.\n \t i=%0d; data=%0d; level_w=%0d", i, w_data, level_w);
                $finish;
            end
-           data_in = i;
+           w_data = i;
            @(posedge wclk) #1;
        end
      
@@ -72,8 +72,8 @@ module iob_async_fifo_tb;
        for(i=0; i < 15; i = i + 1) begin
            // Result will only be available in the next cycle
            @(posedge rclk) #1;
-           if(data_out != i || level_r != 14-i) begin
-               $display("Test failed: read error in data_out.\n \t i=%0d; data=%0d", i, data_out);
+           if(r_data != i || level_r != 14-i) begin
+               $display("Test failed: read error in r_data.\n \t i=%0d; data=%0d", i, r_data);
                $finish;
            end
        end
@@ -100,12 +100,12 @@ module iob_async_fifo_tb;
        .ADDRESS_WIDTH(`ADDR_W)
    ) uut (
        .rst(reset),
-       .data_out(data_out),
+       .r_data(r_data),
        .empty(empty_out),
        .level_r(level_r),
        .read_en(read),
        .rclk(rclk),
-       .data_in(data_in),
+       .w_data(w_data),
        .full(full_out),
        .level_w(level_w),
        .write_en(write),

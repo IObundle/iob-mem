@@ -15,11 +15,11 @@ module iob_2p_ram_tiled_tb;
     reg clk;
     reg w_en;
     reg r_en;
-    reg [`DATA_W-1:0] data_in;
+    reg [`DATA_W-1:0] w_data;
     reg [`ADDR_W-1:0] addr;
 
     // Outputs
-    wire [`DATA_W-1:0] data_out;
+    wire [`DATA_W-1:0] r_data;
 
     integer i, seq_ini;
     integer test, base_block;
@@ -36,9 +36,9 @@ module iob_2p_ram_tiled_tb;
         .clk(clk), 
         .w_en(w_en),
         .r_en(r_en), 
-        .data_in(data_in), 
+        .w_data(w_data), 
         .addr(addr), 
-        .data_out(data_out)
+        .r_data(r_data)
     );
 
     // system clock
@@ -50,7 +50,7 @@ module iob_2p_ram_tiled_tb;
         addr = 0;
         w_en = 0;
         r_en = 0;
-        data_in = 0;
+        w_data = 0;
 
         // Number from which to start the incremental sequence to write into the RAM
         seq_ini = 32;
@@ -72,7 +72,7 @@ module iob_2p_ram_tiled_tb;
 
         //Write all the locations of RAM 
         for(i = 0; i < 16; i = i + 1) begin
-            data_in = i + 32;
+            w_data = i + 32;
             addr = i;
             @(posedge clk) #1;
         end
@@ -88,8 +88,8 @@ module iob_2p_ram_tiled_tb;
             for(i = 0; i < 16; i = i + 1) begin
                 addr = i;
                 @(posedge clk) #1;
-                if(data_out!=0) begin
-                    $display("Test 1 failed: with r_en = 0, at position %0d, data_out should be 0 but is %d", i, data_out);
+                if(r_data!=0) begin
+                    $display("Test 1 failed: with r_en = 0, at position %0d, r_data should be 0 but is %d", i, r_data);
                     $finish;
                 end
             end
@@ -102,8 +102,8 @@ module iob_2p_ram_tiled_tb;
         for(i = 0; i < 16; i = i + 1) begin
             addr = i;
             @(posedge clk) #1;
-            if(data_out!=i+32) begin
-                $display("Test 2 failed: on position %0d, data_out is %d where it should be %0d", i, data_out, i+32);
+            if(r_data!=i+32) begin
+                $display("Test 2 failed: on position %0d, r_data is %d where it should be %0d", i, r_data, i+32);
                 $finish;
             end
         end

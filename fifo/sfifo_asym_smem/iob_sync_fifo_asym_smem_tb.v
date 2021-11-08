@@ -17,17 +17,17 @@
     `define USE_RAM 1
 `endif
 
-module iob_sync_fifo_asym_with_sym_mem_tb;
+module iob_sync_fifo_asym_smem_tb;
 
     //Inputs
     reg clk;
     reg reset;
-    reg [`W_DATA-1:0] data_in;
+    reg [`W_DATA-1:0] w_data;
     reg read;
     reg write;
 
     //Ouptuts
-    wire [`R_DATA-1:0] data_out;
+    wire [`R_DATA-1:0] r_data;
     wire empty_out;
     wire full_out;
     wire [31:0] fifo_occupancy;
@@ -37,7 +37,7 @@ module iob_sync_fifo_asym_with_sym_mem_tb;
     parameter clk_per = 10; // clk period = 10 timeticks
 
     // Instantiate the Unit Under Test (UUT)
-    iob_sync_fifo_asym_with_sym_mem #(
+    iob_sync_fifo_asym_smem #(
         .W_DATA_W(`W_DATA),
         .W_ADDR_W(`W_ADDR),
         .R_DATA_W(`R_DATA),
@@ -46,8 +46,8 @@ module iob_sync_fifo_asym_with_sym_mem_tb;
     ) uut (
         .clk(clk),
         .rst(reset),
-        .data_in(data_in),
-        .data_out(data_out),
+        .w_data(w_data),
+        .r_data(r_data),
         .empty(empty_out),
         .read_en(read),
         .full(full_out),
@@ -62,7 +62,7 @@ module iob_sync_fifo_asym_with_sym_mem_tb;
         //Initialize Inputs
         clk = 0;
         reset = 0;
-        data_in = 0;
+        w_data = 0;
         read = 0;
         write = 0;
 
@@ -75,17 +75,17 @@ module iob_sync_fifo_asym_with_sym_mem_tb;
         if(`R_BIG==0) begin
             // optional VCD
             `ifdef VCD
-                $dumpfile("iob_sync_fifo_asym_with_sym_mem_w.vcd");
+                $dumpfile("iob_sync_fifo_asym_smem_w.vcd");
                 $dumpvars();
             `endif
 
             //Write all the locations of FIFO
             write = 1;
             for(i=0; i < 4; i = i + 1) begin
-                data_in[7:0] = i*4;
-                data_in[15:8] = i*4+1;
-                data_in[23:16] = i*4+2;
-                data_in[31:24] = i*4+3;
+                w_data[7:0] = i*4;
+                w_data[15:8] = i*4+1;
+                w_data[23:16] = i*4+2;
+                w_data[31:24] = i*4+3;
                 @(posedge clk) #1;
             end
             write = 0; //Fifo is now full
@@ -106,14 +106,14 @@ module iob_sync_fifo_asym_with_sym_mem_tb;
         if(`R_BIG==1) begin
             // optional VCD
             `ifdef VCD
-                $dumpfile("iob_sync_fifo_asym_with_sym_mem_r.vcd");
+                $dumpfile("iob_sync_fifo_asym_smem_r.vcd");
                 $dumpvars();
             `endif
 
             //Write all the locations of FIFO
             write = 1;
             for(i=0; i < 16; i = i + 1) begin
-                data_in = i;
+                w_data = i;
                 @(posedge clk) #1;
             end
             write = 0; //Fifo is now full
@@ -127,9 +127,9 @@ module iob_sync_fifo_asym_with_sym_mem_tb;
             read = 1;
             for(i=0; i < 4; i = i + 1) begin
                 @(posedge clk) #1;
-                if(data_out[7:0]!=i*4 || data_out[15:8]!=i*4+1 ||
-                    data_out[23:16]!=i*4+2 || data_out[31:24]!=i*4+3) begin
-                    $display("Test failed: read error in data_out.\n\t");
+                if(r_data[7:0]!=i*4 || r_data[15:8]!=i*4+1 ||
+                    r_data[23:16]!=i*4+2 || r_data[31:24]!=i*4+3) begin
+                    $display("Test failed: read error in r_data.\n\t");
                     $finish;
                 end
             end
@@ -147,4 +147,4 @@ module iob_sync_fifo_asym_with_sym_mem_tb;
         $display("%c[0m",27);
         #(5*clk_per) $finish;
     end
-endmodule // iob_sync_fifo_asym_with_sym_mem_tb
+endmodule // iob_sync_fifo_asym_smem_tb

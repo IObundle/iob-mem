@@ -11,11 +11,11 @@ module iob_tdp_rom
 
     input [(ADDR_W-1):0]      addr_a,
     input                     r_en_a,
-    output reg [(DATA_W-1):0] q_a,
+    output reg [(DATA_W-1):0] r_data_a,
     
     input [(ADDR_W-1):0]      addr_b,
     input                     r_en_b,
-    output reg [(DATA_W-1):0] q_b
+    output reg [(DATA_W-1):0] r_data_b
     );
 
    //this allows ISE 14.7 to work; do not remove
@@ -32,10 +32,10 @@ module iob_tdp_rom
 
    always @ (posedge clk) // Port A
      if (r_en_a)
-       q_a <= rom[addr_a];
+       r_data_a <= rom[addr_a];
 
    always @ (posedge clk) // Port B
      if (r_en_b)
-       q_b <= rom[addr_b];
+       r_data_b <= rom[addr_b];
 
  endmodule

@@ -1,5 +1,8 @@
 include $(MEM_DIR)/mem.mk
 
+# Submodules
+include $(T2PRAM_DIR)/hardware.mk
+
 # Sources
 ifneq (AFIFO,$(filter AFIFO, $(SUBMODULES)))
 SUBMODULES+=AFIFO

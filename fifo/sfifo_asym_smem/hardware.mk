@@ -1,7 +1,7 @@
 include $(MEM_DIR)/mem.mk
 
 # Submodules
-include $(DPRAM_DIR)/hardware.mk
+include $(2PRAM_DIR)/hardware.mk
 
 ifneq (BIN_COUNTER,$(filter BIN_COUNTER, $(SUBMODULES)))
 SUBMODULES+=BIN_COUNTER

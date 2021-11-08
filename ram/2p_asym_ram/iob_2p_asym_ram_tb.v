@@ -21,12 +21,12 @@ module iob_2p_asym_mem_tb;
     reg clk;
     reg w_en;
     reg r_en;
-    reg [`W_DATA-1:0] data_in;
+    reg [`W_DATA-1:0] w_data;
     reg [`W_ADDR-1:0] w_addr;
     reg [`R_ADDR-1:0] r_addr;
 
     // Outputs
-    wire [`R_DATA-1:0] data_out;
+    wire [`R_DATA-1:0] r_data;
 
     integer i, seq_ini;
 
@@ -43,10 +43,10 @@ module iob_2p_asym_mem_tb;
         .clk(clk), 
         .w_en(w_en),
         .r_en(r_en), 
-        .data_in(data_in), 
+        .w_data(w_data), 
         .w_addr(w_addr), 
         .r_addr(r_addr),
-        .data_out(data_out)
+        .r_data(r_data)
     );
 
     // system clock
@@ -58,7 +58,7 @@ module iob_2p_asym_mem_tb;
         w_addr = 0;
         w_en = 0;
         r_en = 0;
-        data_in = 0;
+        w_data = 0;
         r_addr = 0; 
 
         // Number from which to start the incremental sequence to write into the RAM
@@ -77,7 +77,7 @@ module iob_2p_asym_mem_tb;
             w_en = 1; 
             for(i = 0; i < 16; i = i + 1) begin
                 w_addr = i;
-                data_in = i+seq_ini;
+                w_data = i+seq_ini;
                 @(posedge clk) #1;
             end
             w_en = 0;
@@ -89,9 +89,9 @@ module iob_2p_asym_mem_tb;
             for(i = 0 ; i < 4; i = i + 1) begin
                 r_addr = i;
                 @(posedge clk) #1;
-                if(data_out[7:0]!=i*4+seq_ini || data_out[15:8]!=i*4+1+seq_ini || 
-                    data_out[23:16]!=i*4+2+seq_ini || data_out[31:24]!=i*4+3+seq_ini) begin
-                    $display("Test 1 failed: read error in data_out.\n\t");
+                if(r_data[7:0]!=i*4+seq_ini || r_data[15:8]!=i*4+1+seq_ini || 
+                    r_data[23:16]!=i*4+2+seq_ini || r_data[31:24]!=i*4+3+seq_ini) begin
+                    $display("Test 1 failed: read error in r_data.\n\t");
                     $finish;
                 end
                 @(posedge clk) #1;
@@ -110,10 +110,10 @@ module iob_2p_asym_mem_tb;
             //Write all the locations of RAM 
             w_en = 1;
             for(i=0; i < 4; i = i + 1) begin
-                data_in[7:0] = i*4      +seq_ini;
-                data_in[15:8] = i*4+1   +seq_ini;
-                data_in[23:16] = i*4+2  +seq_ini;
-                data_in[31:24] = i*4+3  +seq_ini;
+                w_data[7:0] = i*4      +seq_ini;
+                w_data[15:8] = i*4+1   +seq_ini;
+                w_data[23:16] = i*4+2  +seq_ini;
+                w_data[31:24] = i*4+3  +seq_ini;
                 w_addr = i;
                 #(clk_per);
                 @(posedge clk) #1;
@@ -127,9 +127,9 @@ module iob_2p_asym_mem_tb;
             for(i=0; i < 16; i = i + 1) begin
                 r_addr = i;
                 @(posedge clk) #1;
-                if(data_out!=i+seq_ini) begin
-                    $display("Test 2 failed: read error in data_out. \n \t i=%0d; data = %h when it should have been %0h", 
-                        i, data_out, i+32);
+                if(r_data!=i+seq_ini) begin
+                    $display("Test 2 failed: read error in r_data. \n \t i=%0d; data = %h when it should have been %0h", 
+                        i, r_data, i+32);
                 end
             end
             @(posedge clk) #1;

@@ -10,12 +10,12 @@ module iob_sp_reg_file_tb;
 	//Inputs
 	reg clk;
     reg rst;
-    reg [`DATA_WIDTH-1:0] wdata;
+    reg [`DATA_WIDTH-1:0] w_data;
     reg [`ADDR_WIDTH-1:0] addr;
     reg [`NUM_COL-1:0] en;
    	
    	//Ouptuts
-   	reg [`DATA_WIDTH-1 :0] rdata;
+   	reg [`DATA_WIDTH-1 :0] r_data;
 
     integer i;
 
@@ -31,7 +31,7 @@ module iob_sp_reg_file_tb;
         //Initialize Inputs
         clk = 1;
         rst = 0;
-        wdata = 0;
+        w_data = 0;
         addr = 0;
         en = 0;
 
@@ -47,10 +47,10 @@ module iob_sp_reg_file_tb;
         //Write and real all the locations
         for(i=0; i < 16; i = i + 1) begin
             addr = i;
-            wdata = i;
+            w_data = i;
             @(posedge clk) #1;
-            if(rdata != i) begin
-                $display("Test 1 failed: read error in rdata.\n \t i=%0d; data=%0d", i, rdata);
+            if(r_data != i) begin
+                $display("Test 1 failed: read error in r_data.\n \t i=%0d; data=%0d", i, r_data);
                 $finish;
             end
             @(posedge clk) #1;
@@ -64,8 +64,8 @@ module iob_sp_reg_file_tb;
         for(i=0; i < 16; i = i + 1) begin
             addr = i;
             @(posedge clk) #1;
-            if(rdata != i) begin
-                $display("Test 2 failed: read error in rdata.\n \t i=%0d; data=%0d", i, rdata);
+            if(r_data != i) begin
+                $display("Test 2 failed: read error in r_data.\n \t i=%0d; data=%0d", i, r_data);
                 $finish;
             end
             @(posedge clk) #1;
@@ -82,8 +82,8 @@ module iob_sp_reg_file_tb;
         for(i=0; i < 16; i = i + 1) begin
             addr = i;
             @(posedge clk) #1;
-            if(rdata != 0) begin
-                $display("Test 3 failed: rdata is not null");
+            if(r_data != 0) begin
+                $display("Test 3 failed: r_data is not null");
                 $finish;
             end
             @(posedge clk) #1;
@@ -106,10 +106,10 @@ module iob_sp_reg_file_tb;
 	) uut (
 		.clk(clk), 
 		.rst(rst),
-        .wdata(wdata),
+        .w_data(w_data),
         .addr(addr),
         .en(en),
-        .rdata(rdata)
+        .r_data(r_data)
 	);
     
     // system clock

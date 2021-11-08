@@ -18,12 +18,12 @@ module iob_2p_asym_ram_w_big
 		//Inputs
 		input 				clk,
         input 				w_en,    //write enable
-        input [W_DATA_W-1:0] 	data_in, //Input data to write port
+        input [W_DATA_W-1:0] 	w_data, //Input data to write port
         input [W_ADDR_W-1:0] 	w_addr,  //address for write port
         input [R_ADDR_W-1:0] 	r_addr,  //address for read port
         input				r_en,
         //Outputs
-        output reg [R_DATA_W-1:0] data_out //output port
+        output reg [R_DATA_W-1:0] r_data //output port
     );
 	//local variables
 	localparam maxADDR_W = `max(W_ADDR_W, R_ADDR_W);
@@ -43,10 +43,10 @@ module iob_2p_asym_ram_w_big
            if(USE_RAM)
               always@(posedge clk)  begin
                  if(r_en)
-                    data_out <= ram[r_addr];
+                    r_data <= ram[r_addr];
               end
            else //use reg file
-              always@* data_out = ram[r_addr];
+              always@* r_data = ram[r_addr];
         endgenerate
 	
 	//writing to the RAM
@@ -54,7 +54,7 @@ module iob_2p_asym_ram_w_big
 		for (i = 0; i < RATIO; i = i+1) begin
 			lsbaddr = i;
 			if(w_en)    //check if write enable is ON
-				ram[{w_addr, lsbaddr}] <= data_in[(i+1)*minDATA_W-1 -: minDATA_W];
+				ram[{w_addr, lsbaddr}] <= w_data[(i+1)*minDATA_W-1 -: minDATA_W];
 		end
 	end
 

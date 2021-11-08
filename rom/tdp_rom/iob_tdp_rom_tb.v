@@ -14,8 +14,8 @@ module tdp_rom_tb;
    reg [`ADDR_W-1:0] addr_b;
    
    //Ouptuts
-   reg [`DATA_W-1:0] rdata_a;
-   reg [`DATA_W-1:0] rdata_b;
+   reg [`DATA_W-1:0] r_data_a;
+   reg [`DATA_W-1:0] r_data_b;
    
    // .hex file
    reg [7:0] 	     filemem [0:15];
@@ -54,12 +54,12 @@ module tdp_rom_tb;
          addr_a = i;
 	 addr_b = 15-i;
          @(posedge clk) #1;
-         if(filemem[i]!=rdata_a) begin
-            $display("Port A - Test failed: read error in position %d, where tb.hex=%h but rdata=%h", i, filemem[i], rdata_a);
+         if(filemem[i]!=r_data_a) begin
+            $display("Port A - Test failed: read error in position %d, where tb.hex=%h but r_data=%h", i, filemem[i], r_data_a);
             $finish;
          end
-	 if (filemem[15-i]!= rdata_b) begin
-	    $display("Port B - Test failed: read error in position %d, where tb.hex=%h but rdata=%h", i, filemem[i], rdata_b);
+	 if (filemem[15-i]!= r_data_b) begin
+	    $display("Port B - Test failed: read error in position %d, where tb.hex=%h but r_data=%h", i, filemem[i], r_data_b);
 	    $finish;
 	 end
       end
@@ -87,8 +87,8 @@ module tdp_rom_tb;
 		   .r_en_b(r_en_b),
 		   .addr_a(addr_a),
 		   .addr_b(addr_b),
-		   .q_a(rdata_a),
-		   .q_b(rdata_b)
+		   .r_data_a(r_data_a),
+		   .r_data_b(r_data_b)
 		   );
    
    // system clock

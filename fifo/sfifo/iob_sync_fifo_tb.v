@@ -12,12 +12,12 @@ module iob_sync_fifo_tb;
 	//Inputs
 	reg clk;
     reg reset;
-   	reg [`DATA_W-1:0] data_in;
+   	reg [`DATA_W-1:0] w_data;
    	reg read;
    	reg write;
    	
    	//Outputs
-   	wire [`DATA_W-1:0] data_out;
+   	wire [`DATA_W-1:0] r_data;
    	wire empty_out;
    	wire full_out;
     reg [31:0] fifo_occupancy;
@@ -43,7 +43,7 @@ module iob_sync_fifo_tb;
         //Initialize Inputs
         clk = 1;
         reset = 0;
-        data_in = 0;
+        w_data = 0;
         read = 0;
         write = 0;
 
@@ -57,7 +57,7 @@ module iob_sync_fifo_tb;
         @(posedge clk) #1;
         write = 1;
         for(i=0; i < 16; i = i + 1) begin
-            data_in = i+32;
+            w_data = i+32;
             @(posedge clk) #1;
         end
        
@@ -76,8 +76,8 @@ module iob_sync_fifo_tb;
         if(`USE_RAM==1) @(posedge clk) #1;
         for(i=0; i < 16; i = i + 1) begin
             // Result will only be available in the next cycle
-            if(data_out != i+32) begin
-                $display("Test 2 failed: read error in data_out.\n \t i=%0d; data=%d when it should have been %0d", i, data_out, i+32);
+            if(r_data != i+32) begin
+                $display("Test 2 failed: read error in r_data.\n \t i=%0d; data=%d when it should have been %0d", i, r_data, i+32);
                 $finish;
             end
             @(posedge clk) #1;
@@ -95,7 +95,7 @@ module iob_sync_fifo_tb;
         @(posedge clk) #1;
         write = 1;
         for(i=0; i < 16; i = i + 1) begin
-            data_in = i+32;
+            w_data = i+32;
             @(posedge clk) #1;
         end
 
@@ -131,8 +131,8 @@ module iob_sync_fifo_tb;
 	) uut (
 		.clk(clk), 
 		.rst(reset), 
-		.data_in(data_in), 
-		.data_out(data_out), 
+		.w_data(w_data), 
+		.r_data(r_data), 
 		.empty(empty_out), 
 		.read_en(read), 
 		.full(full_out), 
