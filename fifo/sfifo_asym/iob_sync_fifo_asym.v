@@ -22,12 +22,12 @@ module iob_sync_fifo_asym
 
 
     //read port
-    output [R_DATA_W-1:0] data_out,
+    output [R_DATA_W-1:0] r_data,
     output                empty,
     input                 read_en,
 
     //write port
-    input [W_DATA_W-1:0]  data_in,
+    input [W_DATA_W-1:0]  w_data,
     output                full,
     input                 write_en
     );
@@ -103,19 +103,19 @@ module iob_sync_fifo_asym
   );
 
   //FIFO memory
-  iob_2p_asym_mem #(
+  iob_2p_asym_ram #(
    .W_DATA_W(W_DATA_W),
    .W_ADDR_W(W_ADDR_W),
    .R_ADDR_W(R_ADDR_W),
    .R_DATA_W(R_DATA_W)
-  ) fifo_mem (
+  ) fifo_ram (
   	.clk(clk),
   	.w_en(write_en_int),
-  	.data_in(data_in),
+  	.w_data(w_data),
   	.w_addr(wptr),
   	.r_addr(rptr),
   	.r_en(read_en_int),
-  	.data_out(data_out)
+  	.r_data(r_data)
 	);
 
 endmodule

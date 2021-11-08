@@ -9,7 +9,7 @@ module iob_sp_rom #(
     input                    clk,
     input                    r_en,
     input [ADDR_W-1:0]       addr,
-    output reg [DATA_W-1:0] rdata
+    output reg [DATA_W-1:0]  r_data
     );
    
    // this allows ISE 14.7 to work; do not remove
@@ -25,6 +25,6 @@ module iob_sp_rom #(
    // Operate the ROM
    always @(posedge clk)
      if(r_en)
-       rdata <= rom[addr];
+       r_data <= rom[addr];
    
 endmodule

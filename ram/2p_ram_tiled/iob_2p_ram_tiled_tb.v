@@ -1,77 +1,93 @@
 `timescale 1ns / 1ps
 
-`define DATA_W 8
-`define ADDR_W 4
-
 `ifndef USE_RAM
     `define USE_RAM 0
 `endif
 
+`define DATA_W 16
+`define N_WORDS 8000
+`define ADDR_W $clog2(`N_WORDS*`DATA_W/8)
+`define TILE_ADDR_W 13
 
-module iob_t2p_ram_tb;
+module iob_2p_ram_tiled_tb;
 
     // Inputs
-    reg wclk;
-    reg rclk;
-
-    //write signals
+    reg clk;
     reg w_en;
-    reg [`DATA_W-1:0] w_data;
-    reg [`ADDR_W-1:0] w_addr;
-
-
-    //read signals   
     reg r_en;
-    reg [`ADDR_W-1:0] r_addr;
+    reg [`DATA_W-1:0] w_data;
+    reg [`ADDR_W-1:0] addr;
+
+    // Outputs
     wire [`DATA_W-1:0] r_data;
 
-    integer i;
+    integer i, seq_ini;
+    integer test, base_block;
 
     parameter clk_per = 10; // clk period = 10 timeticks
 
+    // Instantiate the Unit Under Test (UUT)
+    iob_2p_ram_tiled #(
+        .DATA_W(`DATA_W),
+        .N_WORDS(`N_WORDS),
+        .USE_RAM(`USE_RAM),
+        .TILE_ADDR_W(`TILE_ADDR_W)
+    ) uut (
+        .clk(clk), 
+        .w_en(w_en),
+        .r_en(r_en), 
+        .w_data(w_data), 
+        .addr(addr), 
+        .r_data(r_data)
+    );
+
+    // system clock
+    always #(clk_per/2) clk = ~clk; 
+
     initial begin
-        wclk = 1;
-        rclk = 1;
-        r_en = 0;
+        // Initialize Inputs
+        clk = 1;
+        addr = 0;
         w_en = 0;
-        r_addr = 0;
-        w_addr = 0;
+        r_en = 0;
         w_data = 0;
+
+        // Number from which to start the incremental sequence to write into the RAM
+        seq_ini = 32;
 
         // optional VCD
         `ifdef VCD
             if(`USE_RAM == 1) begin
-                $dumpfile("2p_mem_ram.vcd");
+                $dumpfile("tiled_ram.vcd");
                 $dumpvars();
             end
             if(`USE_RAM == 0) begin
-                $dumpfile("2p_mem.vcd");
+                $dumpfile("tiled.vcd");
                 $dumpvars();
             end
         `endif
 
-        @(posedge wclk) #1;
-        @(posedge rclk) #1;
+        @(posedge clk) #1;
         w_en = 1;
 
         //Write all the locations of RAM 
         for(i = 0; i < 16; i = i + 1) begin
             w_data = i + 32;
-            w_addr = i;
-            @(posedge wclk) #1;
+            addr = i;
+            @(posedge clk) #1;
         end
 
-        w_en = 0; 	 
-        @(posedge rclk) #1;
+        w_en = 0;    
+        @(posedge clk) #1;
 
         //Read all the locations of RAM with r_en = 0
         r_en = 0;
-        @(posedge rclk) #1;
+        @(posedge clk) #1;
 
         if(`USE_RAM == 1) begin
             for(i = 0; i < 16; i = i + 1) begin
-                r_addr = i;
-                @(posedge rclk) #1;
+                addr = i;
+                @(posedge clk) #1;
                 if(r_data!=0) begin
                     $display("Test 1 failed: with r_en = 0, at position %0d, r_data should be 0 but is %d", i, r_data);
                     $finish;
@@ -80,12 +96,12 @@ module iob_t2p_ram_tb;
         end
 
         r_en = 1;
-        @(posedge rclk) #1;
+        @(posedge clk) #1;
 
         //Read all the locations of RAM with r_en = 1
         for(i = 0; i < 16; i = i + 1) begin
-            r_addr = i;
-            @(posedge rclk) #1;
+            addr = i;
+            @(posedge clk) #1;
             if(r_data!=i+32) begin
                 $display("Test 2 failed: on position %0d, r_data is %d where it should be %0d", i, r_data, i+32);
                 $finish;
@@ -100,25 +116,4 @@ module iob_t2p_ram_tb;
         $display("%c[0m",27);
         $finish;
     end
-
-    // Instantiate the Unit Under Test (UUT)
-    iob_t2p_ram #(
-        .DATA_W(`DATA_W),
-        .ADDR_W(`ADDR_W),
-        .USE_RAM(`USE_RAM)
-    ) uut (
-        .wclk(wclk),
-        .rclk(rclk), 
-        .w_en(w_en),
-        .r_en(r_en), 
-        .w_data(w_data), 
-        .w_addr(w_addr), 
-        .r_addr(r_addr),
-        .r_data(r_data)
-    );
-
-    //Clock
-    always #(clk_per/2) wclk = ~wclk;
-    always #(clk_per/2) rclk = ~rclk;
-
 endmodule

@@ -14,12 +14,12 @@ module iob_sync_fifo
     output reg [`DATA_W-1:0] fifo_ocupancy, 
 
     //read port
-    output [DATA_WIDTH-1:0]  data_out, 
+    output [DATA_WIDTH-1:0]  r_data, 
     output reg               empty,
     input                    read_en,
 
     //write port	 
-    input [DATA_WIDTH-1:0]   data_in, 
+    input [DATA_WIDTH-1:0]   w_data, 
     output reg               full,
     input                    write_en
     );
@@ -82,15 +82,15 @@ module iob_sync_fifo
      #(
        .DATA_W(DATA_WIDTH), 
        .ADDR_W(ADDRESS_WIDTH)
-       ) fifo_mem 
+       ) fifo_ram
        (
 	.clk(clk),
 	.w_en(write_en_int),
-	.data_in(data_in),
+	.w_data(w_data),
 	.w_addr(wptr),
 	.r_addr(rptr),
 	.r_en(read_en_int),
-	.data_out(data_out)
+	.r_data(r_data)
 	);
 
 endmodule

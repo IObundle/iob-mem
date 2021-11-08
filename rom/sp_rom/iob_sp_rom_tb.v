@@ -12,7 +12,7 @@ module iob_sp_rom_tb;
     reg [`ADDR_W-1:0] addr;
    	
    	//Ouptuts
-   	reg [`DATA_W-1:0] rdata;
+   	reg [`DATA_W-1:0] r_data;
 
     // .hex file
     reg [7:0] filemem [0:15];
@@ -47,8 +47,8 @@ module iob_sp_rom_tb;
         for(i = 0; i < 16; i = i + 1) begin
             addr = i;
             @(posedge clk) #1;
-            if(filemem[i]!=rdata) begin
-                $display("Test failed: read error in position %d, where tb.hex=%h but rdata=%h", i, filemem[i], rdata);
+            if(filemem[i]!=r_data) begin
+                $display("Test failed: read error in position %d, where tb.hex=%h but r_data=%h", i, filemem[i], r_data);
                 $finish;
             end
         end
@@ -73,7 +73,7 @@ module iob_sp_rom_tb;
 		.clk(clk), 
 		.r_en(r_en), 
 		.addr(addr), 
-		.rdata(rdata)
+		.r_data(r_data)
 	);
     
     // system clock

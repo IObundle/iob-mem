@@ -1,18 +1,18 @@
 `timescale 1 ns / 1 ps
 
-module iob_tdp_rom 
+module iob_dp_rom 
   #(
     parameter MEM_INIT_FILE="none",
     parameter DATA_W=32,
     parameter ADDR_W=11
     )
    (
-    input                     clk_a,
+    input                     clk,
+
     input [(ADDR_W-1):0]      addr_a,
     input                     r_en_a,
     output reg [(DATA_W-1):0] r_data_a,
-
-    input                     clk_b,
+    
     input [(ADDR_W-1):0]      addr_b,
     input                     r_en_b,
     output reg [(DATA_W-1):0] r_data_b
@@ -30,11 +30,11 @@ module iob_tdp_rom
      if(mem_init_file_int != "none")
        $readmemh(MEM_INIT_FILE, rom, 0, 2**ADDR_W - 1);
 
-   always @ (posedge clk_a) // Port A
+   always @ (posedge clk) // Port A
      if (r_en_a)
        r_data_a <= rom[addr_a];
 
-   always @ (posedge clk_b) // Port B
+   always @ (posedge clk) // Port B
      if (r_en_b)
        r_data_b <= rom[addr_b];
 

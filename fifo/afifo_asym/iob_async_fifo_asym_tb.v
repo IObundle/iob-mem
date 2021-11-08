@@ -35,12 +35,12 @@ module iob_async_fifo_asym_tb;
    reg reset;
    reg read;
    bit rclk;
-   reg [`W_DATA_W-1:0] data_in;
+   reg [`W_DATA_W-1:0] w_data;
    reg write;
    bit wclk;
      
    //Outputs
-   reg [`R_DATA_W-1:0] data_out;
+   reg [`R_DATA_W-1:0] r_data;
    wire empty_out;
    wire [`R_ADDR_W-1:0] level_r;
    wire full_out;
@@ -70,7 +70,7 @@ module iob_async_fifo_asym_tb;
        rclk = 0;
        wclk = 1;
        reset = 0;
-       data_in = 0;
+       w_data = 0;
        read = 0;
        write = 0;
 
@@ -85,13 +85,13 @@ module iob_async_fifo_asym_tb;
        write = 1;
        for(i=0; i < 2**`W_ADDR_W-1; i = i + 1) begin
            if(level_w !=i ) begin
-               $display("Test failed: write error in data_in.\n \t i=%0d; data=%0d; level_w=%0d", i, data_in, level_w);
+               $display("Test failed: write error in w_data.\n \t i=%0d; data=%0d; level_w=%0d", i, w_data, level_w);
                $finish;
            end
        `ifdef WR_RATIO
-	  data_in = i;
+	  w_data = i;
 	  `else // RW_RATIO
-           data_in = i/`RW_RATIO*((i%`RW_RATIO)==0);
+           w_data = i/`RW_RATIO*((i%`RW_RATIO)==0);
 	  `endif
            @(posedge wclk) #1;
        end
@@ -111,8 +111,8 @@ module iob_async_fifo_asym_tb;
        for(i=0; i < `WR_RATIO*((2**`W_ADDR_W)-1); i = i + 1) begin
            // Result will only be available in the next cycle
            @(posedge rclk) #1;
-	  if(data_out != i/`WR_RATIO*((i%`WR_RATIO)==0) || level_r != (((2**`W_ADDR_W)-1)*`WR_RATIO)-1-i) begin
-               $display("Test failed: read error in data_out.\n \t i=%0d; data=%0d; exp=%0d; lvl=%0d, levl=%0d", i, data_out, i/`WR_RATIO*((i%`WR_RATIO)==0), (((2**`W_ADDR_W)-1)*`WR_RATIO)-i, level_r);
+	  if(r_data != i/`WR_RATIO*((i%`WR_RATIO)==0) || level_r != (((2**`W_ADDR_W)-1)*`WR_RATIO)-1-i) begin
+               $display("Test failed: read error in r_data.\n \t i=%0d; data=%0d; exp=%0d; lvl=%0d, levl=%0d", i, r_data, i/`WR_RATIO*((i%`WR_RATIO)==0), (((2**`W_ADDR_W)-1)*`WR_RATIO)-i, level_r);
                // $finish;
            end
        end
@@ -121,8 +121,8 @@ module iob_async_fifo_asym_tb;
        for(i=0; i < ((2**`W_ADDR_W)/`RW_RATIO)-1; i = i + 1) begin
            // Result will only be available in the next cycle
            @(posedge rclk) #1;
-	  if(data_out != i || level_r != ((2**`R_ADDR_W)-2)-i) begin
-               $display("Test failed: read error in data_out.\n \t i=%0d; data=%0d", i, data_out);
+	  if(r_data != i || level_r != ((2**`R_ADDR_W)-2)-i) begin
+               $display("Test failed: read error in r_data.\n \t i=%0d; data=%0d", i, r_data);
                // $finish;
            end
        end
@@ -150,12 +150,12 @@ module iob_async_fifo_asym_tb;
 		    .ADDR_W(`FIFO_ADDR_W)
    ) uut (
        .rst(reset),
-       .data_out(data_out),
+       .r_data(r_data),
        .empty(empty_out),
        .level_r(level_r),
        .read_en(read),
        .rclk(rclk),
-       .data_in(data_in),
+       .w_data(w_data),
        .full(full_out),
        .level_w(level_w),
        .write_en(write),
