@@ -6,7 +6,7 @@
 /*WARNING: This memory assumes that the read port data width is bigger than the
  write port data width and that they are multiples of eachother
  */
-module iob_2p_asym_ram_r_big
+module iob_2p_asym_ram_w_narrow_r_wide
   #(
      parameter W_DATA_W = 16,
      parameter W_ADDR_W = 6,

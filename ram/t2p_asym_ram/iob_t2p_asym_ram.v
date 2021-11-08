@@ -23,7 +23,7 @@ module iob_t2p_asym_ram
     generate
     	if (W_DATA_W > R_DATA_W)
     	begin
-    		iob_t2p_asym_ram_w_big #(
+    		iob_t2p_asym_ram_w_wide_r_narrow #(
     			.W_DATA_W(W_DATA_W),
     		 	.W_ADDR_W(W_ADDR_W),
     		 	.R_DATA_W(R_DATA_W),
@@ -57,7 +57,7 @@ module iob_t2p_asym_ram
 	  end // if (W_DATA_W == R_DATA_W)
 	else
     	begin
-    		iob_t2p_asym_ram_r_big #(
+    		iob_t2p_asym_ram_w_narrow_r_wide #(
     			.W_DATA_W(W_DATA_W),
     		 	.W_ADDR_W(W_ADDR_W),
     		 	.R_DATA_W(R_DATA_W),

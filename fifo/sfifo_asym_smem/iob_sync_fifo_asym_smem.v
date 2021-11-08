@@ -31,7 +31,7 @@ module iob_sync_fifo_asym_smem
 
   generate if (W_DATA_W > R_DATA_W)
   begin
-    iob_sync_fifo_asym_smem_w_big #(
+    iob_sync_fifo_asym_smem_w_wide_r_narrow #(
       .W_DATA_W(W_DATA_W),
       .W_ADDR_W(W_ADDR_W),
       .R_DATA_W(R_DATA_W),
@@ -51,7 +51,7 @@ module iob_sync_fifo_asym_smem
   end
   else
   begin
-    iob_sync_fifo_asym_smem_r_big #(
+    iob_sync_fifo_asym_smem_w_narrow_r_wide #(
       .W_DATA_W(W_DATA_W),
       .W_ADDR_W(W_ADDR_W),
       .R_DATA_W(R_DATA_W),
