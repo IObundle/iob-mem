@@ -1,7 +1,6 @@
-include $(MEM_DIR)/mem.mk
-
 # Sources
 ifneq (SPROM,$(filter SPROM, $(SUBMODULES)))
 SUBMODULES+=SPROM
+SPROM_DIR=$(MEM_DIR)/rom/sp_rom
 VSRC+=$(SPROM_DIR)/iob_sp_rom.v
 endif
