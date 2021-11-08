@@ -1,4 +1,4 @@
-include $(MEM_DIR)/core.mk
+include $(MEM_DIR)/mem.mk
 
 # Submodules
 ifneq (TDPRAM,$(filter TDPRAM, $(SUBMODULES)))

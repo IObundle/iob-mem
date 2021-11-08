@@ -1,4 +1,4 @@
-include $(MEM_DIR)/core.mk
+include $(MEM_DIR)/mem.mk
 
 # Sources
 ifneq (2P_ASYM_RAM,$(filter 2P_ASYM_RAM, $(SUBMODULES)))

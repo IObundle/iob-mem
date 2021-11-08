@@ -1,4 +1,4 @@
-include $(MEM_DIR)/core.mk
+include $(MEM_DIR)/mem.mk
 
 # Submodules
 include $(2P_ASYM_RAM_DIR)/hardware.mk

@@ -1,123 +1,44 @@
 #
-# PRIMARY PARAMETERS
+# Paths
 #
 
-# Default module path to simulate
-MODULE_DIR ?=ram/sp_ram
-
-# Default simulator (simulators: icarus)
-SIM ?=icarus
-
-# generate .vcd file by default
-VCD ?=1
-
-# optional ram
-USE_RAM ?=1
-
-# Read data > write data
-# By default, read data < write data
-R_BIG ?=0
-
-####################################################################
-# DERIVED FROM PRIMARY PARAMETERS: DO NOT CHANGE BELOW THIS POINT
-####################################################################
-
-include $(MEM_DIR)/core.mk
+MEM_SW_DIR ?=$(MEM_DIR)/software
+MEM_PYTHON_DIR ?=$(SW_DIR)/python
 
 #
-# Defines
+# Submodules
 #
 
-ifeq ($(SIM),xcelium)
-defmacro:=-define 
-incdir:=-incdir 
-else
-defmacro:=-D
-incdir:=-I
-endif
+# RAMs
+RAM_DIR ?=$(MEM_DIR)/ram
+2P_ASYM_RAM_DIR ?=$(RAM_DIR)/2p_asym_ram
+2P_ASYM_RAM_TILED_DIR ?=$(RAM_DIR)/2p_asym_ram_tiled
+2PRAM_DIR ?=$(RAM_DIR)/2p_ram
+2PRAM_TILED_DIR ?=$(RAM_DIR)/2p_ram_tiled
+DPRAM_DIR ?=$(RAM_DIR)/dp_ram
+DPRAM_BE_DIR ?=$(RAM_DIR)/dp_ram_be
+SPRAM_DIR ?=$(RAM_DIR)/sp_ram
+SPRAM_BE_DIR ?=$(RAM_DIR)/sp_ram_be
+T2P_ASYM_RAM_DIR ?=$(RAM_DIR)/t2p_asym_ram
+T2PRAM_DIR ?=$(RAM_DIR)/t2p_ram
+TDPRAM_DIR ?=$(RAM_DIR)/tdp_ram
+TDPRAM_BE_DIR ?=$(RAM_DIR)/tdp_ram_be
 
-ifeq ($(USE_RAM),1)
-DEFINE+=$(defmacro)USE_RAM
-endif
+# ROMs
+ROM_DIR ?=$(MEM_DIR)/rom
+SPROM_DIR ?=$(ROM_DIR)/sp_rom
+TDPROM_DIR ?=$(ROM_DIR)/tdp_rom
 
-ifeq ($(R_BIG),1)
-DEFINE+=$(defmacro)R_BIG
-endif
+# FIFOs
+FIFO_DIR ?=$(MEM_DIR)/fifo
+AFIFO_DIR ?=$(FIFO_DIR)/afifo
+AFIFO_ASYM_DIR ?=$(FIFO_DIR)/afifo_asym
+SFIFO_DIR ?=$(FIFO_DIR)/sfifo
+FIFO_ASYM_DIR ?=$(FIFO_DIR)/sfifo_asym
+SFIFO_ASYM_SMEM_DIR ?=$(FIFO_DIR)/sfifo_asym_with_sym_mem
+BIN_COUNTER_DIR ?=$(FIFO_DIR)
 
-ifeq ($(VCD),1)
-DEFINE+=$(defmacro)VCD
-endif
-
-#
-# Sources
-#
-
-include $(MODULE_DIR)/hardware.mk
-
-# testbench
-VSRC+=$(wildcard $(MODULE_DIR)/*_tb.v)
-
-# hex files generation for tb
-# generate .hex file from string, checks from ram if string is valid
-HEX_FILES:= tb1.hex tb2.hex
-GEN_HEX1:=echo "!IObundle 2020!" | od -A n -t x1 > tb1.hex
-GEN_HEX2:=echo "10 9 8 7 5 4 32" | od -A n -t x1 > tb2.hex
-
-#
-# Simulator flags
-#
-
-VLOG=iverilog -W all -g2005-sv $(INCLUDE) $(DEFINE)
-
-#
-# Script to generate .drom file
-#
-
-GEN_WAVEDROM=$(MEM_PYTHON_DIR)/vcd2wavedrom.py --config $(MODULE_DIR)/*.json --input *.vcd --output $(MODULE_DIR)/*.drom
-
-#
-# Wavedrom
-#
-
-WAVEDROM=npx wavedrom-cli -i $(MODULE_DIR)/*.drom -p $(MODULE_DIR)/*.png
-
-#
-# Wave viewer
-#
-
-GTKW=gtkwave -a
-WSRC=waves.gtkw *.vcd
-
-#
-# Targets
-#
-
-all: run
-
-run: build gen-hex
-	./a.out
-ifeq ($(VCD),1)
-	$(GTKW) $(WSRC)
-endif
-ifeq ($(VCD2DROM),1)
-	$(GEN_WAVEDROM)
-endif
-ifeq ($(PNG),1)
-	$(WAVEDROM)
-endif
-
-build: a.out
-
-a.out: $(VSRC) $(VHDR)
-	$(VLOG) $(VSRC)
-
-gen-hex: $(HEX_FILES)
-
-$(HEX_FILES):
-	@$(GEN_HEX1)
-	@$(GEN_HEX2)
-
-clean:
-	@rm -f *~ \#*\# a.out *.vcd *.hex *.drom *.png *.pyc
-
-.PHONY: all run build gen-hex clean
+# Register files
+REGFILE_DIR ?=$(MEM_DIR)/regfile
+DP_REGFILE_DIR ?=$(REGFILE_DIR)/dp_reg_file
+SP_REGFILE_DIR ?=$(REGFILE_DIR)/sp_reg_file

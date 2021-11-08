@@ -1,5 +1,5 @@
 MEM_DIR:=.
-include mem.mk
+include simulation.mk
 
 #
 # Simulate
