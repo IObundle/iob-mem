@@ -4,18 +4,11 @@ MEM_DIR:=.
 # Default module path to simulate
 MODULE_DIR ?=ram/sp_ram
 
-# Default simulator (simulators: icarus)
-SIM=icarus
-
 # generate .vcd file by default
 VCD ?=1
 
 # optional ram
 USE_RAM ?=1
-
-# Read data > write data
-# By default, read data < write data
-R_BIG ?=0
 
 #
 # Paths
@@ -28,17 +21,11 @@ MEM_PYTHON_DIR=$(SW_DIR)/python
 # Defines
 #
 
-ifeq ($(SIM),icarus)
 defmacro:=-D
 incdir:=-I
-endif
 
 ifeq ($(USE_RAM),1)
 DEFINE+=$(defmacro)USE_RAM
-endif
-
-ifeq ($(R_BIG),1)
-DEFINE+=$(defmacro)R_BIG
 endif
 
 ifeq ($(VCD),1)

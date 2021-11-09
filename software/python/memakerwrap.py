@@ -61,7 +61,7 @@ def instPinout (type, async, be) :
         if be: print "            input [DATA_W/8-1:0] w_en,"
         else: print "            input w_en,"
         print "            input [ADDR_W-1:0] w_addr,"
-        print "            input [DATA_W-1:0] data_in,"
+        print "            input [DATA_W-1:0] w_data,"
         print ""
         #
         # read port
@@ -69,7 +69,7 @@ def instPinout (type, async, be) :
         if be: print "            input [DATA_W/8-1:0] r_en,"
         else: print "            input r_en,"
         print "            input [ADDR_W-1:0] r_addr,"
-        print "            output [DATA_W-1:0] data_out"
+        print "            output [DATA_W-1:0] r_data"
     elif type == "SJ":
         if async:
             print "            input clkA,"
@@ -109,7 +109,7 @@ def instPinout (type, async, be) :
         print "            input clk,"
         print ""
         print "            input [ADDR_W-1:0] addr,"
-        print "            output [DATA_W-1:0] rdata,"
+        print "            output [DATA_W-1:0] r_data,"
         print "            input r_en"
     print "           );"
     print ""
@@ -128,7 +128,7 @@ def instWires (type, async, be) :
             print "   wire clkB = clk;"
         print "   wire [ADDR_W-1:0] addrA = w_addr;"
         print "   wire [ADDR_W-1:0] addrB = r_addr;"
-        print "   wire [DATA_W-1:0] dinA = data_in;"
+        print "   wire [DATA_W-1:0] dinA = w_data;"
         print "   wire [DATA_W-1:0] dinB = {DATA_W{1'b0}};"
         print "   wire [DATA_W-1:0] doutA;"
         print "   wire [DATA_W-1:0] doutB;"
@@ -142,7 +142,7 @@ def instWires (type, async, be) :
         print "   wire enB = r_en;"
         print "   wire oeA = 1'b1; //1'b0;"
         print "   wire oeB = 1'b1; //r_en;"
-        print "   assign data_out = doutB;"
+        print "   assign r_data = doutB;"
         if be: print "   wire [DATA_W/8-1:0] wen = ~w_en;"
         else: print "   wire wen = ~w_en;"
         print "   wire csnA = ~w_en;"
@@ -184,10 +184,10 @@ def instMemory (tech, type, words, bits, bytes, mux):
     
     if type == "SZ":
         for i in range(bits*bytes):
-            print "    .DO"+str(i)+"(data_out["+str(i)+"]),"
+            print "    .DO"+str(i)+"(r_data["+str(i)+"]),"
         print ""
         for i in range(bits*bytes):
-            print "    .DI"+str(i)+"(data_in["+str(i)+"]),"
+            print "    .DI"+str(i)+"(w_data["+str(i)+"]),"
         print ""
         if bytes > 1:
             for i in range(bytes):
@@ -242,7 +242,7 @@ def instMemory (tech, type, words, bits, bytes, mux):
         print "    .OE(oe),"
     elif type == "SP":
         for i in range(bits):
-            print "    .DO"+str(i)+"(rdata["+str(i)+"]),"
+            print "    .DO"+str(i)+"(r_data["+str(i)+"]),"
         print "    .CS(r_en),"
         print "    .OE(oe),"
     print ""
