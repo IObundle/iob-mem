@@ -1,9 +1,6 @@
 # Memory directory path
 MEM_DIR:=.
 
-# Default module path to simulate
-MODULE_DIR ?=ram/sp_ram
-
 # generate .vcd file by default
 VCD ?=1
 
@@ -14,8 +11,12 @@ USE_RAM ?=1
 # Paths
 #
 
+MEM_HW_DIR=$(MEM_DIR)/hardware
 MEM_SW_DIR=$(MEM_DIR)/software
 MEM_PYTHON_DIR=$(SW_DIR)/python
+
+# Default module to simulate
+MODULE_DIR ?= $(MEM_HW_DIR)/ram/sp_ram
 
 #
 # Defines
