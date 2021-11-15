@@ -2,8 +2,6 @@
 include $(MEM_HW_DIR)/ram/2p_ram/hardware.mk
 
 # Sources
-ifneq (2PRAM_TILED,$(filter 2PRAM_TILED, $(SUBMODULES)))
-SUBMODULES+=2PRAM_TILED
 2PRAM_TILED_DIR=$(MEM_HW_DIR)/ram/2p_ram_tiled
 VSRC+=$(2PRAM_TILED_DIR)/iob_2p_ram_tiled.v
 endif
