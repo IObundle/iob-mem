@@ -1,7 +1,8 @@
 `timescale 1ns/1ps
 
 module iob_sync_fifo
-  #(parameter 
+  #(parameter
+    DATA_W = 32,
     DATA_WIDTH = 8, 
     ADDRESS_WIDTH = 4, 
     FIFO_DEPTH = (1 << ADDRESS_WIDTH),
@@ -11,7 +12,7 @@ module iob_sync_fifo
     input                    rst,
     input                    clk,
    
-    output reg [`DATA_W-1:0] fifo_ocupancy, 
+    output reg [DATA_W-1:0] fifo_ocupancy, 
 
     //read port
     output [DATA_WIDTH-1:0]  r_data, 
