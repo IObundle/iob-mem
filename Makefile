@@ -48,6 +48,9 @@ WSRC=waves.gtkw *.vcd
 
 all: sim
 
+corename:
+	@echo $(MODULE)
+
 #
 # Simulate
 #
@@ -79,6 +82,7 @@ sim-clean:
 clean: sim-clean
 
 .PHONY: all \
+	corename \
 	sim sim-clean \
 	build gen-hex \
 	clean
