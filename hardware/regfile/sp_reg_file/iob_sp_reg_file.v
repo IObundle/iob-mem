@@ -21,8 +21,15 @@ module iob_sp_reg_file
    assign r_data = reg_file[addr];
 
    //write
-   always @(posedge clk) 
-     if (we) 
-       reg_file[addr] <= w_data;
-   
+   genvar               i;
+   generate
+      always @(posedge clk)
+        if (rst)
+          for (i=0; i < 2**ADDR_W; i=i+1) begin: rst_loop
+             reg_file[i] <= {DATA_W{1'b0}};
+          end
+        else if (we)
+          reg_file[addr] <= w_data;
+   endgenerate
+
 endmodule

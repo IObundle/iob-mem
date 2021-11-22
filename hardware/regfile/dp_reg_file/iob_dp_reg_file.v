@@ -33,12 +33,15 @@ module iob_dp_reg_file
    assign rdataB = reg_file[addrB];
 
    //write
-   integer               i;
-   always @(posedge clk)
-     if (rst)
-       for (i=0; i < 2**ADDR_W; i=i+1)
-         reg_file[i] <= {DATA_W{1'b0}};
-     else if (we)
-       reg_file[addr] <= wdata;
+   genvar                i;
+   generate
+      always @(posedge clk)
+        if (rst)
+          for (i=0; i < 2**ADDR_W; i=i+1) begin: rst_loop
+             reg_file[i] <= {DATA_W{1'b0}};
+          end
+        else if (we)
+          reg_file[addr] <= wdata;
+   endgenerate
 
 endmodule
