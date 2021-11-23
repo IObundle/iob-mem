@@ -28,7 +28,8 @@ module iob_sp_reg_file
            if (rst)
              reg_file[i] <= {DATA_W{1'b0}};
            else if (we)
-             reg_file[addr] <= w_data;
+             if (addr == i)
+               reg_file[i] <= w_data;
         end
    endgenerate
 
