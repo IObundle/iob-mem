@@ -49,7 +49,7 @@ WSRC=waves.gtkw *.vcd
 all: sim
 
 corename:
-	@echo $(MODULE)
+	@echo "MEM"
 
 #
 # Simulate

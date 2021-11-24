@@ -1,5 +1,3 @@
-MODULE=MEM
-
 # generate .vcd file by default
 VCD ?=1
 
