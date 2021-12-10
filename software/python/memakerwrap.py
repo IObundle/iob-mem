@@ -28,8 +28,8 @@ def timeScale () :
 def initModule (moduleName, type, async) :
     print "module "+moduleName
     print "  #("
-    print "    parameter DATA_W = 8,"
-    print "    parameter ADDR_W = 9,"
+    print "    parameter DATA_W = 32,"
+    print "    parameter ADDR_W = 13,"
     
     if type == "SZ":
         print "    parameter USE_RAM = 1"
@@ -169,11 +169,10 @@ def instWires (type, async, be) :
 
 #
 # Instantiate generated memory
-#
 
 def instMemory (tech, type, words, bits, bytes, mux):
     # memory simulation modute name
-    if tech == "LD130":
+    if (tech == "LD130")or(tech=="skywater130"):
         if type == "SZ": print "   "+type+tech+"_"+str(2**words)+"X"+str(bits)+"X"+str(bytes)+"CM"+str(mux)+" regf"
         elif type == "SJ": print "   "+type+tech+"_"+str(2**words)+"X"+str(bits)+"X"+str(bytes)+"CM"+str(mux)+" ram"
         elif type == "SH": print "   "+type+tech+"_"+str(2**words)+"X"+str(bits)+"X"+str(bytes)+"BM"+str(mux)+" ram"
@@ -181,99 +180,183 @@ def instMemory (tech, type, words, bits, bytes, mux):
     
     # pinout
     print "   ("
-    
-    if type == "SZ":
-        for i in range(bits*bytes):
-            print "    .DO"+str(i)+"(r_data["+str(i)+"]),"
-        print ""
-        for i in range(bits*bytes):
-            print "    .DI"+str(i)+"(w_data["+str(i)+"]),"
-        print ""
-        if bytes > 1:
-            for i in range(bytes):
-                print "    .WEB"+str(i)+"(wen["+str(i)+"]),"
-        else:
-            print "    .WEB(wen),"
-        print ""
-        print "    .CSAN(csnA),"
-        print "    .CSBN(csnB),"
-    elif type == "SJ":
-        for i in range(bits*bytes):
-            print "    .DOA"+str(i)+"(doutA["+str(i)+"]),"
-        print ""
-        for i in range(bits*bytes):
-            print "    .DOB"+str(i)+"(doutB["+str(i)+"]),"
-        print ""
-        for i in range(bits*bytes):
-            print "    .DIA"+str(i)+"(dinA["+str(i)+"]),"
-        print ""
-        for i in range(bits*bytes):
-            print "    .DIB"+str(i)+"(dinB["+str(i)+"]),"
-        print ""
-        if bytes > 1:
-            for i in range(bytes):
-                print "    .WEAN"+str(i)+"(wenA["+str(i)+"]),"
-            print ""
-            for i in range(bytes):
-                print "    .WEBN"+str(i)+"(wenB["+str(i)+"]),"
-        else:
-            print "    .WEAN(wenA),"
-            print "    .WEBN(wenB),"
-        print ""
-        print "    .CSA(enA),"
-        print "    .CSB(enB),"
-        print ""
-        print "    .OEA(oeA),"
-        print "    .OEB(oeB),"
-    elif type == "SH":
-        for i in range(bits*bytes):
-            print "    .DO"+str(i)+"(dout["+str(i)+"]),"
-        print ""
-        for i in range(bits*bytes):
-            print "    .DI"+str(i)+"(din["+str(i)+"]),"
-        print ""
-        if bytes > 1:
-            for i in range(bytes):
-                print "    .WEB"+str(i)+"(wen["+str(i)+"]),"
-        else:
-            print "    .WEB(wen),"
-        print ""
-        print "    .CS(en),"
-        print "    .OE(oe),"
-    elif type == "SP":
-        for i in range(bits):
-            print "    .DO"+str(i)+"(r_data["+str(i)+"]),"
-        print "    .CS(r_en),"
-        print "    .OE(oe),"
-    print ""
-    
-    if type == "SZ":
-        for i in range(words):
-            print "    .A"+str(i)+"(w_addr["+str(i)+"]),"
-        print ""
-        for i in range(words):
-            print "    .B"+str(i)+"(r_addr["+str(i)+"]),"
-        print ""
-        print "    .CKA(clkA),"
-        print "    .CKB(clkB)"
-    elif type == "SJ":
-        for i in range(words):
-            print "    .A"+str(i)+"(addrA["+str(i)+"]),"
-        print ""
-        for i in range(words):
-            print "    .B"+str(i)+"(addrB["+str(i)+"]),"
-        print ""
-        print "    .CKA(clkA),"
-        print "    .CKB(clkB)"
-    else:
-        for i in range(words):
-            print "    .A"+str(i)+"(addr["+str(i)+"]),"
-        print ""
-        print "    .CK(clk)"
-    
-    print "   );"
-    print ""
-
+    if tech == "LD130":
+	    if type == "SZ":
+		for i in range(bits*bytes):
+		    print "    .DO"+str(i)+"(r_data["+str(i)+"]),"
+		print ""
+		for i in range(bits*bytes):
+		    print "    .DI"+str(i)+"(w_data["+str(i)+"]),"
+		print ""
+		if bytes > 1:
+		    for i in range(bytes):
+			print "    .WEB"+str(i)+"(wen["+str(i)+"]),"
+		else:
+		    print "    .WEB(wen),"
+		print ""
+		print "    .CSAN(csnA),"
+		print "    .CSBN(csnB),"
+	    elif type == "SJ":
+		for i in range(bits*bytes):
+		    print "    .DOA"+str(i)+"(doutA["+str(i)+"]),"
+		print ""
+		for i in range(bits*bytes):
+		    print "    .DOB"+str(i)+"(doutB["+str(i)+"]),"
+		print ""
+		for i in range(bits*bytes):
+		    print "    .DIA"+str(i)+"(dinA["+str(i)+"]),"
+		print ""
+		for i in range(bits*bytes):
+		    print "    .DIB"+str(i)+"(dinB["+str(i)+"]),"
+		print ""
+		if bytes > 1:
+		    for i in range(bytes):
+			print "    .WEAN"+str(i)+"(wenA["+str(i)+"]),"
+		    print ""
+		    for i in range(bytes):
+			print "    .WEBN"+str(i)+"(wenB["+str(i)+"]),"
+		else:
+		    print "    .WEAN(wenA),"
+		    print "    .WEBN(wenB),"
+		print ""
+		print "    .CSA(enA),"
+		print "    .CSB(enB),"
+		print ""
+		print "    .OEA(oeA),"
+		print "    .OEB(oeB),"
+	    elif type == "SH":
+		for i in range(bits*bytes):
+		    print "    .DO"+str(i)+"(dout["+str(i)+"]),"
+		print ""
+		for i in range(bits*bytes):
+		    print "    .DI"+str(i)+"(din["+str(i)+"]),"
+		print ""
+		if bytes > 1:
+		    for i in range(bytes):
+			print "    .WEB"+str(i)+"(wen["+str(i)+"]),"
+		else:
+		    print "    .WEB(wen),"
+		print ""
+		print "    .CS(en),"
+		print "    .OE(oe),"
+	    elif type == "SP":
+		for i in range(bits):
+		    print "    .DO"+str(i)+"(r_data["+str(i)+"]),"
+		print "    .CS(r_en),"
+		print "    .OE(oe),"
+	    print ""
+	    
+	    if type == "SZ":
+		for i in range(words):
+		    print "    .A"+str(i)+"(w_addr["+str(i)+"]),"
+		print ""
+		for i in range(words):
+		    print "    .B"+str(i)+"(r_addr["+str(i)+"]),"
+		print ""
+		print "    .CKA(clkA),"
+		print "    .CKB(clkB)"
+	    elif type == "SJ":
+		for i in range(words):
+		    print "    .A"+str(i)+"(addrA["+str(i)+"]),"
+		print ""
+		for i in range(words):
+		    print "    .B"+str(i)+"(addrB["+str(i)+"]),"
+		print ""
+		print "    .CKA(clkA),"
+		print "    .CKB(clkB)"
+	    else:
+		for i in range(words):
+		    print "    .A"+str(i)+"(addr["+str(i)+"]),"
+		print ""
+		print "    .CK(clk)"
+	    
+	    print "   );"
+	    print ""
+    elif tech == "skywater130":
+	    if type == "SZ":
+		for i in range(bits*bytes):
+		    print "    .DO"+str(i)+"(r_data["+str(i)+"]),"
+		print ""
+		for i in range(bits*bytes):
+		    print "    .DI"+str(i)+"(w_data["+str(i)+"]),"
+		print ""
+		if bytes > 1:
+		    for i in range(bytes):
+		        print "    .WEB"+str(i)+"(wen["+str(i)+"]),"
+		else:
+		    print "    .WEB(wen),"
+		print ""
+		print "    .CSAN(csnA),"
+		print "    .CSBN(csnB),"
+	    elif type == "SJ":
+		for i in range(bits*bytes):
+		    print "    .DOA"+str(i)+"(doutA["+str(i)+"]),"
+		print ""
+		for i in range(bits*bytes):
+		    print "    .DOB"+str(i)+"(doutB["+str(i)+"]),"
+		print ""
+		for i in range(bits*bytes):
+		    print "    .DIA"+str(i)+"(dinA["+str(i)+"]),"
+		print ""
+		for i in range(bits*bytes):
+		    print "    .DIB"+str(i)+"(dinB["+str(i)+"]),"
+		print ""
+		print "    .WEAN(wenA),"
+		print "    .WEBN(wenB),"
+		print ""
+		print "    .CSA(enA),"
+		print "    .CSB(enB),"
+		print ""
+		#print "    .OEA(oeA),"
+		#print "    .OEB(oeB),"
+	    elif type == "SH":
+		for i in range(bits*bytes):
+		    print "    .DO"+str(i)+"(dout["+str(i)+"]),"
+		print ""
+		for i in range(bits*bytes):
+		    print "    .DI"+str(i)+"(din["+str(i)+"]),"
+		print ""
+		#if bytes > 1:
+		 #   for i in range(bytes):
+		 #       print "    .WEB"+str(i)+"(wen["+str(i)+"]),"
+		#else:
+		print "    .WEB(wen),"
+		print ""
+		print "    .CS(en),"
+		#print "    .OE(oe),"
+	    elif type == "SP":
+		for i in range(bits):
+		    print "    .DO"+str(i)+"(r_data["+str(i)+"]),"
+		print "    .CS(r_en),"
+		print "    .OE(oe),"
+	    print ""
+	    
+	    if type == "SZ":
+		for i in range(words):
+		    print "    .A"+str(i)+"(w_addr["+str(i)+"]),"
+		print ""
+		for i in range(words):
+		    print "    .B"+str(i)+"(r_addr["+str(i)+"]),"
+		print ""
+		print "    .CKA(clkA),"
+		print "    .CKB(clkB)"
+	    elif type == "SJ":
+		for i in range(words):
+		    print "    .A"+str(i)+"(addrA["+str(i)+"]),"
+		print ""
+		for i in range(words):
+		    print "    .B"+str(i)+"(addrB["+str(i)+"]),"
+		print ""
+		print "    .CKA(clkA),"
+		print "    .CKB(clkB)"
+	    else:
+		for i in range(words):
+		    print "    .A"+str(i)+"(addr["+str(i)+"]),"
+		print ""
+		print "    .CK(clk)"
+	    
+	    print "   );"
+	    print ""	
 #
 # Instantiate memories
 #
@@ -389,6 +472,42 @@ def main () :
                 mems.append([words, bits, mux])
         else:
             sys.exit("Unsupported memory type")
+    elif sys.argv[1] == "skywater130":
+        tech = "skywater130"
+        moduleName = sys.argv[2]
+        if sys.argv[3] == "SZ":
+            type = "SZ"
+            async = int(sys.argv[4])
+            be = int(sys.argv[5])
+            for i in range(int(sys.argv[6])):
+                words = int(sys.argv[7 + i*4])
+                bits  = int(sys.argv[8 + i*4])
+                bytes = int(sys.argv[9 + i*4])
+                mux   = int(sys.argv[10 + i*4])
+                mems.append([words, bits, bytes, mux])
+        elif sys.argv[3] == "SJ":
+            type = "SJ"
+            async = int(sys.argv[4])
+            be = int(sys.argv[5])
+            for i in range(int(sys.argv[6])):
+                words = int(sys.argv[7 + i*4])
+                bits  = int(sys.argv[8 + i*4])
+                bytes = int(sys.argv[9 + i*4])
+                mux   = int(sys.argv[10 + i*4])
+                mems.append([words, bits, bytes, mux])
+        elif sys.argv[3] == "SH":
+            type = "SH"
+            be = int(sys.argv[4])
+            for i in range(int(sys.argv[5])):
+                words = int(sys.argv[6 + i*4])
+                bits  = int(sys.argv[7 + i*4])
+                bytes = int(sys.argv[8 + i*4])
+                mux   = int(sys.argv[9 + i*4])
+                mems.append([words, bits, bytes, mux])
+        elif sys.argv[3] == "SP":
+            sys.exit("Unsupported memory type")
+        else:
+             sys.exit("Unsupported memory type")	
     elif sys.argv[1] == "--help" or sys.argv[1] == "-h":
         usage("")
     else:
