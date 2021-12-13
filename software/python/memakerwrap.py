@@ -335,7 +335,7 @@ def instMemory (tech, type, words, bits, bytes, mux):
 			print "    .WEB(wen),"
 		print ""
 		print "    .CS(en),"
-		#print "    .OE(oe)," it is not req in sky130
+		#print "    .OE(oe)," it is not req in skywater130
 	    elif type == "SP":
 		for i in range(bits):
 		    print "    .DO"+str(i)+"(r_data["+str(i)+"]),"
