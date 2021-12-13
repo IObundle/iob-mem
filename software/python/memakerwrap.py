@@ -28,8 +28,8 @@ def timeScale () :
 def initModule (moduleName, type, async) :
     print "module "+moduleName
     print "  #("
-    print "    parameter DATA_W = 32,"
-    print "    parameter ADDR_W = 13,"
+    print "    parameter DATA_W = 8,"
+    print "    parameter ADDR_W = 9,"
     
     if type == "SZ":
         print "    parameter USE_RAM = 1"
@@ -172,12 +172,17 @@ def instWires (type, async, be) :
 
 def instMemory (tech, type, words, bits, bytes, mux):
     # memory simulation modute name
-    if (tech == "LD130")or(tech=="skywater130"):
+    if (tech == "LD130"):
         if type == "SZ": print "   "+type+tech+"_"+str(2**words)+"X"+str(bits)+"X"+str(bytes)+"CM"+str(mux)+" regf"
         elif type == "SJ": print "   "+type+tech+"_"+str(2**words)+"X"+str(bits)+"X"+str(bytes)+"CM"+str(mux)+" ram"
         elif type == "SH": print "   "+type+tech+"_"+str(2**words)+"X"+str(bits)+"X"+str(bytes)+"BM"+str(mux)+" ram"
         elif type == "SP": print "   "+type+tech+"_"+str(2**words)+"X"+str(bits)+"BM"+str(mux)+"A rom"
-    
+    if (tech=="skywater130"):
+ 	
+ 	if type == "SZ": print "   "+tech+type+"_"+str(2**words)+"X"+str(bits*bytes)+"_"+str(bits)+" regf"
+        elif type == "SJ": print "   "+tech+type+"_"+str(2**words)+"X"+str(bits*bytes)+"_"+str(bits)+" ram"
+        elif type == "SH": print "   "+tech+type+"_"+str(2**words)+"X"+str(bits*bytes)+"_"+str(bits)+" ram"
+        elif type == "SP": print "  "+tech+type+"_"+str(2**words)+"X"+str(bits*bytes)+"_"+str(bits)+"A rom"
     # pinout
     print "   ("
     if tech == "LD130":
@@ -273,7 +278,7 @@ def instMemory (tech, type, words, bits, bytes, mux):
 	    print "   );"
 	    print ""
     elif tech == "skywater130":
-	    if type == "SZ":
+	     if type == "SZ":
 		for i in range(bits*bytes):
 		    print "    .DO"+str(i)+"(r_data["+str(i)+"]),"
 		print ""
@@ -282,7 +287,7 @@ def instMemory (tech, type, words, bits, bytes, mux):
 		print ""
 		if bytes > 1:
 		    for i in range(bytes):
-		        print "    .WEB"+str(i)+"(wen["+str(i)+"]),"
+			print "    .WEB"+str(i)+"(wen["+str(i)+"]),"
 		else:
 		    print "    .WEB(wen),"
 		print ""
@@ -301,14 +306,21 @@ def instMemory (tech, type, words, bits, bytes, mux):
 		for i in range(bits*bytes):
 		    print "    .DIB"+str(i)+"(dinB["+str(i)+"]),"
 		print ""
-		print "    .WEAN(wenA),"
-		print "    .WEBN(wenB),"
+		if bytes > 1:
+		    for i in range(bytes):
+			print "    .WEAN"+str(i)+"(wenA["+str(i)+"]),"
+		    print ""
+		    for i in range(bytes):
+			print "    .WEBN"+str(i)+"(wenB["+str(i)+"]),"
+		else:
+		    print "    .WEAN(wenA),"
+		    print "    .WEBN(wenB),"
 		print ""
 		print "    .CSA(enA),"
 		print "    .CSB(enB),"
 		print ""
-		#print "    .OEA(oeA),"
-		#print "    .OEB(oeB),"
+		print "    .OEA(oeA),"
+		print "    .OEB(oeB),"
 	    elif type == "SH":
 		for i in range(bits*bytes):
 		    print "    .DO"+str(i)+"(dout["+str(i)+"]),"
@@ -316,14 +328,14 @@ def instMemory (tech, type, words, bits, bytes, mux):
 		for i in range(bits*bytes):
 		    print "    .DI"+str(i)+"(din["+str(i)+"]),"
 		print ""
-		#if bytes > 1:
-		 #   for i in range(bytes):
-		 #       print "    .WEB"+str(i)+"(wen["+str(i)+"]),"
-		#else:
-		print "    .WEB(wen),"
+		if bytes > 1:
+		    for i in range(bytes):
+			print "    .WEB"+str(i)+"(wen["+str(i)+"]),"
+		else:
+		    print "    .WEB(wen),"
 		print ""
 		print "    .CS(en),"
-		#print "    .OE(oe),"
+		print "    .OE(oe),"
 	    elif type == "SP":
 		for i in range(bits):
 		    print "    .DO"+str(i)+"(r_data["+str(i)+"]),"
@@ -474,7 +486,7 @@ def main () :
             sys.exit("Unsupported memory type")
     elif sys.argv[1] == "skywater130":
         tech = "skywater130"
-        moduleName = sys.argv[2]
+          moduleName = sys.argv[2]
         if sys.argv[3] == "SZ":
             type = "SZ"
             async = int(sys.argv[4])
@@ -505,9 +517,15 @@ def main () :
                 mux   = int(sys.argv[9 + i*4])
                 mems.append([words, bits, bytes, mux])
         elif sys.argv[3] == "SP":
-            sys.exit("Unsupported memory type")
+            type = "SP"
+            for i in range(int(sys.argv[4])):
+                words = int(sys.argv[5 + i*3])
+                bits  = int(sys.argv[6 + i*3])
+                mux   = int(sys.argv[7 + i*3])
+                mems.append([words, bits, mux])
         else:
-             sys.exit("Unsupported memory type")	
+            sys.exit("Unsupported memory type")
+        
     elif sys.argv[1] == "--help" or sys.argv[1] == "-h":
         usage("")
     else:
