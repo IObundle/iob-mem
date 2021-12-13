@@ -278,7 +278,7 @@ def instMemory (tech, type, words, bits, bytes, mux):
 	    print "   );"
 	    print ""
     elif tech == "skywater130":
-	     if type == "SZ":
+	    if type == "SZ":
 		for i in range(bits*bytes):
 		    print "    .DO"+str(i)+"(r_data["+str(i)+"]),"
 		print ""
@@ -332,10 +332,10 @@ def instMemory (tech, type, words, bits, bytes, mux):
 		    for i in range(bytes):
 			print "    .WEB"+str(i)+"(wen["+str(i)+"]),"
 		else:
-		    print "    .WEB(wen),"
+			print "    .WEB(wen),"
 		print ""
 		print "    .CS(en),"
-		print "    .OE(oe),"
+		#print "    .OE(oe)," it is not req in sky130
 	    elif type == "SP":
 		for i in range(bits):
 		    print "    .DO"+str(i)+"(r_data["+str(i)+"]),"
@@ -486,7 +486,7 @@ def main () :
             sys.exit("Unsupported memory type")
     elif sys.argv[1] == "skywater130":
         tech = "skywater130"
-          moduleName = sys.argv[2]
+        moduleName = sys.argv[2]
         if sys.argv[3] == "SZ":
             type = "SZ"
             async = int(sys.argv[4])
