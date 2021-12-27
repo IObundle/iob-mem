@@ -41,7 +41,7 @@ module iob_t2p_asym_ram
     	end
     	else if (W_DATA_W == R_DATA_W)
 	  begin
-	     iob_2p_ram #(
+	     iob_t2p_ram #(
 				.DATA_W(W_DATA_W),
 				.ADDR_W(W_ADDR_W)
 				) two_port_ram (
