@@ -3,8 +3,10 @@
 `define DATA_W 8
 `define ADDR_W 4
 
+// define RW_RATIO or WR_RATIO
 // `define RW_RATIO 4
-// `define WR_RATIO 4
+`define WR_RATIO 4
+
 `ifdef WR_RATIO
  `define W_DATA_W (`DATA_W*`WR_RATIO)
  `define R_DATA_W (`DATA_W)
