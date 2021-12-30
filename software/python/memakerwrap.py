@@ -444,19 +444,18 @@ def instMemory (tech, type, words, bits, bytes, mux):
 		    print "    .OEA(oeA),"
 		    print "    .OEB(oeB),"
         elif type == "spram":
-		    for i in range(bits*bytes):
-		        print "    .DO"+str(i)+"(dout["+str(i)+"]),"
-		    print ""
-		    for i in range(bits*bytes):
-		        print "    .DI"+str(i)+"(din["+str(i)+"]),"
-		    print ""
-		    if bytes > 1:
-		        for i in range(bytes):
-			    print "    .WEB"+str(i)+"(wen["+str(i)+"]),"
-		    else:
-			    print "    .WEB(wen),"
-		    print ""
-		    print "    .CS(en),"
+            print "    .dout0"+"(dout),"
+            print ""
+            print "    .din0"+"(din),"
+            print ""
+            #if bytes > 1:
+             #   for i in range(bytes):
+              #      print "    .WEB"+str(i)+"(wen["+str(i)+"]),"
+            #else:
+            print "    .web0(wen),"
+            print ""
+            print "    .csb0(en),"
+		    
 		    #print "    .OE(oe)," it is not req in skywater130
         elif type == "sprom":
 		    for i in range(bits):
@@ -483,10 +482,11 @@ def instMemory (tech, type, words, bits, bytes, mux):
 		    print "    .CKA(clkA),"
 		    print "    .CKB(clkB)"
         else:
-	        for i in range(words):
-	            print "    .A"+str(i)+"(addr["+str(i)+"]),"
-	        print ""
-	        print "    .CK(clk)"
+            for i in range(words):
+                print "    .addr0"+"(addr["+str(i)+"]),"
+#            print "    .addr0"+"(addr),"
+            print ""
+            print "    .clk(clk)"
 	    
         print "   );"
         print ""	
