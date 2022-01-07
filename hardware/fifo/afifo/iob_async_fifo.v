@@ -123,10 +123,8 @@ module iob_async_fifo
    assign empty = (level_r == 0);
 
    iob_t2p_ram #(
-            .W_DATA_W(DATA_WIDTH),
-            .W_ADDR_W(ADDRESS_WIDTH),
-            .R_DATA_W(DATA_WIDTH),
-            .R_ADDR_W(ADDRESS_WIDTH)
+            .DATA_W(DATA_WIDTH),
+            .ADDR_W(ADDRESS_WIDTH)
             ) fifo_t2p_ram (
                 .wclk(wclk),
                 .w_en(write_en_int),
