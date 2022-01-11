@@ -8,17 +8,13 @@ module gray2bin #(
     output [DATA_W-1:0] bin
     );
 
-    reg [DATA_W-1:0]  bi;
-    integer 	        i;
-    integer 		    N = DATA_W;
+    genvar i;
 
-    always @* begin
-        bi[N-1] = gr[N-1];
-        for (i=N-2;i>=0;i=i-1)
-           bi[i] = gr[i] ^ bi[i+1];
-    end
-
-    assign bin = bi;
+    generate 
+        for(i=0;i<DATA_W;i=i+1) begin : gen_bin
+            assign bin[i] = ^gr[DATA_W-1:i];
+        end
+    endgenerate
 
 endmodule
 
