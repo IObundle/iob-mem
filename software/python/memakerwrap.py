@@ -25,30 +25,37 @@ def timeScale () :
 # Initiate module
 #
 
-def initModule (moduleName, type, async) :
+def initModule (moduleName,tech, type, async) :
+    global mems
+    for j in range(len(mems)):
+        [words, bits, bytes, mux] = mems[j]
     print "module "+moduleName
     print "  #("
-    print "    parameter DATA_W = 8,"
-    print "    parameter ADDR_W = 9,"
-    
-    if type == "SZ":
-        print "    parameter USE_RAM = 1"
-    elif type == "SJ":
-        print "    parameter FILE = \"none\""
-    elif type == "SH":
-        print "    parameter FILE = \"none\""
-    elif type == "SP":
-        print "    parameter FILE = \"rom.dat\""
-    ### for skywater130
-    elif type == "spregf":
-        print "    parameter USE_RAM = 1"
-    elif type == "dpram":
-        print "    parameter FILE = \"none\""
-    elif type == "spram":
-        print "    parameter FILE = \"none\""
-    elif type == "sprom":
-        print "    parameter FILE = \"rom.dat\""
-    
+    if tech == "LD130":
+        print "    parameter DATA_W = 8,"
+        print "    parameter ADDR_W = 9,"
+        
+        if type == "SZ":
+            print "    parameter USE_RAM = 1"
+        elif type == "SJ":
+            print "    parameter FILE = \"none\""
+        elif type == "SH":
+            print "    parameter FILE = \"none\""
+        elif type == "SP":
+            print "    parameter FILE = \"rom.dat\""
+    if tech == "sky130A":
+        ### for sky130A
+        print "    parameter DATA_W ="+str(bits*bytes)+ ","
+        print "    parameter ADDR_W ="+str(words)+ ","
+        if type == "spregf":
+            print "    parameter USE_RAM = 1"
+        elif type == "dpram":
+            print "    parameter FILE = \"none\""
+        elif type == "spram":
+            print "    parameter FILE = \"none\""
+        elif type == "sprom":
+            print "    parameter FILE = \"rom.dat\""
+        
     print "    )"
 
 #
@@ -121,7 +128,7 @@ def instPinout (type, async, be) :
         print "            output [DATA_W-1:0] r_data,"
         print "            input r_en"
        
-    ### for skywater130
+    ### for sky130A
     if type == "spregf":
         if async:
             print "            input wclk,"
@@ -240,7 +247,7 @@ def instWires (type, async, be) :
     elif type == "SP":
         print "   wire oe = 1'b1; //r_en;"
     print ""
-############ for skywater130
+############ for sky130A
     if type == "spregf":
         if async:
             print "   wire clkA = wclk;"
@@ -299,11 +306,11 @@ def instMemory (tech, type, words, bits, bytes, mux):
         elif type == "SJ": print " "+type+tech+"_"+str(2**words)+"X"+str(bits)+"X"+str(bytes)+"CM"+str(mux)+" ram"
         elif type == "SH": print " "+type+tech+"_"+str(2**words)+"X"+str(bits)+"X"+str(bytes)+"BM"+str(mux)+" ram"
         elif type == "SP": print " "+type+tech+"_"+str(2**words)+"X"+str(bits)+"BM"+str(mux)+"A rom"
-    if tech == "skywater130":
-        if type == "spregf":  print "  "+tech+"_"+type+"_"+str(2**words)+"X"+str(bits*bytes)+"_"+str(bits)+" regf"
-        elif type == "dpram": print "  "+tech+"_"+type+"_"+str(2**words)+"X"+str(bits*bytes)+"_"+str(bits)+" ram"
-        elif type == "spram": print "  "+tech+"_"+type+"_"+str(2**words)+"X"+str(bits*bytes)+"_"+str(bits)+" ram"
-        elif type == "sprom": print "  "+tech+"_"+type+"_"+str(2**words)+"X"+str(bits*bytes)+"_"+str(bits)+"A rom"
+    if tech == "sky130A":
+        if type == "spregf":  print "  " "sram" "_"+str(bits*bytes)+"_"+str(2**words)+"_" +tech+" regf"
+        elif type == "dpram": print "  ""dpram" "_"+str(bits*bytes)+"_"+str(2**words)+" _" +tech+" ram"
+        elif type == "spram": print "  " "sram" "_"+str(bits*bytes)+"_"+str(2**words)+"_" +tech+" ram"
+        elif type == "sprom": print "  " "srom" "_"+str(bits*bytes)+"_"+str(2**words)+"_" +tech+" A rom"
     # pinout
     print "   ("
     if tech == "LD130":
@@ -398,8 +405,8 @@ def instMemory (tech, type, words, bits, bytes, mux):
 	        
 	    print "   );"
 	    print ""
-#########for skywater130	    
-    elif tech == "skywater130":
+#########for sky130A	    
+    elif tech == "sky130A":
         if type == "spregf":
 		    for i in range(bits*bytes):
 		        print "    .DO"+str(i)+"(r_data["+str(i)+"]),"
@@ -444,9 +451,9 @@ def instMemory (tech, type, words, bits, bytes, mux):
 		    print "    .OEA(oeA),"
 		    print "    .OEB(oeB),"
         elif type == "spram":
-            print "    .dout0"+"(dout),"
+            print "    .dout0 (dout),"
             print ""
-            print "    .din0"+"(din),"
+            print "    .din0 (din),"
             print ""
             #if bytes > 1:
              #   for i in range(bytes):
@@ -456,13 +463,14 @@ def instMemory (tech, type, words, bits, bytes, mux):
             print ""
             print "    .csb0(en),"
 		    
-		    #print "    .OE(oe)," it is not req in skywater130
+		    #print "    .OE(oe)," it is not req in sky130A
         elif type == "sprom":
 		    for i in range(bits):
 		        print "    .DO"+str(i)+"(r_data["+str(i)+"]),"
 		    print "    .CS(r_en),"
 		    print "    .OE(oe),"
         print ""
+        
         if type == "spregf":
 		    for i in range(words):
 		        print "    .A"+str(i)+"(w_addr["+str(i)+"]),"
@@ -482,11 +490,11 @@ def instMemory (tech, type, words, bits, bytes, mux):
 		    print "    .CKA(clkA),"
 		    print "    .CKB(clkB)"
         else:
-            for i in range(words):
-                print "    .addr0"+"(addr["+str(i)+"]),"
-#            print "    .addr0"+"(addr),"
+           # for i in range(words):
+            #    print "    .addr0 (addr["+str(i)+"]),"
+            print "    .addr0"+"(addr),"
             print ""
-            print "    .clk(clk)"
+            print "    .clk0(clk)"
 	    
         print "   );"
         print ""	
@@ -532,12 +540,14 @@ def generateWrapper (moduleName, tech, type, async, be) :
     ret = 0
     
     timeScale()
-    initModule(moduleName, type, async)
+    initModule(moduleName,tech, type, async)
     instPinout(type, async, be)
     instWires(type, async, be)
     instMemories(tech, type)
     endModule()
-    
+    if tech == "sky130A":
+        blackboxModule(tech, type)
+        
     return ret
 
 #
@@ -551,7 +561,30 @@ def usage (message) :
     print "       -h, --help    print this message"
     print ""
     sys.exit(1)
+########################
 
+def blackboxModule(tech, type) :
+    global mems
+    for j in range(len(mems)):
+        if type == "sprom": [words, bits, mux] = mems[j]
+        else: [words, bits, bytes, mux] = mems[j]
+    print " "
+    print "(* blackbox *)"
+    if type == "spregf":  print "module" "  " "sram" "_"+str(bits*bytes)+"_"+str(2**words)+"_" +tech+  "(clk0,csb0,web0,addr0,din0,dout0);"
+    elif type == "dpram": print "module" "  " "dpram" "_"+str(bits*bytes)+"_"+str(2**words)+"_"+tech+  "(clk0,csb0,web0,addr0,din0,dout0);" #this will be updated once dual port option is there in OpenRAM
+    elif type == "spram": print "module"  "  " "sram" "_"+str(bits*bytes)+"_"+str(2**words)+"_"+tech+  "(clk0,csb0,web0,addr0,din0,dout0);"
+    elif type == "sprom": print "module"  "  " "srom" "_"+str(bits*bytes)+"_"+str(2**words)+"_"+tech+  "(clk0,csb0,web0,addr0,din0,dout0);" # this will update once ROM is integrated from OpenRAM
+    print " "
+    print "parameter" " " "ADDR_WD" "=" +str(words)+ ";"
+    print "parameter" " " "DATA_WD" "=" +str(bits*bytes)+ ";"
+    if type == "spram":
+        print "input clk0;"
+        print "input csb0;"
+        print "input web0;"
+        print "input" " "  "[" "ADDR_WD-1" ":0" "]" " " "addr0;"
+        print "input" " "  "[" "DATA_WD-1" ":0" "]" " " "din0;"
+        print "output" " " "[" "DATA_WD-1" ":0" "]" " "  "dout0;"
+    print "endmodule"
 #
 # Main
 #
@@ -606,9 +639,9 @@ def main () :
                 mems.append([words, bits, mux])
         else:
             sys.exit("Unsupported memory type")
-    #########for skywater130
-    elif sys.argv[1] == "skywater130":
-        tech = "skywater130"
+    #########for sky130A
+    elif sys.argv[1] == "sky130A":
+        tech = "sky130A"
         moduleName = sys.argv[2]
         if sys.argv[3] == "spregf":
             type = "spregf"
