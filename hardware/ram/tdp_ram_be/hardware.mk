@@ -1,8 +1,16 @@
+ifneq ($(ASIC),1)
+
+MODULES+=ram/tdp_ram_be
+
+# Paths
+TDPRAM_BE_DIR=$(MEM_HW_DIR)/ram/tdp_ram_be
+
 # Submodules
+ifneq (ram/tdp_ram,$(filter ram/tdp_ram, $(MODULES)))
 include $(MEM_HW_DIR)/ram/tdp_ram/hardware.mk
+endif
 
 # Sources
-ifneq ($(ASIC),1)
-TDPRAM_BE_DIR=$(MEM_HW_DIR)/ram/tdp_ram_be
 VSRC+=$(TDPRAM_BE_DIR)/iob_tdp_ram_be.v
+
 endif
