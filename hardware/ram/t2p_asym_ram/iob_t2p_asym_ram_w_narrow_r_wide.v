@@ -49,12 +49,13 @@ module iob_t2p_asym_ram_w_narrow_r_wide
    generate
       if(USE_RAM) begin
 	 always@(posedge rclk) begin
-	    if (r_en) begin
+`ifndef IS_CYCLONEV
+	    if (r_en)
+`endif
 	       for (i = 0; i < RATIO; i = i+1) begin
 		  //lsbaddr <= i[log2RATIO-1:0];
 		  r_data[(i+1)*minDATA_W-1 -: minDATA_W] <= ram[{r_addr, i[log2RATIO-1:0]}];
 	       end
-	    end
 	 end
       end
    endgenerate

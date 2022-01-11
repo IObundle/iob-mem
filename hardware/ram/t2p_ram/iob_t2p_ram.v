@@ -32,7 +32,9 @@ module iob_t2p_ram
    generate
       if(USE_RAM)
         always@(posedge rclk)  begin
+`ifndef IS_CYCLONEV
            if(r_en)
+`endif
              r_data <= mem[r_addr];
         end
       else //use reg file

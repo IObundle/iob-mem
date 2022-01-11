@@ -43,7 +43,9 @@ module iob_t2p_asym_ram_w_wide_r_narrow
    generate
       if(USE_RAM)
         always@(posedge rclk)  begin
+`ifndef IS_CYCLONEV
            if(r_en)
+`endif
              r_data <= ram[r_addr];
         end
       else //use reg file
