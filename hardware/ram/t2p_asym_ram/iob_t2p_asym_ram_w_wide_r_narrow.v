@@ -3,25 +3,26 @@
 `define max(a,b) {(a) > (b) ? (a) : (b)}
 `define min(a,b) {(a) < (b) ? (a) : (b)}
 
-/*WARNING: This memory assumes that the write port data width is bigger than the
- read port data width and that they are multiples of eachother
+/*
+ In this memory, the read port width is greater and multiple of the 
+ write port width
  */
+
 module iob_t2p_asym_ram_w_wide_r_narrow
   #( 
-     parameter W_DATA_W = 16,
-     parameter W_ADDR_W = 6,
-     parameter R_DATA_W = 8,
-     parameter R_ADDR_W = 7,
-     parameter USE_RAM = 1
+     parameter W_DATA_W = 0,
+     parameter W_ADDR_W = 0,
+     parameter R_DATA_W = 0,
+     parameter R_ADDR_W = 0
      ) 
    (
     //Inputs
-    input 		      wclk, //write clock
-    input 		      w_en, //write enable
-    input [W_DATA_W-1:0]      w_data, //Input data to write port
-    input [W_ADDR_W-1:0]      w_addr, //address for write port
-    input 		      rclk, //read clock
-    input [R_ADDR_W-1:0]      r_addr, //address for read port
+    input 		      wclk,   //write clock
+    input 		      w_en,   //write enable
+    input [W_DATA_W-1:0]      w_data, //write port
+    input [W_ADDR_W-1:0]      w_addr, //write port address
+    input 		      rclk,   //read clock
+    input [R_ADDR_W-1:0]      r_addr, //read port address
     input 		      r_en,
     //Outputs
     output reg [R_DATA_W-1:0] r_data //output port
@@ -37,26 +38,16 @@ module iob_t2p_asym_ram_w_wide_r_narrow
    reg [minDATA_W-1:0] 	      ram [2**maxADDR_W-1:0];
    
    integer 		      i;
-   //reg [log2RATIO-1:0] 	      lsbaddr;
    
-   //reading from the RAM
-   generate
-      if(USE_RAM)
-        always@(posedge rclk)  begin
-           if(r_en)
-             r_data <= ram[r_addr];
-        end
-      else //use reg file
-        always@* r_data = ram[r_addr];
-   endgenerate
-   
-   //writing to the RAM
-   always@(posedge wclk) begin
-      for (i = 0; i < RATIO; i = i+1) begin
-	 //lsbaddr = i[log2RATIO-1:0];
-	 if(w_en)    //check if write enable is ON
-	   ram[{w_addr, i[log2RATIO-1:0]}] <= w_data[(i+1)*minDATA_W-1 -: minDATA_W];
-      end
-   end
+   //read port
+   always@(posedge rclk)
+     if(r_en)
+       r_data <= ram[r_addr];
+  
+   //write port
+   always@(posedge wclk)
+     for (i = 0; i < RATIO; i = i+1)
+       if(w_en)
+	 ram[{w_addr, i[log2RATIO-1:0]}] <= w_data[(i+1)*minDATA_W-1 -: minDATA_W];
    
 endmodule   

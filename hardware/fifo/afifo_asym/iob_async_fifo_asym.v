@@ -139,14 +139,18 @@ module iob_async_fifo_asym
    //effective write enable
    assign write_en_int = write_en & ~full;
    
-   gray_counter_asym #(
-		  .COUNTER_WIDTH(W_ADDR_W)
-		  ) wptr_counter (
-                                               .clk(wclk),
-                                               .rst(rst), 
-                                               .en(write_en_int),
-                                               .data_out(wptr)
-                                               );
+   gray_counter_asym 
+     #(
+       .COUNTER_WIDTH(W_ADDR_W)
+       ) 
+   wptr_counter 
+     (
+      .clk(wclk),
+      .rst(rst), 
+      .en(write_en_int),
+      .data_out(wptr)
+      );
+
    //compute binary pointer difference
    assign level_w = gray2binW(wptr, W_ADDR_W) - rptr_wire;
    
@@ -164,14 +168,17 @@ module iob_async_fifo_asym
    //effective read enable
    assign read_en_int  = read_en & ~empty;
    
-   gray_counter_asym #(
-		  .COUNTER_WIDTH(R_ADDR_W)
-		  ) rptr_counter (
-                                               .clk(rclk),
-                                               .rst(rst), 
-                                               .en(read_en_int),
-                                               .data_out(rptr)
-                                              );
+   gray_counter_asym 
+     #(
+       .COUNTER_WIDTH(R_ADDR_W)
+       ) 
+   rptr_counter 
+     (
+      .clk(rclk),
+      .rst(rst), 
+      .en(read_en_int),
+      .data_out(rptr)
+      );
    
    //compute binary pointer difference
    assign level_r = wptr_wire - gray2binR(rptr, R_ADDR_W);
@@ -183,21 +190,24 @@ module iob_async_fifo_asym
    // FIFO memory
    //
 
-   iob_t2p_asym_ram #(
-   			    .W_DATA_W(W_DATA_W),
-   			    .W_ADDR_W(W_ADDR_W),
-   			    .R_DATA_W(R_DATA_W),
-   			    .R_ADDR_W(R_ADDR_W)
-   			    ) fifo_t2p_asym_ram (
-   							.wclk(wclk),
-   							.w_en(write_en_int),
-   							.w_data(w_data),
-   							.w_addr(gray2binW(wptr, W_ADDR_W)),
-   							.rclk(rclk),
-   							.r_addr(gray2binR(rptr, R_ADDR_W)),
-   							.r_en(read_en_int),
-   							.r_data(r_data)
-   							);
+   iob_t2p_asym_ram 
+     #(
+       .W_DATA_W(W_DATA_W),
+       .W_ADDR_W(W_ADDR_W),
+       .R_DATA_W(R_DATA_W),
+       .R_ADDR_W(R_ADDR_W)
+       ) 
+   fifo_t2p_asym_ram 
+     (
+      .wclk(wclk),
+      .w_en(write_en_int),
+      .w_data(w_data),
+      .w_addr(gray2binW(wptr, W_ADDR_W)),
+      .rclk(rclk),
+      .r_addr(gray2binR(rptr, R_ADDR_W)),
+      .r_en(read_en_int),
+      .r_data(r_data)
+      );
    
 endmodule
    

@@ -2,9 +2,9 @@
 
 module iob_tdp_ram
   #(
-    parameter FILE="none",
-    parameter DATA_W=32,
-    parameter ADDR_W=11
+    parameter FILE = "none",
+    parameter DATA_W = 0,
+    parameter ADDR_W = 0
     )
    (
     // Port A
@@ -26,7 +26,6 @@ module iob_tdp_ram
 
    //this allows ISE 14.7 to work; do not remove
    localparam mem_init_file_int = FILE;
-
 
    // Declare the RAM
    reg [DATA_W-1:0] 			       ram[2**ADDR_W-1:0];

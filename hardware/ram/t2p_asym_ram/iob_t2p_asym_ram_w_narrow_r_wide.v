@@ -3,25 +3,26 @@
 `define max(a,b) {(a) > (b) ? (a) : (b)}
 `define min(a,b) {(a) < (b) ? (a) : (b)}
 
-/*WARNING: This memory assumes that the read port data width is bigger than the
- write port data width and that they are multiples of eachother
+/*
+ In this memory, the write port width is greater and multiple of the 
+ read port width
  */
+
 module iob_t2p_asym_ram_w_narrow_r_wide
   #( 
-     parameter W_DATA_W = 16,
-     parameter W_ADDR_W = 6,
-     parameter R_DATA_W = 8,
-     parameter R_ADDR_W = 7,
-     parameter USE_RAM = 1
+     parameter W_DATA_W = 0,
+     parameter W_ADDR_W = 0,
+     parameter R_DATA_W = 0,
+     parameter R_ADDR_W = 0
      ) 
    (
     //Inputs
-    input 		      wclk, //write clock
-    input 		      w_en, //write enable
-    input [W_DATA_W-1:0]      w_data, //Input data to write port
-    input [W_ADDR_W-1:0]      w_addr, //address for write port
-    input 		      rclk, //read clock
-    input [R_ADDR_W-1:0]      r_addr, //address for read port
+    input 		      wclk,   //write clock
+    input 		      w_en,   //write enable
+    input [W_DATA_W-1:0]      w_data, //write port
+    input [W_ADDR_W-1:0]      w_addr, //write port address
+    input 		      rclk,   //read clock
+    input [R_ADDR_W-1:0]      r_addr, //read port address
     input 		      r_en,
     //Outputs
     output reg [R_DATA_W-1:0] r_data //output port
@@ -38,24 +39,16 @@ module iob_t2p_asym_ram_w_narrow_r_wide
    reg [minDATA_W-1:0] 	      ram [2**maxADDR_W-1:0];
    
    integer 		      i;
-   //reg [log2RATIO-1:0] 	      lsbaddr;
    
-   //writing to the RAM
+   //read port
+   always@(posedge rclk)
+     if (r_en)
+       for (i = 0; i < RATIO; i = i+1)
+	 r_data[(i+1)*minDATA_W-1 -: minDATA_W] <= ram[{r_addr, i[log2RATIO-1:0]}];
+
+   //write port
    always@(posedge wclk)
      if (w_en)
        ram[w_addr] <= w_data;
    
-   //reading from the RAM
-   generate
-      if(USE_RAM) begin
-	 always@(posedge rclk) begin
-	    if (r_en) begin
-	       for (i = 0; i < RATIO; i = i+1) begin
-		  //lsbaddr <= i[log2RATIO-1:0];
-		  r_data[(i+1)*minDATA_W-1 -: minDATA_W] <= ram[{r_addr, i[log2RATIO-1:0]}];
-	       end
-	    end
-	 end
-      end
-   endgenerate
 endmodule   
