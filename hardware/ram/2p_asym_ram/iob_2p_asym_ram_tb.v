@@ -1,145 +1,91 @@
 `timescale 1ns / 1ps
 
-`ifdef R_BIG
-    `define W_DATA 8
-    `define W_ADDR 4
-    `define R_DATA 32
-    `define R_ADDR 2
-`endif
+module iob_2p_asym_ram_tb;
 
-`ifndef R_BIG
-    `define R_BIG 0
-    `define W_DATA 32
-    `define W_ADDR 2
-    `define R_DATA 8
-    `define R_ADDR 4
-`endif
+   // Inputs
+   reg clk = 0;
+   reg w_en = 0;
+   reg r_en = 0;
 
-module iob_2p_asym_mem_tb;
+   reg [`W_DATA_W-1:0] w_data;
+   reg [`W_ADDR_W-1:0] w_addr;
+   wire [`R_DATA_W-1:0] r_data;
+   reg [`R_ADDR_W-1:0]  r_addr;
 
-    // Inputs
-    reg clk;
-    reg w_en;
-    reg r_en;
-    reg [`W_DATA-1:0] w_data;
-    reg [`W_ADDR-1:0] w_addr;
-    reg [`R_ADDR-1:0] r_addr;
-
-    // Outputs
-    wire [`R_DATA-1:0] r_data;
-
-    integer i, seq_ini;
-
-    parameter clk_per = 10; // clk period = 10 timeticks
-
-    // Instantiate the Unit Under Test (UUT)
-    iob_2p_asym_mem #(
-        .W_DATA_W(`W_DATA),
-        .W_ADDR_W(`W_ADDR),
-        .R_DATA_W(`R_DATA),
-        .R_ADDR_W(`R_ADDR)
-    )
-    uut (
+   // Instantiate the Unit Under Test (UUT)
+   iob_2p_asym_ram
+     #(
+       .W_DATA_W(`W_DATA_W),
+       .W_ADDR_W(`W_ADDR_W),
+       .R_DATA_W(`R_DATA_W),
+       .R_ADDR_W(`R_ADDR_W)
+       )
+   uut (
         .clk(clk), 
         .w_en(w_en),
         .r_en(r_en), 
-        .w_data(w_data), 
-        .w_addr(w_addr), 
+        .w_addr(w_addr),
+        .w_data(w_data),
         .r_addr(r_addr),
         .r_data(r_data)
-    );
+        );
 
-    // system clock
-    always #(clk_per/2) clk = ~clk; 
+   // system clock
+   localparam clk_per = 10; // clk period = 10 timeticks
+   always #(clk_per/2) clk = ~clk; 
 
-    initial begin
-        // Initialize Inputs
-        clk = 1;
-        w_addr = 0;
-        w_en = 0;
-        r_en = 0;
-        w_data = 0;
-        r_addr = 0; 
+   localparam seq_ini = 10;
+   integer              i;
 
-        // Number from which to start the incremental sequence to write into the RAM
-        seq_ini = 32;
+   reg [`W_DATA_W*2**`W_ADDR_W-1:0] expected;
+   reg [`R_DATA_W-1:0]              r_data_expected;
+   
+   initial begin
 
-        // Read data > write data
-        if(`R_BIG==1) begin
-            // optional VCD
-            `ifdef VCD
-                $dumpfile("iob_2p_asym_mem_r.vcd");
-                $dumpvars();
-            `endif
-            @(posedge clk) #1;
+`ifdef W_WIDE_R_NARROW
+      $display("W_WIDE_R_NARROW");
+`else
+      $display("W_NARROW_R_WIDE");
+`endif
+      $display("W_DATA_W=%d", `W_DATA_W);
+      $display("W_ADDR_W=%d", `W_ADDR_W);      
+      $display("R_DATA_W=%d", `R_DATA_W);
+      $display("R_ADDR_W=%d", `R_ADDR_W);
+   
+      //compute expected response
+      for (i=0; i < 2**`W_ADDR_W; i=i+1)
+        expected[i*`W_DATA_W +: `W_DATA_W] = i+seq_ini;    
+      
+      // optional VCD
+`ifdef VCD
+      $dumpfile("uut.vcd");
+      $dumpvars();
+`endif
+      repeat(4) @(posedge clk) #1;
 
-            //Write all the locations of RAM 
-            w_en = 1; 
-            for(i = 0; i < 16; i = i + 1) begin
-                w_addr = i;
-                w_data = i+seq_ini;
-                @(posedge clk) #1;
-            end
-            w_en = 0;
+      //Write all the locations of RAM 
+      w_en = 1; 
+      for(i = 0; i < 2**`W_ADDR_W; i = i + 1) begin
+         w_addr = i;
+         w_data = i+seq_ini;
+         @(posedge clk) #1;
+      end
+      w_en = 0;
 
-            @(posedge clk) #1;
+      @(posedge clk) #1;
 
-            //Read all the locations of RAM
-            r_en = 1;
-            for(i = 0 ; i < 4; i = i + 1) begin
-                r_addr = i;
-                @(posedge clk) #1;
-                if(r_data[7:0]!=i*4+seq_ini || r_data[15:8]!=i*4+1+seq_ini || 
-                    r_data[23:16]!=i*4+2+seq_ini || r_data[31:24]!=i*4+3+seq_ini) begin
-                    $display("Test 1 failed: read error in r_data.\n\t");
-                    $finish;
-                end
-                @(posedge clk) #1;
-            end
-            r_en = 0;
-        end
+      //Read all the locations of RAM
+      r_en = 1;
+      for(i = 0 ; i < 2**`R_ADDR_W; i = i + 1) begin
+         r_addr = i;
+         @(posedge clk) #1;
+         //verify response
+         r_data_expected = expected[i*`R_DATA_W +: `R_DATA_W];
+         if(r_data != r_data_expected)
+           $display("read addr=%x, got %x, expected %x", r_addr, r_data, r_data_expected);
+      end
 
-        // Write data > read data
-        if(`R_BIG==0) begin
-            // optional VCD
-            `ifdef VCD
-                $dumpfile("iob_2p_asym_mem_w.vcd");
-                $dumpvars();
-            `endif
+      #(5*clk_per) $finish;
+   end
 
-            //Write all the locations of RAM 
-            w_en = 1;
-            for(i=0; i < 4; i = i + 1) begin
-                w_data[7:0] = i*4      +seq_ini;
-                w_data[15:8] = i*4+1   +seq_ini;
-                w_data[23:16] = i*4+2  +seq_ini;
-                w_data[31:24] = i*4+3  +seq_ini;
-                w_addr = i;
-                #(clk_per);
-                @(posedge clk) #1;
-            end
-            w_en = 0;
-
-            @(posedge clk) #1;
-            
-            //Read all the locations of RAM
-            r_en = 1; 
-            for(i=0; i < 16; i = i + 1) begin
-                r_addr = i;
-                @(posedge clk) #1;
-                if(r_data!=i+seq_ini) begin
-                    $display("Test 2 failed: read error in r_data. \n \t i=%0d; data = %h when it should have been %0h", 
-                        i, r_data, i+32);
-                end
-            end
-            @(posedge clk) #1;
-            r_en = 0;
-        end
-
-        #clk_per
-        $display("%c[1;34m",27);
-        $display("Test completed successfully.");
-        $display("%c[0m",27);
-        #(5*clk_per) $finish;
-    end
 endmodule

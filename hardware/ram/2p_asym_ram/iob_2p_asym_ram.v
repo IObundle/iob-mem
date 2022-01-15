@@ -1,60 +1,121 @@
 `timescale 1ns / 1ps
+`define max(a,b) {(a) > (b) ? (a) : (b)}
+`define min(a,b) {(a) < (b) ? (a) : (b)}
 
 module iob_2p_asym_ram
-	#(
-		parameter W_DATA_W = 16,
-		parameter W_ADDR_W = 6,
-		parameter R_DATA_W = 8,
-		parameter R_ADDR_W = 7,
-    parameter USE_RAM = 1
-	)
-	(
-		//Inputs
-		input 				clk,
-    input 				w_en,    //write enable
-    input [W_DATA_W-1:0] 	w_data, //Input data to write port
-    input [W_ADDR_W-1:0] 	w_addr,  //address for write port
-    input [R_ADDR_W-1:0] 	r_addr,  //address for read port
-    input				  r_en,
-    //Outputs
-    output [R_DATA_W-1:0] r_data //output port
+  #(
+    parameter W_DATA_W = 0,
+    parameter W_ADDR_W = 0,
+    parameter R_DATA_W = 0,
+    parameter R_ADDR_W = 0
+    )
+   (
+    //Inputs
+    input                     clk,
+    //write port
+    input                     w_en,
+    input [W_DATA_W-1:0]      w_data,
+    input [W_ADDR_W-1:0]      w_addr,
+    //read port
+    input                     r_en,
+    input [R_ADDR_W-1:0]      r_addr,
+    output reg [R_DATA_W-1:0] r_data
     );
 
-    generate
-    	if (W_DATA_W > R_DATA_W)
-    	begin
-    		iob_2p_asym_ram_w_wide_r_narrow #(
-    			.W_DATA_W(W_DATA_W),
-    		 	.W_ADDR_W(W_ADDR_W),
-    		 	.R_DATA_W(R_DATA_W),
-    		 	.R_ADDR_W(R_ADDR_W),
-                .USE_RAM(USE_RAM)
-    		 ) two_port_ram (
-    		 	.clk(clk),
-    		 	.w_en(w_en),
-    		 	.w_data(w_data),
-    		 	.w_addr(w_addr),
-    		 	.r_addr(r_addr),
-    		 	.r_en(r_en),
-    		 	.r_data(r_data)
-    		 );
-    	end
-    	else
-    	begin
-    		iob_2p_asym_ram_w_narrow_r_wide #(
-    			.W_DATA_W(W_DATA_W),
-    		 	.W_ADDR_W(W_ADDR_W),
-    		 	.R_DATA_W(R_DATA_W),
-    		 	.R_ADDR_W(R_ADDR_W)
-    		 ) two_port_ram (
-    		 	.clk(clk),
-    		 	.w_en(w_en),
-    		 	.w_data(w_data),
-    		 	.w_addr(w_addr),
-    		 	.r_addr(r_addr),
-    		 	.r_en(r_en),
-    		 	.r_data(r_data)
-    		 );
-    	end
-    endgenerate
+   //determins the number of blocks N
+   localparam MAXDATA_W = `max(W_DATA_W, R_DATA_W);
+   localparam MINDATA_W = `min(W_DATA_W, R_DATA_W);
+   localparam N = MAXDATA_W/MINDATA_W;
+   localparam MAXADDR_W = `max(W_ADDR_W, R_ADDR_W);
+   localparam MINADDR_W = `min(W_ADDR_W, R_ADDR_W);
+   
+
+   //memory buses
+   //write buses
+   reg [N-1:0]                en_wr;
+   reg [MINDATA_W-1:0]        data_wr [N-1:0];
+   reg [MINADDR_W-1:0]        addr_wr [N-1:0];
+
+   //read buses
+   wire [MINDATA_W-1:0]       data_rd [N-1:0];
+   reg [MINADDR_W-1:0]        addr_rd [N-1:0];
+
+   //instantiate N RAM blocks and connect them to the buses
+   genvar                 i;
+   generate 
+      for (i=0; i<N; i=i+1) begin
+         iob_2p_ram
+             #(
+               .DATA_W(MINDATA_W),
+               .ADDR_W(MINADDR_W)
+               )
+         iob_2p_ram_inst
+             (
+              .clk(clk),
+              .w_en(en_wr[i]),
+              .w_addr(addr_wr[i]),
+              .w_data(data_wr[i]),
+              .r_en(r_en),
+              .r_addr(addr_rd[i]),
+              .r_data(data_rd[i])              
+              );
+         
+      end
+   endgenerate
+
+   integer j,k,l;
+   generate
+
+      //WRITE DATA WIDER THAN READ DATA
+
+      reg [MAXDATA_W-MINDATA_W-1:0] r_addr_lsbs_reg;
+
+      if (W_DATA_W > R_DATA_W) begin
+         //write parallel
+         always @* begin
+            for (j=0; j < N; j= j+1) begin
+               en_wr[j] = w_en;
+               data_wr[j] = w_data[j*MINDATA_W +: MINDATA_W];
+               addr_wr[j] = w_addr;
+            end
+         end
+         
+         //read serial
+         always @* begin
+            for (k=0; k < N; k= k+1) begin
+               addr_rd[k] = r_addr[R_ADDR_W-1-:W_ADDR_W];
+            end
+         end
+
+         //read address register
+         always @(posedge clk)
+           r_addr_lsbs_reg <= r_addr[R_ADDR_W-W_ADDR_W-1:0];
+           
+         //read mux
+         always @* begin
+            r_data = 1'b0;
+            for (l=0; l < N; l= l+1) begin
+               r_data = data_rd[r_addr_lsbs_reg];
+            end
+         end
+         
+      //READ DATA WIDER THAN OR EQUAL TO WRITE DATA 
+      end else if (W_DATA_W <= R_DATA_W) begin
+         //write serial
+         always @* begin
+            for (j=0; j < N; j= j+1) begin
+               en_wr[j] = w_en & (w_addr[W_ADDR_W-R_ADDR_W-1:0] == j[W_ADDR_W-R_ADDR_W-1:0]);
+               data_wr[j] = w_data;
+               addr_wr[j] = w_addr[R_ADDR_W-1:0];
+            end
+         end
+         //read parallel
+         always @* begin
+            for (k=0; k < N; k= k+1) begin
+               addr_rd[k] = r_addr;
+               r_data[k*MINDATA_W +: MINDATA_W] = data_rd[k];
+            end
+         end
+      end
+   endgenerate
 endmodule

@@ -72,7 +72,7 @@ module iob_sync_fifo_asym_tb;
         if(`R_BIG==0) begin
             // optional VCD
             `ifdef VCD
-                $dumpfile("iob_sync_fifo_asym_w.vcd");
+                $dumpfile("uut.vcd");
                 $dumpvars();
             `endif
 
@@ -103,7 +103,7 @@ module iob_sync_fifo_asym_tb;
         if(`R_BIG==1) begin
             // optional VCD
             `ifdef VCD
-                $dumpfile("iob_sfifo_asym_r.vcd");
+                $dumpfile("uut.vcd");
                 $dumpvars();
             `endif
 

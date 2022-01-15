@@ -25,7 +25,7 @@ module iob_sp_rom_tb;
     initial begin
         // optional VCD
         `ifdef VCD
-      	   $dumpfile("iob_sp_rom.vcd");
+      	   $dumpfile("uut.vcd");
       	   $dumpvars();
         `endif
       	

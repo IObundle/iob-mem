@@ -28,13 +28,14 @@ module iob_tdp_ram
    localparam mem_init_file_int = FILE;
 
    // Declare the RAM
-   reg [DATA_W-1:0] 			       ram[2**ADDR_W-1:0];
+   reg [DATA_W-1:0]           ram[2**ADDR_W-1:0];
 
    // Initialize the RAM
    initial
      if(mem_init_file_int != "none")
        $readmemh(mem_init_file_int, ram, 0, 2**ADDR_W - 1);
 
+   //read port
    always @ (posedge clkA) begin// Port A
       if (enA)
         if (weA)
@@ -45,6 +46,7 @@ module iob_tdp_ram
       doutA <= ram[addrA];
     end
 
+   //write port
    always @ (posedge clkB) begin // Port B
       if (enB)
         if (weB)

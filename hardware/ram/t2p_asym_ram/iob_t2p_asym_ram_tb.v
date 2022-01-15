@@ -72,7 +72,7 @@ module iob_t2p_asym_ram_tb;
         if(`R_BIG==1) begin
             // optional VCD
             `ifdef VCD
-                $dumpfile("iob_t2p_asym_ram_r.vcd");
+                $dumpfile("uut.vcd");
                 $dumpvars();
             `endif
             @(posedge wclk) #1;
@@ -107,7 +107,7 @@ module iob_t2p_asym_ram_tb;
         if(`R_BIG==0) begin
             // optional VCD
             `ifdef VCD
-                $dumpfile("iob_t2p_asym_ram_w.vcd");
+                $dumpfile("uut.vcd");
                 $dumpvars();
             `endif
 

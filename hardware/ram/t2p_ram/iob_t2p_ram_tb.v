@@ -3,11 +3,6 @@
 `define DATA_W 8
 `define ADDR_W 4
 
-`ifndef USE_RAM
-    `define USE_RAM 0
-`endif
-
-
 module iob_t2p_ram_tb;
 
     // Inputs
@@ -38,17 +33,11 @@ module iob_t2p_ram_tb;
         w_addr = 0;
         w_data = 0;
 
-        // optional VCD
-        `ifdef VCD
-            if(`USE_RAM == 1) begin
-                $dumpfile("2p_mem_ram.vcd");
-                $dumpvars();
-            end
-            if(`USE_RAM == 0) begin
-                $dumpfile("2p_mem.vcd");
-                $dumpvars();
-            end
-        `endif
+       // optional VCD
+`ifdef VCD
+       $dumpfile("uut.vcd");
+       $dumpvars();
+`endif
 
         @(posedge wclk) #1;
         @(posedge rclk) #1;
@@ -68,16 +57,14 @@ module iob_t2p_ram_tb;
         r_en = 0;
         @(posedge rclk) #1;
 
-        if(`USE_RAM == 1) begin
-            for(i = 0; i < 16; i = i + 1) begin
-                r_addr = i;
-                @(posedge rclk) #1;
-                if(r_data!=0) begin
-                    $display("Test 1 failed: with r_en = 0, at position %0d, r_data should be 0 but is %d", i, r_data);
-                    $finish;
-                end
-            end
-        end
+       for(i = 0; i < 16; i = i + 1) begin
+          r_addr = i;
+          @(posedge rclk) #1;
+          if(r_data!=0) begin
+             $display("Test 1 failed: with r_en = 0, at position %0d, r_data should be 0 but is %d", i, r_data);
+             $finish;
+          end
+       end
 
         r_en = 1;
         @(posedge rclk) #1;
@@ -104,8 +91,7 @@ module iob_t2p_ram_tb;
     // Instantiate the Unit Under Test (UUT)
     iob_t2p_ram #(
         .DATA_W(`DATA_W),
-        .ADDR_W(`ADDR_W),
-        .USE_RAM(`USE_RAM)
+        .ADDR_W(`ADDR_W)
     ) uut (
         .wclk(wclk),
         .rclk(rclk), 

@@ -2,9 +2,9 @@
 
 module iob_2p_ram
   #( 
-     parameter DATA_W = 8,
-     parameter ADDR_W = 6,
-     parameter USE_RAM = 1
+     parameter FILE = "none",
+     parameter DATA_W = 0,
+     parameter ADDR_W = 0
      ) 
    (
     input                   clk,
@@ -20,23 +20,25 @@ module iob_2p_ram
     output reg [DATA_W-1:0] r_data
     );
 
-   //memory declaration
+   //this allows ISE 14.7 to work; do not remove
+   localparam mem_init_file_int = FILE;
+
+   // Declare the RAM
    reg [DATA_W-1:0]         mem [2**ADDR_W-1:0];
 
-   //write
-   always@(posedge clk)
+   // Initialize the RAM
+   initial
+     if(mem_init_file_int != "none")
+       $readmemh(mem_init_file_int, ram, 0, 2**ADDR_W - 1);
+
+   //read port
+   always @(posedge clk)
+      if(r_en)
+        r_data <= mem[r_addr];
+
+   //write port
+   always @(posedge clk)
      if(w_en)
        mem[w_addr] <= w_data;
-
-   //read mode depends on mem implementation, as ram or reg
-   generate
-      if(USE_RAM)
-        always@(posedge clk)  begin
-           if(r_en)
-             r_data <= mem[r_addr];
-        end
-      else //use reg file
-        always@* r_data = mem[r_addr];
-   endgenerate
 
 endmodule   

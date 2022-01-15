@@ -2,11 +2,9 @@
 
 module iob_2p_ram_tiled
     #(
-        parameter DATA_W  = 32,                         // data width
-        parameter N_WORDS = 8192,                       // number of words (each word has 'DATA_W/8' bytes)
-        parameter ADDR_W  = $clog2(N_WORDS*DATA_W/8.0), // address width
-        parameter TILE_ADDR_W = 11,                     // log2 of block size
-        parameter USE_RAM = 0
+      parameter DATA_W  = 32, // data width
+      parameter ADDR_W  = 13, // address width
+      parameter TILE_ADDR_W = 11 // tile address width
     )
     (
         // Inputs
@@ -41,8 +39,7 @@ module iob_2p_ram_tiled
         for(i = 0; i < K; i = i + 1) begin
             2p_ram #(
                 .DATA_W(DATA_W),
-                .ADDR_W(ADDR_W - $clog2(K)),
-                .USE_RAM(USE_RAM)
+                .ADDR_W(ADDR_W - $clog2(K))
             ) bram (
                 .clk(clk),
                 .w_en(w_en & addr_en[i]),

@@ -28,7 +28,7 @@ module iob_async_fifo_tb;
    initial begin
        // optional VCD
        `ifdef VCD
-            $dumpfile("iob_async_fifo.vcd");
+            $dumpfile("uut.vcd");
             $dumpvars();
        `endif
          

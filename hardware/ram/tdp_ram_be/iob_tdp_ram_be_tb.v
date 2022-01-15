@@ -36,7 +36,7 @@ module iob_tdp_ram_be_tb;
     initial begin
         // optional VCD
         `ifdef VCD
-      	   $dumpfile("td_ram_be.vcd");
+      	   $dumpfile("uut.vcd");
       	   $dumpvars();
         `endif
 

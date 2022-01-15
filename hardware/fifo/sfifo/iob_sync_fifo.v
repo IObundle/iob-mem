@@ -5,8 +5,7 @@ module iob_sync_fifo
     DATA_W = 32,
     DATA_WIDTH = 8, 
     ADDRESS_WIDTH = 4, 
-    FIFO_DEPTH = (1 << ADDRESS_WIDTH),
-    USE_RAM = 1
+    FIFO_DEPTH = (1 << ADDRESS_WIDTH)
     )
    (
     input                    rst,
@@ -70,12 +69,17 @@ module iob_sync_fifo
    assign read_en_int  = read_en & ~empty;
    //assign empty = (fifo_ocupancy == 0);
    
-   bin_counter #(ADDRESS_WIDTH) rptr_counter (
-	   	                              .clk(clk),
-	   	                              .rst(rst), 
-		                              .en(read_en_int),
-	   	                              .data_out(rptr)
-	                                      );
+   bin_counter 
+     #(
+       ADDRESS_WIDTH
+       ) 
+   rptr_counter 
+     (
+      .clk(clk),
+      .rst(rst), 
+      .en(read_en_int),
+      .data_out(rptr)
+      );
    
    
    //FIFO memory
@@ -83,16 +87,17 @@ module iob_sync_fifo
      #(
        .DATA_W(DATA_WIDTH), 
        .ADDR_W(ADDRESS_WIDTH)
-       ) fifo_ram
-       (
-	.clk(clk),
-	.w_en(write_en_int),
-	.w_data(w_data),
-	.w_addr(wptr),
-	.r_addr(rptr),
-	.r_en(read_en_int),
-	.r_data(r_data)
-	);
+       ) 
+   fifo_ram
+     (
+      .clk(clk),
+      .w_en(write_en_int),
+      .w_data(w_data),
+      .w_addr(wptr),
+      .r_addr(rptr),
+      .r_en(read_en_int),
+      .r_data(r_data)
+      );
 
 endmodule
 
