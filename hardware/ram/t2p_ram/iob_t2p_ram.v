@@ -8,13 +8,13 @@ module iob_t2p_ram
      ) 
    (
     // Write port
-    input                   wclk,
+    input                   w_clk,
     input                   w_en,
     input [ADDR_W-1:0]      w_addr,
     input [DATA_W-1:0]      w_data,
 
     // Read port
-    input                   rclk,
+    input                   r_clk,
     input                   r_en,
     input [ADDR_W-1:0]      r_addr,
     output reg [DATA_W-1:0] r_data
@@ -32,12 +32,12 @@ module iob_t2p_ram
        $readmemh(mem_init_file_int, ram, 0, 2**ADDR_W - 1);
 
    //write
-   always@(posedge wclk)
+   always@(posedge w_clk)
      if(w_en)
        ram[w_addr] <= w_data;
 
    //read mode depends on mem implementation, as ram or reg
-   always@(posedge rclk)  begin
+   always@(posedge r_clk)  begin
       if(r_en)
         r_data <= ram[r_addr];
    end

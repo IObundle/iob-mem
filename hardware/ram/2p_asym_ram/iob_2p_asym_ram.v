@@ -10,7 +10,6 @@ module iob_2p_asym_ram
     parameter R_ADDR_W = 0
     )
    (
-    //Inputs
     input                     clk,
     //write port
     input                     w_en,
@@ -22,7 +21,7 @@ module iob_2p_asym_ram
     output reg [R_DATA_W-1:0] r_data
     );
 
-   //determins the number of blocks N
+   //determine the number of blocks N
    localparam MAXDATA_W = `max(W_DATA_W, R_DATA_W);
    localparam MINDATA_W = `min(W_DATA_W, R_DATA_W);
    localparam N = MAXDATA_W/MINDATA_W;
@@ -68,9 +67,8 @@ module iob_2p_asym_ram
 
       //WRITE DATA WIDER THAN READ DATA
 
-      reg [MAXDATA_W-MINDATA_W-1:0] r_addr_lsbs_reg;
-
       if (W_DATA_W > R_DATA_W) begin
+         
          //write parallel
          always @* begin
             for (j=0; j < N; j= j+1) begin
@@ -88,6 +86,7 @@ module iob_2p_asym_ram
          end
 
          //read address register
+         reg [MAXDATA_W-MINDATA_W-1:0] r_addr_lsbs_reg;
          always @(posedge clk)
            r_addr_lsbs_reg <= r_addr[R_ADDR_W-W_ADDR_W-1:0];
            
@@ -100,7 +99,7 @@ module iob_2p_asym_ram
          end
          
       //READ DATA WIDER THAN OR EQUAL TO WRITE DATA 
-      end else if (W_DATA_W <= R_DATA_W) begin
+      end else begin
          //write serial
          always @* begin
             for (j=0; j < N; j= j+1) begin
