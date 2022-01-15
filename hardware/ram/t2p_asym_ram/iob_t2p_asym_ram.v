@@ -43,7 +43,7 @@ module iob_t2p_asym_ram
    //instantiate N RAM blocks and connect them to the buses
    genvar                 i;
    generate 
-      for (i=0; i<N; i=i+1) begin
+      for (i=0; i<N; i=i+1) begin : t2p_ram_array
          iob_t2p_ram
              #(
                .DATA_W(MINDATA_W),
