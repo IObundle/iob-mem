@@ -4,10 +4,10 @@
 
 module iob_t2p_asym_ram 
   #(
-    parameter W_DATA_W = 16,
-    parameter W_ADDR_W = 6,
-    parameter R_DATA_W = 8,
-    parameter R_ADDR_W = 7
+    parameter W_DATA_W = 0,
+    parameter W_ADDR_W = 0,
+    parameter R_DATA_W = 0,
+    parameter R_ADDR_W = 0
     )
    (
     //write port
