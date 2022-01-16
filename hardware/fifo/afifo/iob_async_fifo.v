@@ -53,28 +53,16 @@ module iob_async_fifo
    wire [ADDRESS_WIDTH-1:0]     wptr;
    reg [ADDRESS_WIDTH-1:0]      rptr_sync[1:0];
    wire                         write_en_int;
+   wire [ADDRESS_WIDTH-1:0]     wptr_bin_w;
+   wire [ADDRESS_WIDTH-1:0]     rptr_bin_w;
    
    //READ DOMAIN    
    wire [ADDRESS_WIDTH-1:0]     rptr;
    reg [ADDRESS_WIDTH-1:0]      wptr_sync[1:0];
    wire                         read_en_int;
+   wire [ADDRESS_WIDTH-1:0]     wptr_bin_r;
+   wire [ADDRESS_WIDTH-1:0]     rptr_bin_r;
 
-   //convert gray to binary code
-   function [ADDRESS_WIDTH-1:0] gray2bin;
-      input reg [ADDRESS_WIDTH-1:0] gr;
-      input integer                 N;
-      begin: g2b
-   reg [ADDRESS_WIDTH-1:0] bi;
-   integer                 i;
-   
-   bi[N-1] = gr[N-1];
-   for (i=N-2;i>=0;i=i-1)
-           bi[i] = gr[i] ^ bi[i+1];
-   
-   gray2bin = bi;
-      end
-   endfunction
-   
    //WRITE DOMAIN LOGIC
 
    //sync read pointer
@@ -93,7 +81,19 @@ module iob_async_fifo
                                                .data_out(wptr)
                                                );
    //compute binary pointer difference
-   assign level_w = gray2bin(wptr, ADDRESS_WIDTH) - gray2bin(rptr_sync[1], ADDRESS_WIDTH);
+   gray2bin #(
+       .DATA_W(ADDRESS_WIDTH)
+   ) gray2bin_wptr_w (
+       .gr(wptr),
+       .bin(wptr_bin_w)
+   );
+   gray2bin #(
+       .DATA_W(ADDRESS_WIDTH)
+   ) gray2bin_rptr_w (
+       .gr(rptr_sync[1]),
+       .bin(rptr_bin_w)
+   );
+   assign level_w = wptr_bin_w - rptr_bin_w;
    
    assign full = (level_w == (FIFO_DEPTH-1));
 
@@ -117,7 +117,19 @@ module iob_async_fifo
                                               );
    
    //compute binary pointer difference
-   assign level_r = gray2bin(wptr_sync[1], ADDRESS_WIDTH) - gray2bin(rptr, ADDRESS_WIDTH);
+   gray2bin #(
+       .DATA_W(ADDRESS_WIDTH)
+   ) gray2bin_wptr_r (
+       .gr(wptr_sync[1]),
+       .bin(wptr_bin_r)
+   );
+   gray2bin #(
+       .DATA_W(ADDRESS_WIDTH)
+   ) gray2bin_rptr_r (
+       .gr(rptr),
+       .bin(rptr_bin_r)
+   );
+   assign level_r = wptr_bin_r - rptr_bin_r;
    
 
    assign empty = (level_r == 0);
@@ -129,9 +141,9 @@ module iob_async_fifo
                 .wclk(wclk),
                 .w_en(write_en_int),
                 .w_data(w_data),
-                .w_addr(gray2bin(wptr, ADDRESS_WIDTH)),
+                .w_addr(wptr_bin_w),
                 .rclk(rclk),
-                .r_addr(gray2bin(rptr, ADDRESS_WIDTH)),
+                .r_addr(rptr_bin_r),
                 .r_en(read_en_int),
                 .r_data(r_data)
                 );

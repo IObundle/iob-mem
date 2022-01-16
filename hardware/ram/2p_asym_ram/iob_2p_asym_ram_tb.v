@@ -2,17 +2,18 @@
 
 module iob_2p_asym_ram_tb;
 
-   // Inputs
+   // uut inputs
    reg clk = 0;
+   //write port 
    reg w_en = 0;
-   reg r_en = 0;
-
    reg [`W_DATA_W-1:0] w_data;
    reg [`W_ADDR_W-1:0] w_addr;
+   //read port
+   reg r_en = 0;
    wire [`R_DATA_W-1:0] r_data;
    reg [`R_ADDR_W-1:0]  r_addr;
 
-   // Instantiate the Unit Under Test (UUT)
+   // instantiate the Unit Under Test (UUT)
    iob_2p_asym_ram
      #(
        .W_DATA_W(`W_DATA_W),
@@ -22,16 +23,18 @@ module iob_2p_asym_ram_tb;
        )
    uut (
         .clk(clk), 
+
         .w_en(w_en),
-        .r_en(r_en), 
         .w_addr(w_addr),
         .w_data(w_data),
+
+        .r_en(r_en), 
         .r_addr(r_addr),
         .r_data(r_data)
         );
 
    // system clock
-   localparam clk_per = 10; // clk period = 10 timeticks
+   localparam clk_per = 10; //ns
    always #(clk_per/2) clk = ~clk; 
 
    localparam seq_ini = 10;
@@ -63,7 +66,7 @@ module iob_2p_asym_ram_tb;
 `endif
       repeat(4) @(posedge clk) #1;
 
-      //Write all the locations of RAM 
+      //write all the locations of RAM 
       w_en = 1; 
       for(i = 0; i < 2**`W_ADDR_W; i = i + 1) begin
          w_addr = i;
@@ -74,7 +77,7 @@ module iob_2p_asym_ram_tb;
 
       @(posedge clk) #1;
 
-      //Read all the locations of RAM
+      //read all the locations of RAM
       r_en = 1;
       for(i = 0 ; i < 2**`R_ADDR_W; i = i + 1) begin
          r_addr = i;

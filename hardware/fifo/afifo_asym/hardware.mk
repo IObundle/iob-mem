@@ -1,6 +1,7 @@
 MODULES+=fifo/afifo_asym
 
 # Paths
+FIFO_DIR=$(MEM_HW_DIR)/fifo
 AFIFO_ASYM_DIR=$(MEM_HW_DIR)/fifo/afifo_asym
 
 # Submodules
@@ -10,3 +11,23 @@ endif
 
 # Sources
 VSRC+=$(AFIFO_ASYM_DIR)/iob_async_fifo_asym.v
+VSRC+=$(FIFO_DIR)/gray2bin.v
+
+# Defines
+#W_WIDE_R_NARROW=1
+
+ifeq ($(W_WIDE_R_NARROW),1)
+DEFINE += "$(defmacro)WR_RATIO=4"
+DEFINE += "$(defmacro)W_WIDE_R_NARROW=1"
+DEFINE += $(defmacro)W_DATA_W=4
+DEFINE += $(defmacro)W_ADDR_W=4
+DEFINE += $(defmacro)R_DATA_W=1
+DEFINE += $(defmacro)R_ADDR_W=6
+else
+DEFINE += "$(defmacro)RW_RATIO=4"
+DEFINE += "$(defmacro)W_NARROW_R_WIDE=1"
+DEFINE += $(defmacro)R_DATA_W=4
+DEFINE += $(defmacro)R_ADDR_W=4
+DEFINE += $(defmacro)W_DATA_W=1
+DEFINE += $(defmacro)W_ADDR_W=6
+endif

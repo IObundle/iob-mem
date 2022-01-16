@@ -1,6 +1,7 @@
 MODULES+=fifo/afifo
 
 # Paths
+FIFO_DIR=$(MEM_HW_DIR)/fifo
 AFIFO_DIR=$(MEM_HW_DIR)/fifo/afifo
 
 # Submodules
@@ -10,3 +11,4 @@ endif
 
 # Sources
 VSRC+=$(AFIFO_DIR)/iob_async_fifo.v
+VSRC+=$(FIFO_DIR)/gray2bin.v
