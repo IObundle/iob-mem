@@ -98,7 +98,7 @@ module iob_t2p_asym_ram
             end
          end
  
-      end else begin
+      end else if (W_DATA_W < R_DATA_W) begin
          //write serial
          always @* begin
             for (j=0; j < N; j= j+1) begin
@@ -114,8 +114,13 @@ module iob_t2p_asym_ram
                r_data[k*MINDATA_W +: MINDATA_W] = data_rd[k];
             end
          end
-    
-      end
+      end else begin
+         always @* begin
+            en_wr[0] = w_en;
+            data_wr[0] = w_data;
+            addr_wr[0] = w_addr;
+         end
+      end 
    endgenerate
 endmodule
 
