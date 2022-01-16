@@ -9,10 +9,10 @@
  */
 module iob_sync_fifo_asym
   #(
-    parameter W_DATA_W = 8,
-    parameter W_ADDR_W = 7,
-    parameter R_ADDR_W = 6,
-    parameter R_DATA_W = 16
+    parameter W_DATA_W = 0,
+    parameter W_ADDR_W = 0,
+    parameter R_ADDR_W = 0,
+    parameter R_DATA_W = 0
     )
    (
     input                 rst,
@@ -93,29 +93,35 @@ module iob_sync_fifo_asym
   assign read_en_int  = read_en & ~empty;
   assign empty = (fifo_ocupancy == 0);
 
-  bin_counter #(
-    R_ADDR_W
-  ) rptr_counter (
-    .clk(clk),
-    .rst(rst),
-    .en(read_en_int),
-    .data_out(rptr)
-  );
+  bin_counter 
+    #(
+      R_ADDR_W
+      ) 
+   rptr_counter 
+     (
+      .clk(clk),
+      .rst(rst),
+      .en(read_en_int),
+      .data_out(rptr)
+      );
 
   //FIFO memory
-  iob_2p_asym_ram #(
-   .W_DATA_W(W_DATA_W),
-   .W_ADDR_W(W_ADDR_W),
-   .R_ADDR_W(R_ADDR_W),
-   .R_DATA_W(R_DATA_W)
-  ) fifo_ram (
-  	.clk(clk),
-  	.w_en(write_en_int),
-  	.w_data(w_data),
-  	.w_addr(wptr),
-  	.r_addr(rptr),
-  	.r_en(read_en_int),
-  	.r_data(r_data)
-	);
+  iob_2p_asym_ram
+    #(
+      .W_DATA_W(W_DATA_W),
+      .W_ADDR_W(W_ADDR_W),
+      .R_ADDR_W(R_ADDR_W),
+      .R_DATA_W(R_DATA_W)
+      ) 
+   fifo_ram 
+     (
+      .clk(clk),
+      .w_en(write_en_int),
+      .w_data(w_data),
+      .w_addr(wptr),
+      .r_addr(rptr),
+      .r_en(read_en_int),
+      .r_data(r_data)
+      );
 
 endmodule

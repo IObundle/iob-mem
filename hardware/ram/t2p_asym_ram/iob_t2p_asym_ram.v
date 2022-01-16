@@ -109,17 +109,25 @@ module iob_t2p_asym_ram
          end
          //read parallel
          always @* begin
+            r_data = 1'b0;
             for (k=0; k < N; k= k+1) begin
                addr_rd[k] = r_addr;
                r_data[k*MINDATA_W +: MINDATA_W] = data_rd[k];
             end
          end
-      end else begin
+      end else begin //W_DATA_W = R_DATA_W
+         //write serial
          always @* begin
             en_wr[0] = w_en;
             data_wr[0] = w_data;
             addr_wr[0] = w_addr;
          end
+         //read parallel
+         always @* begin
+            addr_rd[0] = r_addr;
+            r_data = data_rd[0];
+         end
+
       end 
    endgenerate
 endmodule

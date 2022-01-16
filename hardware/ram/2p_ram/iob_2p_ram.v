@@ -29,7 +29,7 @@ module iob_2p_ram
    // Initialize the RAM
    initial
      if(mem_init_file_int != "none")
-       $readmemh(mem_init_file_int, ram, 0, 2**ADDR_W - 1);
+       $readmemh(mem_init_file_int, mem, 0, 2**ADDR_W - 1);
 
    //read port
    always @(posedge clk)
