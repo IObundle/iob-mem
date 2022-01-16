@@ -11,7 +11,7 @@ endif
 
 # Sources
 VSRC+=$(AFIFO_ASYM_DIR)/iob_async_fifo_asym.v
-VSRC+=$(FIFO_DIR)/gray2bin.v
+VSRC+=$(FIFO_DIR)/gray2bin.v $(FIFO_DIR)/gray_counter.v
 
 # Defines
 #W_WIDE_R_NARROW=1

@@ -60,13 +60,11 @@ module iob_async_fifo_asym_tb;
       $dumpvars();
 `endif
 
-      $display("%c[1;34m",27);
 `ifdef WR_RATIO      
       $display("Asymmetric Asynchronous FIFO testbench.\n\tWR_RATIO=%0d", `WR_RATIO);
 `else
       $display("Asymmetric Asynchronous FIFO testbench.\n\tRW_RATIO=%0d", `RW_RATIO);
 `endif
-      $display("%c[0m",27);
 
       //Initialize Inputs
       r_clk = 0;
@@ -129,6 +127,7 @@ module iob_async_fifo_asym_tb;
          end
       end
 `endif
+
       @(posedge r_clk) #1;
       r_en = 0; //Fifo is now empty
       @(posedge r_clk) #1;
@@ -137,9 +136,6 @@ module iob_async_fifo_asym_tb;
          $finish;
       end
 
-      #clk_per_r $display("%c[1;34m",27);
-      $display("Test completed successfully.");
-      $display("%c[0m",27);
       #(5*clk_per_r) $finish;
 
    end

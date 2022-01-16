@@ -11,4 +11,4 @@ endif
 
 # Sources
 VSRC+=$(AFIFO_DIR)/iob_async_fifo.v
-VSRC+=$(FIFO_DIR)/gray2bin.v
+VSRC+=$(FIFO_DIR)/gray2bin.v $(FIFO_DIR)/gray_counter.v

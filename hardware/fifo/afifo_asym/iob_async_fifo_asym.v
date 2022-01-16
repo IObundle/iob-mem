@@ -95,7 +95,7 @@ module iob_async_fifo_asym
    //effective write enable
    assign w_en_int = w_en & ~w_full;
    
-   gray_counter_asym 
+   gray_counter 
      #(
        .COUNTER_WIDTH(W_ADDR_W)
        ) 
@@ -129,7 +129,7 @@ module iob_async_fifo_asym
    //effective read enable
    assign r_en_int  = r_en & ~r_empty;
    
-   gray_counter_asym 
+   gray_counter
      #(
        .COUNTER_WIDTH(R_ADDR_W)
        ) 
@@ -178,30 +178,4 @@ module iob_async_fifo_asym
    
 endmodule
 
-
-module gray_counter_asym 
-  #(
-    parameter   COUNTER_WIDTH = 4
-    ) 
-   (
-    input wire                 rst, //Count reset.
-    input wire                 clk,
-    input wire                 en, //Count enable.
-    output [COUNTER_WIDTH-1:0] data_out
-    );
-
-   reg [COUNTER_WIDTH-1:0]                               bin_counter;
-   reg [COUNTER_WIDTH-1:0]                               gray_counter;
-
-   assign data_out = gray_counter;
-   
-   always @ (posedge clk, posedge rst)
-     if (rst) begin
-        bin_counter   <= 1; 
-        gray_counter <= 0; 
-     end else if (en) begin
-        bin_counter   <= bin_counter + 1'b1;
-        gray_counter <= {bin_counter[COUNTER_WIDTH-1], bin_counter[COUNTER_WIDTH-2:0] ^ bin_counter[COUNTER_WIDTH-1:1]};
-     end 
-endmodule
 
