@@ -1,8 +1,22 @@
 `timescale 1ns / 1ps
 
+//test defines
+`define FIFO_ADDR_W 10
+
+//comment to run W_NARROW_R_WIDE
+`define W_WIDE_R_NARROW 1
+
+`ifdef  W_WIDE_R_NARROW
+ `define W_DATA_W 32
+ `define R_DATA_W 8
+`else
+ `define W_NARROW_R_WIDE 1
+ `define R_DATA_W 32
+ `define W_DATA_W 8
+`endif
+
 module iob_t2p_asym_ram_tb;
 
-   // uut inputs
    //write port 
    reg w_clk = 0;
    reg w_en = 0;
@@ -14,26 +28,8 @@ module iob_t2p_asym_ram_tb;
    wire [`R_DATA_W-1:0] r_data;
    reg [`R_ADDR_W-1:0]  r_addr;
 
-    // instantiate the Unit Under Test (UUT)
-    iob_t2p_asym_ram #(
-        .W_DATA_W(`W_DATA_W),
-        .W_ADDR_W(`W_ADDR_W),
-        .R_DATA_W(`R_DATA_W),
-        .R_ADDR_W(`R_ADDR_W)
-    )
-    uut (
-        .w_clk(w_clk), 
-        .w_en(w_en),
-        .w_addr(w_addr),
-        .w_data(w_data), 
 
-	.r_clk(r_clk),
-        .r_en(r_en), 
-        .r_addr(r_addr),
-        .r_data(r_data)
-    );
-
-    // system clock
+    // clocks
    localparam clk_per_w = 10; //ns
    always #(clk_per_w/2) w_clk = ~w_clk; 
 
@@ -94,4 +90,25 @@ module iob_t2p_asym_ram_tb;
         #(5*clk_per_w) $finish;
     end
 
+
+    // instantiate the Unit Under Test (UUT)
+    iob_t2p_asym_ram #(
+        .W_DATA_W(`W_DATA_W),
+        .W_ADDR_W(`W_ADDR_W),
+        .R_DATA_W(`R_DATA_W),
+        .R_ADDR_W(`R_ADDR_W)
+    )
+    uut (
+        .w_clk(w_clk), 
+        .w_en(w_en),
+        .w_addr(w_addr),
+        .w_data(w_data), 
+
+	.r_clk(r_clk),
+        .r_en(r_en), 
+        .r_addr(r_addr),
+        .r_data(r_data)
+    );
+
+   
 endmodule

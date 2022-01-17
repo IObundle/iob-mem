@@ -1,5 +1,20 @@
 `timescale 1ns / 1ps
 
+//test defines
+`define FIFO_ADDR_W 10
+
+//comment to run W_NARROW_R_WIDE
+`define W_WIDE_R_NARROW 1
+
+`ifdef  W_WIDE_R_NARROW
+ `define W_DATA_W 32
+ `define R_DATA_W 8
+`else
+ `define W_NARROW_R_WIDE 1
+ `define R_DATA_W 32
+ `define W_DATA_W 8
+`endif
+
 module iob_2p_asym_ram_tb;
 
    // uut inputs

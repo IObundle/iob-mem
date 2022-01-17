@@ -8,9 +8,11 @@ module iob_async_fifo_asym
     R_DATA_W = 0,
     W_DATA_W = 0,
     ADDR_W = 0,//higher ADDR_W (lower DATA_W)
-    L_ADDR_W = ADDR_W-$clog2(`max(W_DATA_W, R_DATA_W)/`min(W_DATA_W, R_DATA_W)),//lower ADDR_W (higher DATA_W)
-    W_ADDR_W = (`max(R_DATA_W, W_DATA_W) == W_DATA_W) ? L_ADDR_W : ADDR_W,
-    R_ADDR_W = (`max(R_DATA_W, W_DATA_W) == R_DATA_W) ? L_ADDR_W : ADDR_W
+    MAXDATA_W = `max(W_DATA_W, R_DATA_W),
+    MINDATA_W = `min(W_DATA_W, R_DATA_W),
+    L_ADDR_W = ADDR_W-$clog2(MAXDATA_W/MINDATA_W),//lower ADDR_W (higher DATA_W)
+    W_ADDR_W = (W_DATA_W == MAXDATA_W) ? L_ADDR_W : ADDR_W,
+    R_ADDR_W = (R_DATA_W == MAXDATA_W) ? L_ADDR_W : ADDR_W
     )
    (
     input                     rst,
@@ -97,7 +99,7 @@ module iob_async_fifo_asym
    
    gray_counter 
      #(
-       .COUNTER_WIDTH(W_ADDR_W)
+       .W(W_ADDR_W)
        ) 
    wptr_counter 
      (
@@ -110,10 +112,12 @@ module iob_async_fifo_asym
    //compute binary pointer difference
    gray2bin #(
        .DATA_W(W_ADDR_W)
-   ) gray2bin_wptr_w (
-       .gr(wptr),
-       .bin(wptr_bin_w)
-   );
+   ) 
+   gray2bin_wptr_w 
+     (
+      .gr(wptr),
+      .bin(wptr_bin_w)
+      );
 
    assign w_level = wptr_bin_w - rptr_wire;
    assign w_full = (w_level == (W_FIFO_DEPTH-1));
@@ -131,7 +135,7 @@ module iob_async_fifo_asym
    
    gray_counter
      #(
-       .COUNTER_WIDTH(R_ADDR_W)
+       .W(R_ADDR_W)
        ) 
    rptr_counter 
      (
@@ -144,10 +148,13 @@ module iob_async_fifo_asym
    //compute binary pointer difference
    gray2bin #(
        .DATA_W(R_ADDR_W)
-   ) gray2bin_rptr_r (
-       .gr(rptr),
-       .bin(rptr_bin_r)
-   );
+   ) 
+   gray2bin_rptr_r 
+     (
+      .gr(rptr),
+      .bin(rptr_bin_r)
+      );
+   
    assign r_level = wptr_wire - rptr_bin_r;
    
 

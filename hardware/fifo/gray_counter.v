@@ -2,16 +2,17 @@
 
 module gray_counter 
   #(
-    parameter   COUNTER_WIDTH = 4)
+    parameter   W = 1
+    )
    (
-    input wire                 rst,
-    input wire                 clk,
-    input wire                 en,
-    output [COUNTER_WIDTH-1:0] data_out
+    input wire     rst,
+    input wire     clk,
+    input wire     en,
+    output [W-1:0] data_out
     );
    
-   reg [COUNTER_WIDTH-1:0]     bin_counter;
-   reg [COUNTER_WIDTH-1:0]     gray_counter;
+   reg [W-1:0]     bin_counter;
+   reg [W-1:0]     gray_counter;
 
    assign data_out = gray_counter;
        
@@ -21,7 +22,7 @@ module gray_counter
         gray_counter <= 0; 
      end else if (en) begin
         bin_counter   <= bin_counter + 1'b1;
-        gray_counter <= {bin_counter[COUNTER_WIDTH-1], bin_counter[COUNTER_WIDTH-2:0] ^ bin_counter[COUNTER_WIDTH-1:1]};
+        gray_counter <= W > 1? {bin_counter, bin_counter[W-2:0] ^ bin_counter[W-1:1]} : bin_counter;
      end
    
 endmodule
