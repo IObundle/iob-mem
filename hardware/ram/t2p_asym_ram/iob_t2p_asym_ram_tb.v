@@ -1,35 +1,36 @@
 `timescale 1ns / 1ps
+`include "iob_lib.vh"
 
 //test defines
-`define FIFO_ADDR_W 10
+`define W_DATA_W 32
+`define R_DATA_W 8
+`define ADDR_W 10
 
-//comment to run W_NARROW_R_WIDE
-`define W_WIDE_R_NARROW 1
-
-`ifdef  W_WIDE_R_NARROW
- `define W_DATA_W 32
- `define R_DATA_W 8
-`else
- `define W_NARROW_R_WIDE 1
- `define R_DATA_W 32
- `define W_DATA_W 8
-`endif
 
 module iob_t2p_asym_ram_tb;
 
+   //determine W_ADDR_W and R_ADDR_W
+   localparam W_DATA_W = `W_DATA_W;
+   localparam R_DATA_W = `R_DATA_W;
+   localparam MAXDATA_W = `max(W_DATA_W, R_DATA_W);
+   localparam MINDATA_W = `min(W_DATA_W, R_DATA_W);
+   localparam L_ADDR_W = `ADDR_W - $clog2(MAXDATA_W/MINDATA_W);
+   localparam W_ADDR_W = W_DATA_W == MINDATA_W? `ADDR_W: L_ADDR_W;
+   localparam R_ADDR_W = R_DATA_W == MINDATA_W? `ADDR_W: L_ADDR_W;
+ 
    //write port 
    reg w_clk = 0;
    reg w_en = 0;
    reg [`W_DATA_W-1:0] w_data;
-   reg [`W_ADDR_W-1:0] w_addr;
+   reg [W_ADDR_W-1:0] w_addr;
    //read port
-   reg r_clk = 0;
-   reg r_en = 0;
+   reg                 r_clk = 0;
+   reg                 r_en = 0;
    wire [`R_DATA_W-1:0] r_data;
-   reg [`R_ADDR_W-1:0]  r_addr;
+   reg [R_ADDR_W-1:0]  r_addr;
 
 
-    // clocks
+   // clocks
    localparam clk_per_w = 10; //ns
    always #(clk_per_w/2) w_clk = ~w_clk; 
 
@@ -39,23 +40,25 @@ module iob_t2p_asym_ram_tb;
    localparam seq_ini = 10;
    integer              i;
 
-   reg [`W_DATA_W*2**`W_ADDR_W-1:0] expected;
+   reg [`W_DATA_W*2**W_ADDR_W-1:0] expected;
    reg [`R_DATA_W-1:0]              r_data_expected;
 
    initial begin
- 
-`ifdef W_WIDE_R_NARROW
-      $display("W_WIDE_R_NARROW");
-`else
-      $display("W_NARROW_R_WIDE");
-`endif
-      $display("W_DATA_W=%d", `W_DATA_W);
-      $display("W_ADDR_W=%d", `W_ADDR_W);      
-      $display("R_DATA_W=%d", `R_DATA_W);
-      $display("R_ADDR_W=%d", `R_ADDR_W);
-   
+
+      if(W_DATA_W > R_DATA_W)
+        $display("W_DATA_W > R_DATA_W");
+      else if (W_DATA_W < R_DATA_W)
+        $display("W_DATA_W < R_DATA_W");
+      else
+        $display("W_DATA_W = R_DATA_W");
+
+      $display("W_DATA_W=%d", W_DATA_W);
+      $display("W_ADDR_W=%d", W_ADDR_W);      
+      $display("R_DATA_W=%d", R_DATA_W);
+      $display("R_ADDR_W=%d", R_ADDR_W);
+      
       //compute expected response
-      for (i=0; i < 2**`W_ADDR_W; i=i+1)
+      for (i=0; i < 2**W_ADDR_W; i=i+1)
         expected[i*`W_DATA_W +: `W_DATA_W] = i+seq_ini;    
       
       // optional VCD
@@ -67,7 +70,7 @@ module iob_t2p_asym_ram_tb;
 
       //write all the locations of RAM 
       w_en = 1; 
-      for(i = 0; i < 2**`W_ADDR_W; i = i + 1) begin
+      for(i = 0; i < 2**W_ADDR_W; i = i + 1) begin
          w_addr = i;
          w_data = i+seq_ini;
          @(posedge w_clk) #1;
@@ -78,7 +81,7 @@ module iob_t2p_asym_ram_tb;
 
       //read all the locations of RAM
       r_en = 1;
-      for(i = 0 ; i < 2**`R_ADDR_W; i = i + 1) begin
+      for(i = 0 ; i < 2**R_ADDR_W; i = i + 1) begin
          r_addr = i;
          @(posedge r_clk) #1;
          //verify response
@@ -86,19 +89,19 @@ module iob_t2p_asym_ram_tb;
          if(r_data != r_data_expected)
            $display("read addr=%x, got %x, expected %x", r_addr, r_data, r_data_expected);
       end
-   
-        #(5*clk_per_w) $finish;
-    end
+      
+      #(5*clk_per_w) $finish;
+   end
 
 
-    // instantiate the Unit Under Test (UUT)
-    iob_t2p_asym_ram #(
-        .W_DATA_W(`W_DATA_W),
-        .W_ADDR_W(`W_ADDR_W),
-        .R_DATA_W(`R_DATA_W),
-        .R_ADDR_W(`R_ADDR_W)
-    )
-    uut (
+   // instantiate the Unit Under Test (UUT)
+   iob_t2p_asym_ram 
+     #(
+       .W_DATA_W(`W_DATA_W),
+       .R_DATA_W(`R_DATA_W),
+       .ADDR_W(`ADDR_W)
+       )
+   uut (
         .w_clk(w_clk), 
         .w_en(w_en),
         .w_addr(w_addr),
@@ -108,7 +111,7 @@ module iob_t2p_asym_ram_tb;
         .r_en(r_en), 
         .r_addr(r_addr),
         .r_data(r_data)
-    );
+        );
 
    
 endmodule

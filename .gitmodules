@@ -1,0 +1,3 @@
+[submodule "submodules/LIB"]
+	path = submodules/LIB
+	url = git@github.com:IObundle/iob-lib.git

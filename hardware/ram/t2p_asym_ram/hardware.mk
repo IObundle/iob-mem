@@ -1,4 +1,14 @@
-MODULES+=ram/t2p_asym_ram
+include config.mk
+
+#define module name here from directory below the hardware directory
+MEM_NAME="t2p_asym_ram"
+
+#add to define list
+DEFINE+=$(defmacro)MEM_NAME=$(MEM_MODULE_NAME)
+
+
+#add to global modules list
+MODULES+=$(MEM_MODULE_NAME)
 
 # Paths
 T2P_ASYM_RAM_DIR=$(MEM_HW_DIR)/ram/t2p_asym_ram

@@ -1,13 +1,14 @@
-MEM_DIR:=.
-
-include $(MEM_DIR)/config.mk
-
 defmacro:=-D
 incdir:=-I
+
+include config.mk
 
 ifeq ($(VCD),1)
 DEFINE+=$(defmacro)VCD
 endif
+
+MEM_NAME ?= sp_ram
+MODULE_DIR = $(shell find . -name $(MEM_NAME))
 
 include $(MODULE_DIR)/hardware.mk
 
@@ -19,40 +20,37 @@ VSRC+=$(wildcard $(MODULE_DIR)/*_tb.v)
 
 VLOG=iverilog -W all -g2005-sv $(INCLUDE) $(DEFINE)
 
-corename:
-	@echo "MEM"
+ALL_MODULES=$(shell find . -name hardware.mk | sed 's/\/hardware.mk//g' | tail -n +2)
+
+.PHONY: sim sim-all clean corename $(ALL_MODULES)
 
 #
 # Simulate
 #
 
-sim: $(VSRC) $(VHDR) build gen-hex
+sim: $(VSRC) $(VHDR)
 	$(VLOG) $(VSRC)
-	./a.out
+	@echo "\n\nTesting module $(MEM_NAME)\n\n"
+	@./a.out
 ifeq ($(VCD),1)
 	if [ ! `pgrep gtkwave` ]; then gtkwave uut.vcd; fi &
 endif
 
-# hex files generation for tb
-# generate .hex file from string, checks from ram if string is valid
-HEX_FILES:= tb1.hex tb2.hex
-GEN_HEX1:=echo "!IObundle 2020!" | od -A n -t x1 > tb1.hex
-GEN_HEX2:=echo "10 9 8 7 5 4 32" | od -A n -t x1 > tb2.hex
-gen-hex: $(HEX_FILES)
 
-$(HEX_FILES):
-	@$(GEN_HEX1)
-	@$(GEN_HEX2)
+sim-all: $(ALL_MODULES)
+	@echo "Listing all modules: $(ALL_MODULES)"
+
+$(ALL_MODULES):
+	make sim MODULE_DIR=$@
+
 
 #
 # Clean
 # 
 
 clean:
-	@rm -f *~ \#*\# a.out *.vcd *.hex *.drom *.png *.pyc
+	@rm -f *~ \#*\# a.out *.vcd *.drom *.png *.pyc
 
-.PHONY: all \
-	corename \
-	sim sim-clean \
-	build gen-hex \
-	clean
+corename:
+	@echo "MEM"
+

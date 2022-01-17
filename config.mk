@@ -1,11 +1,12 @@
-#
 # Paths
-#
 
-MEM_HW_DIR=$(MEM_DIR)/hardware
-MEM_SW_DIR=$(MEM_DIR)/software
-MEM_PYTHON_DIR=$(SW_DIR)/python
+LIB_DIR?=submodules/LIB
 
+MEM_HW_DIR?=hardware
+MEM_SW_DIR?=software
+MEM_PYTHON_DIR?=$(SW_DIR)/python
+
+INCLUDE += $(incdir)$(LIB_DIR)/hardware/include
 
 #SIMULATION
 

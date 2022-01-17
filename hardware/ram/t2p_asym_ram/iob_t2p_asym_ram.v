@@ -1,13 +1,11 @@
 `timescale 1ns / 1ps
-`define max(a,b) {(a) > (b) ? (a) : (b)}
-`define min(a,b) {(a) < (b) ? (a) : (b)}
+`include "iob_lib.vh"
 
 module iob_t2p_asym_ram 
   #(
     parameter W_DATA_W = 0,
-    parameter W_ADDR_W = 0,
     parameter R_DATA_W = 0,
-    parameter R_ADDR_W = 0
+    parameter ADDR_W = 0
     )
    (
     //write port
@@ -22,23 +20,26 @@ module iob_t2p_asym_ram
     input [R_ADDR_W-1:0]      r_addr,
     output reg [R_DATA_W-1:0] r_data
     );
-   
+
    //determine the number of blocks N
    localparam MAXDATA_W = `max(W_DATA_W, R_DATA_W);
    localparam MINDATA_W = `min(W_DATA_W, R_DATA_W);
    localparam N = MAXDATA_W/MINDATA_W;
-   localparam MAXADDR_W = `max(W_ADDR_W, R_ADDR_W);
-   localparam MINADDR_W = `min(W_ADDR_W, R_ADDR_W);
-  
+   localparam L_ADDR_W = ADDR_W - $clog2(N);
+
+   //determine W_ADDR_W and R_ADDR_W
+   localparam W_ADDR_W = W_DATA_W == MAXDATA_W? L_ADDR_W: ADDR_W;
+   localparam R_ADDR_W = R_DATA_W == MAXDATA_W? L_ADDR_W: ADDR_W;
+   
   //memory buses
    //write buses
    reg [N-1:0]                en_wr;
    reg [MINDATA_W-1:0]        data_wr [N-1:0];
-   reg [MINADDR_W-1:0]        addr_wr [N-1:0];
+   reg [L_ADDR_W-1:0]        addr_wr [N-1:0];
 
    //read buses
    wire [MINDATA_W-1:0]       data_rd [N-1:0];
-   reg [MINADDR_W-1:0]        addr_rd [N-1:0];
+   reg [L_ADDR_W-1:0]        addr_rd [N-1:0];
 
    //instantiate N RAM blocks and connect them to the buses
    genvar                 i;
@@ -47,7 +48,7 @@ module iob_t2p_asym_ram
          iob_t2p_ram
              #(
                .DATA_W(MINDATA_W),
-               .ADDR_W(MINADDR_W)
+               .ADDR_W(L_ADDR_W)
                )
          iob_t2p_ram_inst
              (
