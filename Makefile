@@ -20,7 +20,7 @@ VSRC+=$(wildcard $(MODULE_DIR)/*_tb.v)
 
 VLOG=iverilog -W all -g2005-sv $(INCLUDE) $(DEFINE)
 
-ALL_MODULES=$(shell find . -name hardware.mk | sed 's/\/hardware.mk//g' | tail -n +2)
+ALL_MODULES=$(shell find . -name hardware.mk | sed 's/\/hardware.mk//g' | tail -n +3)
 
 .PHONY: sim sim-all clean corename $(ALL_MODULES)
 
