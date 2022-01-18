@@ -1,49 +1,40 @@
 `timescale 1ns / 1ps
+`include "iob_lib.vh"
 
-`define DATA_W 8
-`define ADDR_W 4
-
-`ifdef WR_RATIO
- `define W_DATA_W (`DATA_W*`WR_RATIO)
- `define R_DATA_W (`DATA_W)
- `define FIFO_ADDR_W (`ADDR_W+$clog2(`WR_RATIO))
-
-// TB defines
- `define W_ADDR_W (`ADDR_W)
- `define R_ADDR_W (`FIFO_ADDR_W)
-`endif
-
-`ifdef RW_RATIO
- `define W_DATA_W (`DATA_W)
- `define FIFO_ADDR_W (`ADDR_W+$clog2(`RW_RATIO))
- `define R_DATA_W (`DATA_W*`RW_RATIO)
-
-// TB defines
- `define R_ADDR_W (`ADDR_W)
- `define W_ADDR_W (`FIFO_ADDR_W)
-
-`endif
-
-// `define R_RATIO (`W_DATA_W/`R_DATA_W)
+//test defines
+`define W_DATA_W 32
+`define R_DATA_W 8
+`define ADDR_W 10
+`define TESTSIZE 256
 
 module iob_async_fifo_asym_tb;
-   
-   //Inputs
-   reg reset;
-   reg r_en;
-   reg r_clk;
-   reg [`W_DATA_W-1:0] w_data;
-   reg                 w_en;
-   reg                 w_clk;
-   
-   //Outputs
-   reg [`R_DATA_W-1:0] r_data;
-   wire                r_empty;
-   wire [`R_ADDR_W-1:0] r_level;
-   wire                 w_full;
-   wire [`W_ADDR_W-1:0] w_level;
 
-   integer              i;
+   localparam TESTSIZE = `TESTSIZE; //bytes
+   localparam W_DATA_W = `W_DATA_W;
+   localparam R_DATA_W = `R_DATA_W;
+   localparam MAXDATA_W = `max(W_DATA_W, R_DATA_W);
+   localparam MINDATA_W = `min( W_DATA_W, R_DATA_W );
+   localparam ADDR_W = `ADDR_W;   
+   localparam MINADDR_W = ADDR_W-$clog2(MAXDATA_W/MINDATA_W);//lower ADDR_W (higher DATA_W)
+   localparam W_ADDR_W = W_DATA_W == MAXDATA_W? MINADDR_W : ADDR_W;
+   localparam R_ADDR_W = R_DATA_W == MAXDATA_W? MINADDR_W : ADDR_W;
+   
+   reg reset = 0;
+ 
+   //write port 
+   reg                 w_clk = 0;
+   reg                 w_en = 0;
+   reg [W_DATA_W-1:0]  w_data;
+   wire                w_full;
+   wire [W_ADDR_W-1:0] w_level;
+   
+   //read port 
+   reg r_clk = 0;
+   reg r_en = 0;
+   wire [R_DATA_W-1:0] r_data;
+   wire                r_empty;
+   wire [R_ADDR_W-1:0] r_level;
+
    
    // clocks
    parameter clk_per_w = 10; //ns
@@ -51,101 +42,90 @@ module iob_async_fifo_asym_tb;
    parameter clk_per_r = 13; //ns
    always #(clk_per_r/2) r_clk = ~r_clk;
 
+   integer              i,j; //iterators
 
+   reg [W_DATA_W*2**W_ADDR_W-1:0] test_data;
+   reg [W_DATA_W*2**W_ADDR_W-1:0] read;
 
-   initial begin
+   initial begin //writer process
+
+      if(W_DATA_W > R_DATA_W)
+        $display("W_DATA_W > R_DATA_W");
+      else if (W_DATA_W < R_DATA_W)
+        $display("W_DATA_W < R_DATA_W");
+      else
+        $display("W_DATA_W = R_DATA_W");
+
+      $display("W_DATA_W=%d", W_DATA_W);
+      $display("R_DATA_W=%d", R_DATA_W);
+      $display("ADDR_W=%d", ADDR_W);
+
+      //create the test data bytes
+      for (i=0; i < TESTSIZE; i=i+1)
+        test_data[i*8 +: 8] = i;    
+
       // optional VCD
 `ifdef VCD
       $dumpfile("uut.vcd");
       $dumpvars();
 `endif
+      repeat(4) @(posedge w_clk) #1;
 
-`ifdef WR_RATIO      
-      $display("Asymmetric Asynchronous FIFO testbench.\n\tWR_RATIO=%0d", `WR_RATIO);
-`else
-      $display("Asymmetric Asynchronous FIFO testbench.\n\tRW_RATIO=%0d", `RW_RATIO);
-`endif
 
-      //Initialize Inputs
-      r_clk = 0;
-      w_clk = 1;
-      reset = 0;
-      w_data = 0;
-      r_en = 0;
-      w_en = 0;
-
-      //Write all the locations of FIFO
+      //reset FIFO
       #clk_per_w;
       @(posedge w_clk) #1;
       reset = 1;
       @(posedge w_clk) #1;
       reset = 0;
       
-      @(posedge w_clk) #1;
-      w_en = 1;
-      for(i=0; i < 2**`W_ADDR_W-1; i = i + 1) begin
-         if(w_level !=i ) begin
-            $display("Test failed: write error in w_data.\n \t i=%0d; data=%0d; w_level=%0d", i, w_data, w_level);
-            $finish;
-         end
-`ifdef WR_RATIO
-	 w_data = i;
-`else // RW_RATIO
-         w_data = i/`RW_RATIO*((i%`RW_RATIO)==0);
-`endif
-         @(posedge w_clk) #1;
-      end
-      
-      @(posedge w_clk) #1;
-      w_en = 0; //Fifo is now full
-      if(w_full!=1 || w_level!=2**`W_ADDR_W-1) begin
-         $display("Test failed: fifo not full.");
-         $finish;
-      end
-      
-      #clk_per_r @(posedge r_clk) #1;
-      r_en=1;
 
-`ifdef WR_RATIO
-      //Read all locations of RAM.
-      for(i=0; i < `WR_RATIO*((2**`W_ADDR_W)-1); i = i + 1) begin
-         // Result will only be available in the next cycle
-         @(posedge r_clk) #1;
-	 if(r_data != i/`WR_RATIO*((i%`WR_RATIO)==0) || r_level != (((2**`W_ADDR_W)-1)*`WR_RATIO)-1-i) begin
-            $display("Test failed: read error in r_data.\n \t i=%0d; data=%0d; exp=%0d; lvl=%0d, levl=%0d", i, r_data, i/`WR_RATIO*((i%`WR_RATIO)==0), (((2**`W_ADDR_W)-1)*`WR_RATIO)-i, r_level);
-            // $finish;
-         end
-      end
-`else // RW_RATIO
-      //Read all the locations of RAM.
-      for(i=0; i < ((2**`W_ADDR_W)/`RW_RATIO)-1; i = i + 1) begin
-         // Result will only be available in the next cycle
-         @(posedge r_clk) #1;
-	 if(r_data != i || r_level != ((2**`R_ADDR_W)-2)-i) begin
-            $display("Test failed: read error in r_data.\n \t i=%0d; data=%0d", i, r_data);
-            // $finish;
-         end
-      end
-`endif
+      //pause for 1ms to allow the reader to test the empty flag
+      #1000000 @(posedge w_clk) #1;
+      
+      
+      //write test data to fifo
+      for(i = 0; i < ((TESTSIZE*8)/W_ADDR_W); i = i + 1) begin
+         if( i == ((TESTSIZE*8)/W_ADDR_W/2) ) //another pause
+           #1000000 @(posedge w_clk) #1;
 
-      @(posedge r_clk) #1;
-      r_en = 0; //Fifo is now empty
-      @(posedge r_clk) #1;
-      if(r_empty!=1 || r_level!=0) begin
-         $display("Test failed: fifo not empty.\n \t");
-         $finish;
+         if(!w_full) begin
+            w_en = 1;
+            w_data = test_data[i*W_ADDR_W +: W_ADDR_W];
+            @(posedge w_clk) #1;
+            w_en = 0;
+         end
       end
 
       #(5*clk_per_r) $finish;
 
-   end
+   end // end of writer process
+   
+   initial begin //reader process
 
+      //wait for reset to be de-asserted
+      @(negedge reset) repeat(4) @(posedge r_clk) #1;
+      
+      //read data from fifo
+      for(j = 0; j < ((TESTSIZE*8)/R_ADDR_W); j = j + 1) begin
+         if(!r_empty) begin
+            r_en = 1;
+            @(posedge r_clk) #1;
+            read[j*R_ADDR_W +: R_ADDR_W] = r_data;
+            r_en = 0;
+         end
+      end
+
+      if(read != test_data)
+        $display("ERROR: data read does not match the test data.");   
+   end
+      
    // Instantiate the Unit Under Test (UUT)
    iob_async_fifo_asym 
      #(
-       .W_DATA_W(`W_DATA_W),
-       .R_DATA_W(`R_DATA_W),
-       .ADDR_W(`FIFO_ADDR_W)
+       .W_DATA_W(W_DATA_W),
+       .R_DATA_W(R_DATA_W),
+       .ADDR_W(ADDR_W)
        ) 
    uut 
      (

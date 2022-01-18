@@ -24,18 +24,21 @@ used with its definitions in simulation and synthesis.
 
 ## Simulation
 
+WARNING: some memory models and testbenches may fail the simulation and require
+more work. Please feel free to contribute.
+
 Each memory module can be simulated using the free of charge and open-source
 Icarus Verilog simulator by using the accompanying Makefile. Other simulators
 can be used. To simulate a module using the Icarus Verilog simulator, type
 
 ```
-make sim MODULE_DIR=$(MEM_HW_DIR)/ram/<module>
+make sim MEM_NAME=<memory module name>
 ```
 
-where MODULE\_DIR is a variable that points to the module to be simulated. By
-default MODULE\_DIR=$(MEM_HW_DIR)/ram/sp\_ram, pointing to the single-port RAM
-module `sp\_ram`. To clean the simulation generated artefacts placed in the root
-directory, type
+where MEM\_NAME is a variable that must be set to the name of the directory that
+contains the module to be simulated. By default MEM\_NAME=sp\_ram, pointing to
+the single-port RAM module in `hardware/ram/sp\_ram`. To clean the simulation generated
+artefacts placed in the root directory, type
 
 ```
 make clean 
@@ -61,3 +64,20 @@ memwrapper.py can be found in `software/python`directory, which generates
 suitable memory wrappers for a few memory compilers; feel free to contribute to
 this program by providing additional cases to support other memory compilers and
 memory blocks.
+
+## Contribute
+
+Edit the memory models as required.
+
+The testbench should create a large vector called `test_data`representing the
+entire memory contents. It should write `test_data`to the memory, read it back,
+and compare the data read with `test_data`.
+
+FIFO tests should write and read to the FIFO in parallel with an intermediate
+pause to allow the FIFO to go empty. The FIFO size should be smaller than the
+test data to allow the FIFO to go full. The FIFO levels upon write and read and
+should be tested.
+
+For dual and two-port memories, the two ports may be exercised in parallel
+but the testbench should ensure that reads and writes to the same address do not
+happen simultaneous or, if they do, the expected behaviour should be verified. 

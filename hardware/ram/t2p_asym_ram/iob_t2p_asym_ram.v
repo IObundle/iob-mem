@@ -1,13 +1,11 @@
 `timescale 1ns / 1ps
-`define max(a,b) {(a) > (b) ? (a) : (b)}
-`define min(a,b) {(a) < (b) ? (a) : (b)}
+`include "iob_lib.vh"
 
 module iob_t2p_asym_ram 
   #(
     parameter W_DATA_W = 0,
-    parameter W_ADDR_W = 0,
     parameter R_DATA_W = 0,
-    parameter R_ADDR_W = 0
+    parameter MAXADDR_W = 0
     )
    (
     //write port
@@ -22,15 +20,18 @@ module iob_t2p_asym_ram
     input [R_ADDR_W-1:0]      r_addr,
     output reg [R_DATA_W-1:0] r_data
     );
-   
+
    //determine the number of blocks N
    localparam MAXDATA_W = `max(W_DATA_W, R_DATA_W);
    localparam MINDATA_W = `min(W_DATA_W, R_DATA_W);
    localparam N = MAXDATA_W/MINDATA_W;
-   localparam MAXADDR_W = `max(W_ADDR_W, R_ADDR_W);
-   localparam MINADDR_W = `min(W_ADDR_W, R_ADDR_W);
-  
-  //memory buses
+   localparam MINADDR_W = MAXADDR_W - $clog2(N);
+
+   //determine W_ADDR_W and R_ADDR_W
+   localparam W_ADDR_W = W_DATA_W == MAXDATA_W? MINADDR_W: MAXADDR_W;
+   localparam R_ADDR_W = R_DATA_W == MAXDATA_W? MINADDR_W: MAXADDR_W;
+   
+   //symmetric memory block buses
    //write buses
    reg [N-1:0]                en_wr;
    reg [MINDATA_W-1:0]        data_wr [N-1:0];
@@ -40,7 +41,7 @@ module iob_t2p_asym_ram
    wire [MINDATA_W-1:0]       data_rd [N-1:0];
    reg [MINADDR_W-1:0]        addr_rd [N-1:0];
 
-   //instantiate N RAM blocks and connect them to the buses
+   //instantiate N symmetric RAM blocks and connect them to the buses
    genvar                 i;
    generate 
       for (i=0; i<N; i=i+1) begin : t2p_ram_array
@@ -68,6 +69,7 @@ module iob_t2p_asym_ram
    integer j,k,l;
 
    generate
+
       if (W_DATA_W > R_DATA_W) begin
           //write parallel
          always @* begin
@@ -86,7 +88,7 @@ module iob_t2p_asym_ram
          end
 
          //read address register
-         reg [MAXDATA_W-MINDATA_W-1:0] r_addr_lsbs_reg;
+         reg [R_ADDR_W-W_ADDR_W-1:0] r_addr_lsbs_reg;
          always @(posedge r_clk)
            r_addr_lsbs_reg <= r_addr[R_ADDR_W-W_ADDR_W-1:0];
            
@@ -115,6 +117,7 @@ module iob_t2p_asym_ram
                r_data[k*MINDATA_W +: MINDATA_W] = data_rd[k];
             end
          end
+
       end else begin //W_DATA_W = R_DATA_W
          //write serial
          always @* begin
