@@ -1,123 +1,119 @@
 `timescale 1ns / 1ps
+`include "iob_lib.vh"
 
-`define DATA_W 8
-`define ADDR_W 4
+//test defines
+`define DATA_W 32
+`define ADDR_W 10
+`define TESTSIZE 256 //test size in bytes
 
 module iob_sync_fifo_tb;
    
-   //Inputs
-   reg clk;
-   reg reset;
-   reg [`DATA_W-1:0] w_data;
-   reg               read;
-   reg               write;
+    localparam DATA_W = `DATA_W;
+    localparam ADDR_W = `ADDR_W;
+    localparam TESTSIZE = `TESTSIZE;
+    
+    //Inputs
+    reg                 clk = 0;
+    reg                 reset;
+    reg [DATA_W-1:0]    w_data;
+    reg                 r_en;
+    reg                 w_en;
+
+    //Outputs
+    wire [DATA_W-1:0]   r_data;
+    wire                r_empty;
+    wire                w_full;
+    reg [ADDR_W-1:0]    fifo_occupancy;
+
+    integer             i, j;
+
+    reg [DATA_W*2**ADDR_W-1:0] test_input;
+    reg [DATA_W*2**ADDR_W-1:0] test_output;
+
+    parameter clk_per = 10; // clk period = 10 timeticks
+    always #(clk_per/2) clk = ~clk; 
    
-   //Outputs
-   wire [`DATA_W-1:0] r_data;
-   wire               empty_out;
-   wire               full_out;
-   reg [31:0]         fifo_occupancy;
+    initial begin //writer process
+        // initialize values
+        w_en = 0;
+        w_data = 0;
+        i = 0;
 
-   integer            i;
+        $display("DATA_W=%d", DATA_W);
+        $display("ADDR_W=%d", ADDR_W);
 
-   parameter clk_per = 10; // clk period = 10 timeticks
-   
+        //create the test data bytes
+        for(i=0;i< TESTSIZE; i=i+1)
+            test_input[i*8 +: 8] = i;
 
-   initial begin
-      // optional VCD
+        // optional VCD
 `ifdef VCD
-      $dumpfile("uut.vcd");
-      $dumpvars();
+        $dumpfile("uut.vcd");
+        $dumpvars();
 `endif
+        repeat(4) @(posedge clk) #1;
 
-      //Initialize Inputs
-      clk = 1;
-      reset = 0;
-      w_data = 0;
-      read = 0;
-      write = 0;
-
-      //Write all the locations of FIFO
-      #clk_per;
-      @(posedge clk) #1; 
-      reset = 1;
-      @(posedge clk) #1;
-      reset = 0;
-      
-      @(posedge clk) #1;
-      write = 1;
-      for(i=0; i < 16; i = i + 1) begin
-         w_data = i+32;
-         @(posedge clk) #1;
-      end
-      
-      @(posedge clk) #1;
-      write = 0; //Fifo is now full
-      if(fifo_occupancy != 16 && full_out!=1) begin
-         $display("Test 1 failed: fifo not full.");
-         $finish;
-      end
-      
-      #clk_per
+        //reset FIFO
+        #clk_per;
         @(posedge clk) #1;
-      read=1;
+        reset = 1;
+        @(posedge clk) #1;
+        reset = 0;
 
-      //Read all the locations of RAM. 
-      @(posedge clk) #1;
-      for(i=0; i < 16; i = i + 1) begin
-         // Result will only be available in the next cycle
-         if(r_data != i+32) begin
-            $display("Test 2 failed: read error in r_data.\n \t i=%0d; data=%d when it should have been %0d", i, r_data, i+32);
-            $finish;
-         end
-         @(posedge clk) #1;
-      end
+        //pause for 1ms to allow the reader to test the empty flag
+        #1000000 @(posedge clk) #1;
 
-      @(posedge clk) #1;
-      read = 0; //Fifo is now empty
-      @(posedge clk) #1;
-      if(fifo_occupancy != 0 && empty_out!=1) begin
-         $display("Test 3 failed: fifo not empty.\n \t occupancy=%d;", fifo_occupancy);
-         $finish;
-      end
+        //write test input to fifo
+        for(i=0; i<((TESTSIZE*8)/DATA_W); i=i+1) begin
+            if( i == ((TESTSIZE*8)/DATA_W/2) ) begin//another pause
+                #1000000 @(posedge clk) #1;
+            end
 
-      // Test reset
-      @(posedge clk) #1;
-      write = 1;
-      for(i=0; i < 16; i = i + 1) begin
-         w_data = i+32;
-         @(posedge clk) #1;
-      end
+            if(!w_full) begin
+                w_en = 1;
+                w_data = test_input[i*DATA_W +: DATA_W];
+                @(posedge clk) #1;
+                w_en = 0;
+            end
+            @(posedge clk) #1;
+        end
 
-      write = 0; //Fifo is now full
-      if(fifo_occupancy != 16 && full_out!=1) begin
-         $display("Test 4 failed: fifo not full.");
-         $finish;
-      end
+        #(5*clk_per) $finish;
 
-      @(posedge clk) #1;
-      reset = 1;
-      @(posedge clk) #1;
-      reset = 0;
+    end // end of write process 
 
-      if(fifo_occupancy != 0 && empty_out!= 1) begin
-         $display("Test 5 failed: reset did not work");
-         $finish;
-      end
+    initial begin //read process
+        // initialize values
+        r_en = 0;
+        j = 0;
 
-      #clk_per
-        $display("%c[1;34m",27);
-      $display("Test completed successfully.");
-      $display("%c[0m",27);
-      #(5*clk_per) $finish;
+        @(negedge reset) repeat(4) @(posedge clk) #1;
 
-   end
+        //read data from fifo
+        for(j=0; j<((TESTSIZE*8)/DATA_W); j = j+1) begin
+            //wait for data to read
+            while(r_empty) begin
+                @(posedge clk) #1;
+            end
+
+            if(!r_empty) begin
+                r_en = 1;
+                @(posedge clk) #1;
+                test_output[j*DATA_W +: DATA_W] = r_data;
+                r_en = 0;
+            end
+        end
+
+        // compare written and read data
+        if(test_output !== test_input)
+            $display("ERROR: data read does not match the test data.");
+    end // end of read process
 
    // Instantiate the Unit Under Test (UUT)
    iob_sync_fifo 
      #(
-       .DATA_WIDTH(`DATA_W), 
-       .ADDRESS_WIDTH(`ADDR_W)
+       .DATA_W(DATA_W), 
+       .ADDR_W(ADDR_W)
        ) 
    uut 
      (
@@ -125,14 +121,12 @@ module iob_sync_fifo_tb;
       .rst(reset), 
       .w_data(w_data), 
       .r_data(r_data), 
-      .empty(empty_out), 
-      .read_en(read), 
-      .full(full_out), 
-      .write_en(write),
+      .r_empty(r_empty), 
+      .r_en(r_en), 
+      .w_full(w_full), 
+      .w_en(w_en),
       .fifo_ocupancy(fifo_occupancy)
       );
    
-   // system clock
-   always #(clk_per/2) clk = ~clk; 
 
 endmodule // iob_sync_fifo_tb
