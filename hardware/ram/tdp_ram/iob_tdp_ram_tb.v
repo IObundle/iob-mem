@@ -2,12 +2,10 @@
 
 `define DATA_W 8
 `define ADDR_W 4
-`define hex_file1 "tb1.hex"
-`define hex_file2 "tb2.hex"
 
 module iob_tdp_ram_tb;
    
-   //Inputs
+   // Inputs
    reg               clkA;
    reg [`DATA_W-1:0] data_a;
    reg [`ADDR_W-1:0] addr_a;
@@ -20,14 +18,11 @@ module iob_tdp_ram_tb;
    reg               en_b;
    reg               we_b;
    
-   //Outputs
+   // Outputs
    reg [`DATA_W-1:0] q_a;
    reg [`DATA_W-1:0] q_b;
 
-   // .hex file
-   reg [7:0]         filemem [0:15];
-
-   integer           i;
+   integer           i, seq_ini;
 
    parameter clk_per = 10; // clk period = 10 timeticks
 
@@ -37,9 +32,8 @@ module iob_tdp_ram_tb;
       $dumpfile("uut.vcd");
       $dumpvars();
 `endif
-      $dumpoff();
       
-      //Initialize Inputs
+      // Initialize Inputs
       clkA = 1;
       clkB = 1;
 
@@ -53,57 +47,23 @@ module iob_tdp_ram_tb;
       en_b = 0;
       we_b = 0;
 
-      // store file for comparison
-      #clk_per
-        @(posedge clkA) #1;
-      @(posedge clkB) #1;
-      $readmemh(`hex_file1, filemem);
+      // Number from which to start the incremental sequence to write into the RAM
+      seq_ini = 32;
 
+      #clk_per;
+      @(posedge clkA) #1;
+      @(posedge clkB) #1;
 
       @(posedge clkA) #1;
       en_a = 1;
 
-      $dumpon();
-      // read from file stored in port A
-      @(posedge clkA) #1;
-      for(i = 0; i < 16; i = i + 1) begin
-         addr_a = i;
-         @(posedge clkA) #1;
-         if(filemem[i]!= q_a) begin
-            $display("Test failed: read error in port A position %d, where tb1.hex=%h but q_a=%h", i, filemem[i], q_a);
-            $finish;
-         end
-      end
-
-      #clk_per
-
-        @(posedge clkB) #1;
-      en_b = 1;
-
-
-      // read from file stored in port B
-      @(posedge clkB) #1;
-      for(i = 0; i < 16; i = i + 1) begin
-         addr_b = i;
-         @(posedge clkB) #1;
-         if(filemem[i]!= q_b) begin
-            $display("Test failed: read error in port B position %d, where tb1.hex=%h but q_b=%h", i, filemem[i], q_b);
-            $finish;
-         end
-      end
-      $dumpoff();
-
-      #clk_per
-
-        $readmemh(`hex_file2, filemem);
-
-      // write into port A and read from it
+      // Write into port A and read from it
       @(posedge clkA) #1;
       we_a = 1;
 
-      for(i = 0; i < 16; i = i + 1) begin
+      for(i = 0; i < 2**`ADDR_W; i = i + 1) begin
          addr_a = i;
-         data_a = filemem[i];
+         data_a = i+seq_ini;
          @(posedge clkA) #1;
       end
 
@@ -111,22 +71,28 @@ module iob_tdp_ram_tb;
       we_a = 0;
 
       @(posedge clkA) #1;
-      for(i = 0; i < 16; i = i + 1) begin
+      for(i = 0; i < 2**`ADDR_W; i = i + 1) begin
          addr_a = i;
          @(posedge clkA) #1;
-         if(filemem[i]!= q_a) begin
-            $display("Test failed: write error in port A position %d, where tb2.hex=%h but q_a=%h", i, filemem[i], q_a);
+         if(i+seq_ini != q_a) begin
+            $display("Test failed: write error in port A position %d, where data=%h but q_a=%h", i, i+seq_ini, q_a);
             $finish;
          end
       end
 
-      // write into port B and read from it
+      // Number from which to start the incremental sequence to write into the RAM
+      seq_ini = 64;
+
+      @(posedge clkB) #1;
+      en_b = 1;
+
+      // Write into port B and read from it
       @(posedge clkB) #1;
       we_b = 1;
 
-      for(i = 0; i < 16; i = i + 1) begin
+      for(i = 0; i < 2**`ADDR_W; i = i + 1) begin
          addr_b = i;
-         data_b = filemem[i];
+         data_b = i+seq_ini;
          @(posedge clkB) #1;
       end
 
@@ -134,11 +100,11 @@ module iob_tdp_ram_tb;
       we_b = 0;
 
       @(posedge clkB) #1;
-      for(i = 0; i < 16; i = i + 1) begin
+      for(i = 0; i < 2**`ADDR_W; i = i + 1) begin
          addr_b = i;
          @(posedge clkB) #1;
-         if(filemem[i]!= q_b) begin
-            $display("Test failed: write error in port B position %d, where tb2.hex=%h but q_b=%h", i, filemem[i], q_b);
+         if(i+seq_ini != q_b) begin
+            $display("Test failed: write error in port B position %d, where data=%h but q_b=%h", i, i+seq_ini, q_b);
             $finish;
          end
       end
@@ -147,8 +113,8 @@ module iob_tdp_ram_tb;
       en_a = 0;
       en_b = 0;
 
-      #clk_per
-        $display("%c[1;34m",27);
+      #clk_per;
+      $display("%c[1;34m",27);
       $display("Test completed successfully.");
       $display("%c[0m",27);
       #(5*clk_per) $finish;
@@ -156,28 +122,30 @@ module iob_tdp_ram_tb;
    end
 
    // Instantiate the Unit Under Test (UUT)
-   iob_tdp_ram #(
-                 .DATA_W(`DATA_W), 
-                 .ADDR_W(`ADDR_W),
-                 .FILE(`hex_file1)
-                 ) uut (
-                        .clkA(clkA),
-                        .dinA(data_a),
-                        .addrA(addr_a),
-                        .enA(en_a),
-                        .weA(we_a),
-                        .doutA(q_a),
+   iob_tdp_ram
+     #(
+       .DATA_W(`DATA_W),
+       .ADDR_W(`ADDR_W)
+       )
+   uut
+     (
+      .clkA(clkA),
+      .dinA(data_a),
+      .addrA(addr_a),
+      .enA(en_a),
+      .weA(we_a),
+      .doutA(q_a),
 
-                        .clkB(clkB),
-                        .dinB(data_b),
-                        .addrB(addr_b),
-                        .enB(en_b),
-                        .weB(we_b),
-                        .doutB(q_b)
-                        );
-   
+      .clkB(clkB),
+      .dinB(data_b),
+      .addrB(addr_b),
+      .enB(en_b),
+      .weB(we_b),
+      .doutB(q_b)
+      );
+
    // system clock
    always #(clk_per/2) clkA = ~clkA;
    always #(clk_per/2) clkB = ~clkB;
 
-endmodule // tdp_ram_tb
+endmodule

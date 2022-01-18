@@ -2,25 +2,20 @@
 
 `define DATA_W 8
 `define ADDR_W 4
-`define hex_file1 "tb1.hex"
-`define hex_file2 "tb2.hex"
 
 module iob_sp_ram_tb;
    
-   //Inputs
+   // Inputs
    reg clk;
    reg en; // enable access to ram
    reg we; // write enable
    reg [`ADDR_W-1:0] addr;
    reg [`DATA_W-1:0] data_in;
    
-   //Ouptuts
+   // Ouptuts
    reg [`DATA_W-1:0] data_out;
 
-   // .hex file
-   reg [7:0]         filemem [0:15];
-
-   integer           i;
+   integer           i, seq_ini;
 
    parameter clk_per = 10; // clk period = 10 timeticks
 
@@ -31,55 +26,39 @@ module iob_sp_ram_tb;
       $dumpvars();
 `endif
       
-      //Initialize Inputs
+      // Initialize Inputs
       clk = 1;
       en = 0;
       we = 0;
       addr = 0;
 
-      // store file for comparison
-      #clk_per
-        @(posedge clk) #1;
-      $readmemh(`hex_file1, filemem);
+      // Number from which to start the incremental sequence to write into the RAM
+      seq_ini = 32;
 
-
+      #clk_per;
       @(posedge clk) #1;
       en = 1;
 
-      // read from file stored in RAM
-      @(posedge clk) #1;
-      for(i = 0; i < 16; i = i + 1) begin
-         addr = i;
-         @(posedge clk) #1;
-         if(filemem[i]!= data_out) begin
-            $display("Test failed: read error in position %d, where tb1.hex=%h but data_out=%h", i, filemem[i], data_out);
-            $finish;
-         end
-      end
-      
-      #clk_per
-
-        $readmemh(`hex_file2, filemem);
-
-      // write into RAM and read from it
+      // Write to all RAM words
       @(posedge clk) #1;
       we = 1;
 
-      for(i = 0; i < 16; i = i + 1) begin
+      for(i = 0; i < 2**`ADDR_W; i = i + 1) begin
          addr = i;
-         data_in = filemem[i];
+         data_in = i+seq_ini;
          @(posedge clk) #1;
       end
 
       @(posedge clk) #1;
       we = 0;
 
+      // Read from all RAM words
       @(posedge clk) #1;
-      for(i = 0; i < 16; i = i + 1) begin
+      for(i = 0; i < 2**`ADDR_W; i = i + 1) begin
          addr = i;
          @(posedge clk) #1;
-         if(filemem[i]!= data_out) begin
-            $display("Test failed: write error in position %d, where tb2.hex=%h but data_out=%h", i, filemem[i], data_out);
+         if(i+seq_ini != data_out) begin
+            $display("Test failed: read error in data_out. \n \t i=%0d; data = %h when it should have been %0h", i, i+seq_ini, data_out);
             $finish;
          end
       end
@@ -87,8 +66,8 @@ module iob_sp_ram_tb;
       @(posedge clk) #1;
       en = 0;
 
-      #clk_per
-        $display("%c[1;34m",27);
+      #clk_per;
+      $display("%c[1;34m",27);
       $display("Test completed successfully.");
       $display("%c[0m",27);
       #(5*clk_per) $finish;
@@ -99,8 +78,7 @@ module iob_sp_ram_tb;
    iob_sp_ram 
      #(
        .DATA_W(`DATA_W), 
-       .ADDR_W(`ADDR_W),
-       .FILE(`hex_file1)
+       .ADDR_W(`ADDR_W)
        ) 
    uut 
      (
@@ -115,4 +93,4 @@ module iob_sp_ram_tb;
    // system clock
    always #(clk_per/2) clk = ~clk; 
 
-endmodule // sp_ram_tb
+endmodule

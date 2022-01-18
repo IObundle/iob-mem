@@ -1,6 +1,6 @@
 ifneq ($(ASIC),1)
 
-MODULES+=ram/dp_ram_be
+include $(MEM_DIR)/config.mk
 
 # Paths
 DPRAM_BE_DIR=$(MEM_HW_DIR)/ram/dp_ram_be
