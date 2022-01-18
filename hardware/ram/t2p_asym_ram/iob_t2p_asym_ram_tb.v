@@ -79,7 +79,7 @@ module iob_t2p_asym_ram_tb;
 
             //Write all the locations of RAM 
             w_en = 1; 
-            for(i = 0; i < 16; i = i + 1) begin
+            for(i = 0; i < 2**`W_ADDR; i = i + 1) begin
                 w_addr = i;
                 w_data = i+seq_ini;
                 @(posedge wclk) #1;
@@ -90,7 +90,7 @@ module iob_t2p_asym_ram_tb;
 
             //Read all the locations of RAM
             r_en = 1;
-            for(i = 0 ; i < 4; i = i + 1) begin
+            for(i = 0 ; i < 2**`R_ADDR; i = i + 1) begin
                 r_addr = i;
                 @(posedge rclk) #1;
                 if(r_data[7:0]!=i*4+seq_ini || r_data[15:8]!=i*4+1+seq_ini || 
@@ -113,7 +113,7 @@ module iob_t2p_asym_ram_tb;
 
             //Write all the locations of RAM 
             w_en = 1;
-            for(i=0; i < 4; i = i + 1) begin
+            for(i=0; i < 2**`W_ADDR; i = i + 1) begin
                 w_data[7:0] = i*4      +seq_ini;
                 w_data[15:8] = i*4+1   +seq_ini;
                 w_data[23:16] = i*4+2  +seq_ini;
@@ -128,12 +128,12 @@ module iob_t2p_asym_ram_tb;
             
             //Read all the locations of RAM
             r_en = 1; 
-            for(i=0; i < 16; i = i + 1) begin
+            for(i=0; i < 2**`R_ADDR; i = i + 1) begin
                 r_addr = i;
                 @(posedge rclk) #1;
                 if(r_data!=i+seq_ini) begin
                     $display("Test 2 failed: read error in r_data. \n \t i=%0d; data = %h when it should have been %0h", 
-                        i, r_data, i+32);
+                        i, r_data, i+seq_ini);
                 end
             end
             @(posedge rclk) #1;

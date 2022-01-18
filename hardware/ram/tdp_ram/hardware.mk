@@ -1,6 +1,6 @@
 ifneq ($(ASIC),1)
 
-MODULES+=ram/tdp_ram
+include $(MEM_DIR)/config.mk
 
 # Paths
 TDPRAM_DIR=$(MEM_HW_DIR)/ram/tdp_ram
