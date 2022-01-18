@@ -1,13 +1,13 @@
 defmacro:=-D
 incdir:=-I
 
+MEM_DIR=.
 include config.mk
 
 ifeq ($(VCD),1)
 DEFINE+=$(defmacro)VCD
 endif
 
-MEM_NAME ?= sp_ram
 MODULE_DIR = $(shell find . -name $(MEM_NAME))
 
 include $(MODULE_DIR)/hardware.mk
@@ -29,6 +29,7 @@ ALL_MODULES=$(shell find . -name hardware.mk | sed 's/\/hardware.mk//g' | tail -
 #
 
 sim: $(VSRC) $(VHDR)
+	@echo $(VSRC)
 	$(VLOG) $(VSRC)
 	@echo "\n\nTesting module $(MEM_NAME)\n\n"
 	@./a.out
@@ -41,7 +42,10 @@ sim-all: $(ALL_MODULES)
 	@echo "Listing all modules: $(ALL_MODULES)"
 
 $(ALL_MODULES):
-	make sim MODULE_DIR=$@
+	make sim MEM_NAME=$(shell basename $@)
+
+debug:
+	@echo $(VSRC)
 
 
 #

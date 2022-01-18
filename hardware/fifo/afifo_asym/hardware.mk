@@ -1,11 +1,12 @@
-MODULES+=fifo/afifo_asym
+MEM_NAME ?= afifo_asym
+include $(MEM_DIR)/config.mk
 
 # Paths
 FIFO_DIR=$(MEM_HW_DIR)/fifo
 AFIFO_ASYM_DIR=$(MEM_HW_DIR)/fifo/afifo_asym
 
 # Submodules
-ifneq (ram/t2p_asym_ram,$(filter ram/t2p_asym_ram, $(MODULES)))
+ifneq (t2p_asym_ram,$(filter t2p_asym_ram, $(MODULES)))
 include $(MEM_HW_DIR)/ram/t2p_asym_ram/hardware.mk
 endif
 

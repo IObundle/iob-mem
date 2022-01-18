@@ -1,18 +1,17 @@
 `timescale 1ns/1ps
-
-`define max(a,b) {(a) > (b) ? (a) : (b)}
-`define min(a,b) {(a) < (b) ? (a) : (b)}
+`include "iob_lib.vh"
 
 module iob_async_fifo_asym
   #(parameter 
-    R_DATA_W = 0,
     W_DATA_W = 0,
+    R_DATA_W = 0,
     ADDR_W = 0,//higher ADDR_W (lower DATA_W)
+    //determine W_ADDR_W and R_ADDR_W
     MAXDATA_W = `max(W_DATA_W, R_DATA_W),
     MINDATA_W = `min(W_DATA_W, R_DATA_W),
-    L_ADDR_W = ADDR_W-$clog2(MAXDATA_W/MINDATA_W),//lower ADDR_W (higher DATA_W)
-    W_ADDR_W = (W_DATA_W == MAXDATA_W) ? L_ADDR_W : ADDR_W,
-    R_ADDR_W = (R_DATA_W == MAXDATA_W) ? L_ADDR_W : ADDR_W
+    MINADDR_W = ADDR_W-$clog2(MAXDATA_W/MINDATA_W),//lower ADDR_W (higher DATA_W)
+    W_ADDR_W = (W_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W,
+    R_ADDR_W = (R_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W
     )
    (
     input                     rst,
@@ -34,7 +33,7 @@ module iob_async_fifo_asym
     );
 
    //local variables
-   localparam ADDR_W_DIFF = ADDR_W - L_ADDR_W;
+   localparam ADDR_W_DIFF = ADDR_W - MINADDR_W;
    localparam W_FIFO_DEPTH = (1 << W_ADDR_W);
    
 
@@ -44,7 +43,7 @@ module iob_async_fifo_asym
    reg [R_ADDR_W-1:0] 	      rptr_sync[1:0];
    wire 		      w_en_int;
    wire [R_ADDR_W-1:0] 	      rptr_bin;
-   wire [W_ADDR_W-1:0] 	      rptr_wire;
+   wire [W_ADDR_W-1:0] 	      rptr_wside;
    wire [W_ADDR_W-1:0]        wptr_bin_w;
    
    
@@ -53,7 +52,7 @@ module iob_async_fifo_asym
    reg [W_ADDR_W-1:0] 	      wptr_sync[1:0];
    wire 		      r_en_int;
    wire [W_ADDR_W-1:0] 	      wptr_bin;
-   wire [R_ADDR_W-1:0] 	      wptr_wire;
+   wire [R_ADDR_W-1:0] 	      wptr_rside;
    wire [R_ADDR_W-1:0]        rptr_bin_r;
    
    
@@ -73,14 +72,14 @@ module iob_async_fifo_asym
 
    generate
       if(W_ADDR_W > R_ADDR_W) begin
-	 assign rptr_wire = {rptr_bin, {ADDR_W_DIFF{1'b0}}};
-	 assign wptr_wire = wptr_bin[W_ADDR_W-1:ADDR_W_DIFF];
+	 assign rptr_wside = {rptr_bin, {ADDR_W_DIFF{1'b0}}};
+	 assign wptr_rside = wptr_bin[W_ADDR_W-1:ADDR_W_DIFF];
       end else if (W_ADDR_W == R_ADDR_W) begin
-	 assign rptr_wire = rptr_bin;
-	 assign wptr_wire = wptr_bin;
-      end else begin
-	 assign rptr_wire = rptr_bin[R_ADDR_W-1:ADDR_W_DIFF];
-	 assign wptr_wire = {wptr_bin, {ADDR_W_DIFF{1'b0}}};
+	 assign rptr_wside = rptr_bin;
+	 assign wptr_rside = wptr_bin;
+      end else begin //W_ADDR_W < R_ADDR_W
+	 assign rptr_wside = rptr_bin[R_ADDR_W-1:ADDR_W_DIFF];
+	 assign wptr_rside = {wptr_bin, {ADDR_W_DIFF{1'b0}}};
       end
    endgenerate
 
@@ -109,7 +108,7 @@ module iob_async_fifo_asym
       .data_out(wptr)
       );
 
-   //compute binary pointer difference
+   //compute FIFO levels 
    gray2bin #(
        .DATA_W(W_ADDR_W)
    ) 
@@ -119,7 +118,7 @@ module iob_async_fifo_asym
       .bin(wptr_bin_w)
       );
 
-   assign w_level = wptr_bin_w - rptr_wire;
+   assign w_level = wptr_bin_w - rptr_wside;
    assign w_full = (w_level == (W_FIFO_DEPTH-1));
    
    //READ DOMAIN LOGIC
@@ -155,21 +154,16 @@ module iob_async_fifo_asym
       .bin(rptr_bin_r)
       );
    
-   assign r_level = wptr_wire - rptr_bin_r;
-   
-
+   assign r_level = wptr_rside - rptr_bin_r;
    assign r_empty = (r_level == 0);
    
-   //
-   // FIFO memory
-   //
 
+   // FIFO memory
    iob_t2p_asym_ram 
      #(
        .W_DATA_W(W_DATA_W),
-       .W_ADDR_W(W_ADDR_W),
        .R_DATA_W(R_DATA_W),
-       .R_ADDR_W(R_ADDR_W)
+       .MAXADDR_W(ADDR_W)
        ) 
    t2p_asym_ram 
      (
@@ -177,6 +171,7 @@ module iob_async_fifo_asym
       .w_en(w_en_int),
       .w_data(w_data),
       .w_addr(wptr_bin_w),
+      
       .r_clk(r_clk),
       .r_addr(rptr_bin_r),
       .r_en(r_en_int),

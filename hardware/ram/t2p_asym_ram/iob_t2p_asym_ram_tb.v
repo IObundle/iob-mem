@@ -4,7 +4,7 @@
 //test defines
 `define W_DATA_W 32
 `define R_DATA_W 8
-`define ADDR_W 10
+`define MAXADDR_W 10
 
 
 module iob_t2p_asym_ram_tb;
@@ -14,9 +14,10 @@ module iob_t2p_asym_ram_tb;
    localparam R_DATA_W = `R_DATA_W;
    localparam MAXDATA_W = `max(W_DATA_W, R_DATA_W);
    localparam MINDATA_W = `min(W_DATA_W, R_DATA_W);
-   localparam L_ADDR_W = `ADDR_W - $clog2(MAXDATA_W/MINDATA_W);
-   localparam W_ADDR_W = W_DATA_W == MINDATA_W? `ADDR_W: L_ADDR_W;
-   localparam R_ADDR_W = R_DATA_W == MINDATA_W? `ADDR_W: L_ADDR_W;
+   localparam MAXADDR_W = `MAXADDR_W;
+   localparam MINADDR_W = MAXADDR_W - $clog2(MAXDATA_W/MINDATA_W);
+   localparam W_ADDR_W = W_DATA_W == MINDATA_W? MAXADDR_W: MINADDR_W;
+   localparam R_ADDR_W = R_DATA_W == MINDATA_W? MAXADDR_W: MINADDR_W;
  
    //write port 
    reg w_clk = 0;
@@ -40,8 +41,8 @@ module iob_t2p_asym_ram_tb;
    localparam seq_ini = 10;
    integer              i;
 
-   reg [`W_DATA_W*2**W_ADDR_W-1:0] expected;
-   reg [`R_DATA_W-1:0]              r_data_expected;
+   reg [`W_DATA_W*2**W_ADDR_W-1:0] test_data;
+   reg [`R_DATA_W-1:0]             r_data_expected;
 
    initial begin
 
@@ -57,9 +58,9 @@ module iob_t2p_asym_ram_tb;
       $display("R_DATA_W=%d", R_DATA_W);
       $display("R_ADDR_W=%d", R_ADDR_W);
       
-      //compute expected response
+      //compute the test data
       for (i=0; i < 2**W_ADDR_W; i=i+1)
-        expected[i*`W_DATA_W +: `W_DATA_W] = i+seq_ini;    
+        test_data[i*`W_DATA_W +: `W_DATA_W] = i+seq_ini;    
       
       // optional VCD
 `ifdef VCD
@@ -85,8 +86,8 @@ module iob_t2p_asym_ram_tb;
          r_addr = i;
          @(posedge r_clk) #1;
          //verify response
-         r_data_expected = expected[i*`R_DATA_W +: `R_DATA_W];
-         if(r_data != r_data_expected)
+         r_data_expected = test_data[i*`R_DATA_W +: `R_DATA_W];
+         if(r_data !== r_data_expected)
            $display("read addr=%x, got %x, expected %x", r_addr, r_data, r_data_expected);
       end
       
@@ -97,21 +98,22 @@ module iob_t2p_asym_ram_tb;
    // instantiate the Unit Under Test (UUT)
    iob_t2p_asym_ram 
      #(
-       .W_DATA_W(`W_DATA_W),
-       .R_DATA_W(`R_DATA_W),
-       .ADDR_W(`ADDR_W)
+       .W_DATA_W(W_DATA_W),
+       .R_DATA_W(R_DATA_W),
+       .MAXADDR_W(MAXADDR_W)
        )
-   uut (
-        .w_clk(w_clk), 
-        .w_en(w_en),
-        .w_addr(w_addr),
-        .w_data(w_data), 
-
-	.r_clk(r_clk),
-        .r_en(r_en), 
-        .r_addr(r_addr),
-        .r_data(r_data)
-        );
+   uut 
+     (
+      .w_clk(w_clk), 
+      .w_en(w_en),
+      .w_addr(w_addr),
+      .w_data(w_data), 
+      
+      .r_clk(r_clk),
+      .r_en(r_en), 
+      .r_addr(r_addr),
+      .r_data(r_data)
+      );
 
    
 endmodule

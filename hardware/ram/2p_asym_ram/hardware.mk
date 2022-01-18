@@ -1,4 +1,4 @@
-MODULES+=ram/2p_asym_ram
+include $(MEM_DIR)/config.mk
 
 # Paths
 2P_ASYM_RAM_DIR=$(MEM_HW_DIR)/ram/2p_asym_ram

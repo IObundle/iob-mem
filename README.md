@@ -32,13 +32,13 @@ Icarus Verilog simulator by using the accompanying Makefile. Other simulators
 can be used. To simulate a module using the Icarus Verilog simulator, type
 
 ```
-make sim MODULE_DIR=$(MEM\_HW\_DIR)/ram/<module>
+make sim MEM_NAME=<memory module name>
 ```
 
-where MODULE\_DIR is a variable that points to the module to be simulated. By
-default MODULE\_DIR=$(MEM\_HW\_DIR)/ram/sp\_ram, pointing to the single-port RAM
-module `sp\_ram`. To clean the simulation generated artefacts placed in the root
-directory, type
+where MEM\_NAME is a variable that must be set to the name of the directory that
+contains the module to be simulated. By default MEM\_NAME=sp\_ram, pointing to
+the single-port RAM module in `hardware/ram/sp\_ram`. To clean the simulation generated
+artefacts placed in the root directory, type
 
 ```
 make clean 
