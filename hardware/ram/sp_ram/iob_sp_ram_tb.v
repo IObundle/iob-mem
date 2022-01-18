@@ -1,8 +1,5 @@
 `timescale 1ns / 1ps
 
-`define DATA_W 8
-`define ADDR_W 4
-
 module iob_sp_ram_tb;
    
    // Inputs

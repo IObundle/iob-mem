@@ -20,7 +20,8 @@ module iob_sp_rom #(
 
    // Initialize the ROM
    initial 
-     $readmemh(mem_init_file_int, rom, 0, 2**ADDR_W-1);
+     if(mem_init_file_int != "none")
+       $readmemh(mem_init_file_int, rom, 0, 2**ADDR_W-1);
 
    // Operate the ROM
    always @(posedge clk)

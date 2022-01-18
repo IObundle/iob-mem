@@ -1,5 +1,3 @@
-MODULES+=$(MEM_NAME)
-
 #
 # Paths
 #
@@ -13,7 +11,7 @@ MEM_PYTHON_DIR=$(SW_DIR)/python
 #
 
 # Default module to simulate
-MODULE_DIR=$(MEM_HW_DIR)/$(MEM_NAME)
+MODULE_DIR ?=$(MEM_HW_DIR)/$(MEM_NAME)
 
 # do not generate .vcd file by default
 VCD ?=0

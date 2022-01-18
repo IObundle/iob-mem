@@ -2,7 +2,7 @@
 
 module iob_tdp_rom 
   #(
-    parameter MEM_INIT_FILE="none",
+    parameter FILE="none",
     parameter DATA_W=32,
     parameter ADDR_W=11
     )
@@ -19,7 +19,7 @@ module iob_tdp_rom
     );
 
    //this allows ISE 14.7 to work; do not remove
-   localparam mem_init_file_int = MEM_INIT_FILE;
+   localparam mem_init_file_int = FILE;
 
    
    // Declare the ROM
@@ -28,7 +28,7 @@ module iob_tdp_rom
    // Initialize the ROM
    initial 
      if(mem_init_file_int != "none")
-       $readmemh(MEM_INIT_FILE, rom, 0, 2**ADDR_W - 1);
+       $readmemh(mem_init_file_int, rom, 0, 2**ADDR_W - 1);
 
    always @ (posedge clk_a) // Port A
      if (r_en_a)
