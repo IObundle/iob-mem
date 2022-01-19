@@ -1,7 +1,7 @@
 `timescale 1ns/1ps
 `include "iob_lib.vh"
 
-module iob_async_fifo_asym
+module iob_fifo_async_asym
   #(parameter 
     W_DATA_W = 0,
     R_DATA_W = 0,
@@ -39,47 +39,56 @@ module iob_async_fifo_asym
 
    
    //WRITE DOMAIN 
-   wire [W_ADDR_W-1:0] 	      wptr;
-   reg [R_ADDR_W-1:0] 	      rptr_sync[1:0];
    wire 		      w_en_int;
-   wire [R_ADDR_W-1:0] 	      rptr_bin;
-   wire [W_ADDR_W-1:0] 	      rptr_wside;
-   wire [W_ADDR_W-1:0]        wptr_bin_w;
+   wire [W_ADDR_W-1:0] 	      write_addr;
+   wire [W_ADDR_W-1:0]        write_addr_bin;
+   reg [R_ADDR_W-1:0] 	      read_addr_sync[1:0];
+   wire [R_ADDR_W-1:0] 	      read_addr_bin_w;
+   wire [W_ADDR_W-1:0] 	      read_addr_bin_w_n;
    
    
    //READ DOMAIN    
-   wire [R_ADDR_W-1:0] 	      rptr;
-   reg [W_ADDR_W-1:0] 	      wptr_sync[1:0];
    wire 		      r_en_int;
-   wire [W_ADDR_W-1:0] 	      wptr_bin;
-   wire [R_ADDR_W-1:0] 	      wptr_rside;
-   wire [R_ADDR_W-1:0]        rptr_bin_r;
-   
-   
-   //convert pointers to other domain ADDR_W
-   gray2bin #(
-       .DATA_W(R_ADDR_W)
-   ) gray2bin_rptr_sync (
-       .gr(rptr_sync[1]),
-       .bin(rptr_bin)
-   );
-   gray2bin #(
-       .DATA_W(W_ADDR_W)
-   ) gray2bin_wptr_sync (
-       .gr(wptr_sync[1]),
-       .bin(wptr_bin)
-   );
+   wire [R_ADDR_W-1:0] 	      read_addr;
+   wire [R_ADDR_W-1:0]        read_addr_bin;
+   reg [W_ADDR_W-1:0] 	      write_addr_sync[1:0];
+   wire [W_ADDR_W-1:0] 	      write_addr_bin_r;
+   wire [R_ADDR_W-1:0] 	      write_addr_bin_r_n;
 
+   
+   
+   //convert addresses from gray to binary code
+   gray2bin 
+     #(
+       .DATA_W(R_ADDR_W)
+       ) 
+   gray2bin_read_addr_sync 
+     (
+      .gr(read_addr_sync[1]),
+      .bin(read_addr_bin_w)
+      );
+
+   gray2bin 
+     #(
+       .DATA_W(W_ADDR_W)
+       ) 
+   gray2bin_write_addr_sync 
+     (
+      .gr(write_addr_sync[1]),
+      .bin(write_addr_bin_r)
+      );
+
+   //normalise addresses from write (read) to read (write) sizes
    generate
       if(W_ADDR_W > R_ADDR_W) begin
-	 assign rptr_wside = {rptr_bin, {ADDR_W_DIFF{1'b0}}};
-	 assign wptr_rside = wptr_bin[W_ADDR_W-1:ADDR_W_DIFF];
+	 assign read_addr_bin_w_n = {read_addr_bin_w, {ADDR_W_DIFF{1'b0}}};
+	 assign write_addr_bin_r_n = write_addr_bin_r[W_ADDR_W-1:ADDR_W_DIFF];
       end else if (W_ADDR_W == R_ADDR_W) begin
-	 assign rptr_wside = rptr_bin;
-	 assign wptr_rside = wptr_bin;
+	 assign read_addr_bin_w_n = read_addr_bin_w;
+	 assign write_addr_bin_r_n = write_addr_bin_r;
       end else begin //W_ADDR_W < R_ADDR_W
-	 assign rptr_wside = rptr_bin[R_ADDR_W-1:ADDR_W_DIFF];
-	 assign wptr_rside = {wptr_bin, {ADDR_W_DIFF{1'b0}}};
+	 assign read_addr_bin_w_n = read_addr_bin_w[R_ADDR_W-1:ADDR_W_DIFF];
+	 assign write_addr_bin_r_n = {write_addr_bin_r, {ADDR_W_DIFF{1'b0}}};
       end
    endgenerate
 
@@ -87,79 +96,83 @@ module iob_async_fifo_asym
 
    //WRITE DOMAIN LOGIC
 
-   //sync read pointer
+   //sync gray read pointer to write domain
    always @ (posedge w_clk) begin 
-      rptr_sync[0] <= rptr;
-      rptr_sync[1] <= rptr_sync[0];
+      read_addr_sync[0] <= read_addr;
+      read_addr_sync[1] <= read_addr_sync[0];
    end
    
    //effective write enable
    assign w_en_int = w_en & ~w_full;
-   
+
+   //write address gray code counter
    gray_counter 
      #(
        .W(W_ADDR_W)
        ) 
-   wptr_counter 
+   write_addr_counter 
      (
       .clk(w_clk),
       .rst(rst), 
       .en(w_en_int),
-      .data_out(wptr)
+      .data_out(write_addr)
       );
 
-   //compute FIFO levels 
-   gray2bin #(
+   //compute write side info
+   gray2bin 
+     #(
        .DATA_W(W_ADDR_W)
-   ) 
-   gray2bin_wptr_w 
+       ) 
+   gray2bin_write_addr 
      (
-      .gr(wptr),
-      .bin(wptr_bin_w)
+      .gr(write_addr),
+      .bin(write_addr_bin)
       );
 
-   assign w_level = wptr_bin_w - rptr_wside;
+   assign w_level = write_addr_bin - read_addr_bin_w_n;
    assign w_full = (w_level == (W_FIFO_DEPTH-1));
    
    //READ DOMAIN LOGIC
 
    //sync write pointer
    always @ (posedge r_clk) begin 
-      wptr_sync[0] <= wptr;
-      wptr_sync[1] <= wptr_sync[0];
+      write_addr_sync[0] <= write_addr;
+      write_addr_sync[1] <= write_addr_sync[0];
    end
 
    //effective read enable
    assign r_en_int  = r_en & ~r_empty;
-   
+
+   //read address gray code counter
    gray_counter
      #(
        .W(R_ADDR_W)
        ) 
-   rptr_counter 
+   read_addr_counter 
      (
       .clk(r_clk),
       .rst(rst), 
       .en(r_en_int),
-      .data_out(rptr)
+      .data_out(read_addr)
       );
    
-   //compute binary pointer difference
-   gray2bin #(
+   //compute read side info
+   gray2bin 
+     #(
        .DATA_W(R_ADDR_W)
-   ) 
-   gray2bin_rptr_r 
+       ) 
+   gray2bin_read_addr
      (
-      .gr(rptr),
-      .bin(rptr_bin_r)
+      .gr(read_addr),
+      .bin(read_addr_bin)
       );
    
-   assign r_level = wptr_rside - rptr_bin_r;
+   assign r_level = write_addr_bin_r_n - read_addr_bin;
    assign r_empty = (r_level == 0);
    
 
    // FIFO memory
-   iob_t2p_asym_ram 
+   iob_ram_t2p_asym
      #(
        .W_DATA_W(W_DATA_W),
        .R_DATA_W(R_DATA_W),
@@ -170,10 +183,10 @@ module iob_async_fifo_asym
       .w_clk(w_clk),
       .w_en(w_en_int),
       .w_data(w_data),
-      .w_addr(wptr_bin_w),
+      .w_addr(write_addr_bin),
       
       .r_clk(r_clk),
-      .r_addr(rptr_bin_r),
+      .r_addr(read_addr_bin),
       .r_en(r_en_int),
       .r_data(r_data)
       );

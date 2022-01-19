@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 `include "iob_lib.vh"
 
-module iob_t2p_asym_ram 
+module iob_ram_t2p_asym 
   #(
     parameter W_DATA_W = 0,
     parameter R_DATA_W = 0,
@@ -45,12 +45,12 @@ module iob_t2p_asym_ram
    genvar                 i;
    generate 
       for (i=0; i<N; i=i+1) begin : t2p_ram_array
-         iob_t2p_ram
+         iob_ram_t2p
              #(
                .DATA_W(MINDATA_W),
                .ADDR_W(MINADDR_W)
                )
-         iob_t2p_ram_inst
+         iob_ram_t2p_inst
              (
               .w_clk(w_clk),
               .w_en(en_wr[i]),

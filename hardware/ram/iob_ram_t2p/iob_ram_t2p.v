@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-module iob_t2p_ram
+module iob_ram_t2p
   #( 
      parameter FILE="none",
      parameter DATA_W = 0,

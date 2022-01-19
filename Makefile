@@ -1,32 +1,28 @@
 defmacro:=-D
 incdir:=-I
-
-MEM_DIR=.
 include config.mk
 
-ifeq ($(VCD),1)
-DEFINE+=$(defmacro)VCD
-endif
+MEM_DIR=.
 
+# Default module
+MEM_NAME ?= sp_ram
 MODULE_DIR = $(shell find . -name $(MEM_NAME))
 
+# sources 
 include $(MODULE_DIR)/hardware.mk
 
 # testbench
-VSRC+=$(wildcard $(MODULE_DIR)/*_tb.v)
+VSRC+=$(wildcard $(MODULE_DIR)/$(MEM_NAME)_tb.v)
 
-
-# Icarus Verilog simulator flags
-
-VLOG=iverilog -W all -g2005-sv $(INCLUDE) $(DEFINE)
-
-ALL_MODULES=$(shell find . -name hardware.mk | sed 's/\/hardware.mk//g' | tail -n +3)
-
+# Rules
 .PHONY: sim sim-all clean corename $(ALL_MODULES)
 
 #
 # Simulate
 #
+
+# Icarus Verilog simulator flags
+VLOG=iverilog -W all -g2005-sv $(INCLUDE) $(DEFINE)
 
 sim: $(VSRC) $(VHDR)
 	@echo $(VSRC)
@@ -37,6 +33,7 @@ ifeq ($(VCD),1)
 	if [ ! `pgrep gtkwave` ]; then gtkwave uut.vcd; fi &
 endif
 
+ALL_MODULES=$(shell find . -name hardware.mk | sed 's/\/hardware.mk//g' | tail -n +3)
 
 sim-all: $(ALL_MODULES)
 	@echo "Listing all modules: $(ALL_MODULES)"
@@ -44,9 +41,14 @@ sim-all: $(ALL_MODULES)
 $(ALL_MODULES):
 	make sim MEM_NAME=$(shell basename $@)
 
-debug:
-	@echo $(VSRC)
+#
+# DEBUG
+#
 
+debug:
+	@echo $(MODULE_DIR)
+	@echo $(VSRC)
+	@echo $(MODULES)
 
 #
 # Clean
@@ -54,6 +56,11 @@ debug:
 
 clean:
 	@rm -f *~ \#*\# a.out *.vcd *.drom *.png *.pyc
+
+
+#
+# Module name
+#
 
 corename:
 	@echo "MEM"

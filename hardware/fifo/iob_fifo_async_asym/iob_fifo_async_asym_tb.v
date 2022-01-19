@@ -5,9 +5,9 @@
 `define W_DATA_W 32
 `define R_DATA_W 8
 `define ADDR_W 10
-`define TESTSIZE 256
+`define TESTSIZE (2*2**ADDR_W) //twice the fifo size
 
-module iob_async_fifo_asym_tb;
+module iob_fifo_async_asym_tb;
 
    localparam TESTSIZE = `TESTSIZE; //bytes
    localparam W_DATA_W = `W_DATA_W;
@@ -47,7 +47,10 @@ module iob_async_fifo_asym_tb;
    reg [W_DATA_W*2**W_ADDR_W-1:0] test_data;
    reg [W_DATA_W*2**W_ADDR_W-1:0] read;
 
-   initial begin //writer process
+   //
+   // WRITE PROCESS
+   //
+   initial begin
 
       if(W_DATA_W > R_DATA_W)
         $display("W_DATA_W > R_DATA_W");
@@ -76,7 +79,7 @@ module iob_async_fifo_asym_tb;
       #clk_per_w;
       @(posedge w_clk) #1;
       reset = 1;
-      @(posedge w_clk) #1;
+      repeat (4) @(posedge w_clk) #1;
       reset = 0;
       
 
@@ -100,28 +103,33 @@ module iob_async_fifo_asym_tb;
       #(5*clk_per_r) $finish;
 
    end // end of writer process
-   
-   initial begin //reader process
+
+   //
+   // READ PROCESS
+   //
+   initial begin
 
       //wait for reset to be de-asserted
       @(negedge reset) repeat(4) @(posedge r_clk) #1;
       
       //read data from fifo
       for(j = 0; j < ((TESTSIZE*8)/R_ADDR_W); j = j + 1) begin
-         if(!r_empty) begin
-            r_en = 1;
-            @(posedge r_clk) #1;
-            read[j*R_ADDR_W +: R_ADDR_W] = r_data;
-            r_en = 0;
-         end
+         while(r_empty) @(posedge r_clk) #1;
+         r_en = 1;
+         @(posedge r_clk) #1;
+         read[j*R_ADDR_W +: R_ADDR_W] = r_data;
+         r_en = 0;
       end
 
-      if(read != test_data)
+      if(read !== test_data) begin
         $display("ERROR: data read does not match the test data.");   
+        $display("data read: %x", read);   
+        $display("test data: %x", test_data);
+      end
    end
-      
+   
    // Instantiate the Unit Under Test (UUT)
-   iob_async_fifo_asym 
+   iob_fifo_async_asym 
      #(
        .W_DATA_W(W_DATA_W),
        .R_DATA_W(R_DATA_W),
@@ -144,4 +152,4 @@ module iob_async_fifo_asym_tb;
       .w_level(w_level)
       );
    
-endmodule // iob_asyn_fifo_asym_tb
+endmodule
