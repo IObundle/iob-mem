@@ -1,6 +1,6 @@
 `timescale 1 ns / 1 ps
 
-module iob_dp_reg_file
+module iob_reg_file_dp
   #(
     parameter ADDR_W = 2,
     parameter DATA_W = 32
