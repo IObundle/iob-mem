@@ -1,14 +1,17 @@
-MODULES+=fifo/afifo
+ifneq (iob_async_fifo,$(filter $S, $(MODULES)))
+
+# Add to modules list
+MODULES+=iob_async_fifo
 
 # Paths
-FIFO_DIR=$(MEM_HW_DIR)/fifo
-AFIFO_DIR=$(MEM_HW_DIR)/fifo/afifo
+AFIFO_DIR=$(MEM_FIFO_DIR)/iob_async_fifo
 
 # Submodules
-ifneq (ram/t2p_ram,$(filter ram/t2p_ram, $(MODULES)))
-include $(MEM_HW_DIR)/ram/t2p_ram/hardware.mk
-endif
+include $(MEM_RAM_DIR)/iob_ram_t2p/hardware.mk
+include $(MEM_FIFO_DIR)/gray2bin/hardware.mk
+include $(MEM_FIFO_DIR)/gray_counter/hardware.mk
 
 # Sources
 VSRC+=$(AFIFO_DIR)/iob_async_fifo.v
-VSRC+=$(FIFO_DIR)/gray2bin.v $(FIFO_DIR)/gray_counter.v
+
+endif
