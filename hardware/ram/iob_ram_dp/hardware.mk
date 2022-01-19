@@ -1,6 +1,7 @@
 ifneq ($(ASIC),1)
 ifneq (iob_ram_dp,$(filter $S, $(MODULES)))
 
+# Add to modules list
 MODULES+=iob_ram_dp
 
 # Paths
