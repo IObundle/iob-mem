@@ -5,7 +5,7 @@ include config.mk
 MEM_DIR=.
 
 # Default module
-MEM_NAME ?= sp_ram
+MEM_NAME ?= iob_ram_sp
 MODULE_DIR = $(shell find . -name $(MEM_NAME))
 
 # sources 
