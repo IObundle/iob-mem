@@ -1,5 +1,5 @@
 ifneq ($(ASIC),1)
-ifneq (iob_reg_file_dp,$(filter $S, $(MODULES)))
+ifneq (iob_reg_file_dp,$(filter iob_reg_file_dp,, $(MODULES)))
 
 # Add to modules list
 MODULES+=iob_reg_file_dp

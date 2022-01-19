@@ -1,4 +1,4 @@
-ifneq (bin_counter,$(filter $S, $(MODULES)))
+ifneq (bin_counter,$(filter bin_counter,, $(MODULES)))
 
 # Add to modules list
 MODULES+=bin_counter
