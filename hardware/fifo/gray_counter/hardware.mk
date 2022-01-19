@@ -1,4 +1,4 @@
-ifneq (gray_counter,$(filter $S, $(MODULES)))
+ifneq (gray_counter,$(filter gray_counter,, $(MODULES)))
 
 # Add to modules list
 MODULES+=gray_counter

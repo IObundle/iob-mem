@@ -1,4 +1,4 @@
-ifneq (gray2bin,$(filter $S, $(MODULES)))
+ifneq (gray2bin,$(filter gray2bin,, $(MODULES)))
 
 # Add to modules list
 MODULES+=gray2bin
