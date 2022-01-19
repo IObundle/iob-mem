@@ -5,7 +5,7 @@
 `define DATA_WIDTH (`NUM_COL * `COL_WIDTH)
 `define ADDR_WIDTH 4
 
-module iob_reg_file_dp_tb;
+module iob_regfile_dp_tb;
    
    //Inputs
    reg clk;
@@ -98,7 +98,7 @@ module iob_reg_file_dp_tb;
    end
 
    // Instantiate the Unit Under Test (UUT)
-   iob_reg_file_dp
+   iob_regfile_dp
      #(
        .NUM_COL(`NUM_COL), 
        .COL_WIDTH(`COL_WIDTH),

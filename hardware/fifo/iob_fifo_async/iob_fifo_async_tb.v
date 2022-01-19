@@ -3,7 +3,7 @@
 `define DATA_W 8
 `define ADDR_W 4
 
-module iob_async_fifo_tb;
+module iob_fifo_async_tb;
    
    //Inputs
    reg reset;
@@ -99,7 +99,7 @@ module iob_async_fifo_tb;
    end
 
       // Instantiate the Unit Under Test (UUT)
-   iob_async_fifo #(
+   iob_fifo_async #(
        .DATA_WIDTH(`DATA_W),
        .ADDRESS_WIDTH(`ADDR_W)
    ) uut (

@@ -1,5 +1,5 @@
 ifneq ($(ASIC),1)
-ifneq (iob_rom_sp,$(filter $S, $(MODULES)))
+ifneq (iob_rom_sp,$(filter iob_rom_sp, $(MODULES)))
 
 # Add to modules list
 MODULES+=iob_rom_sp

@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-module iob_async_fifo
+module iob_fifo_async
   #(parameter 
     DATA_WIDTH = 8, 
     ADDRESS_WIDTH = 4
@@ -134,12 +134,12 @@ module iob_async_fifo
 
    assign r_empty = (r_level == 0);
 
-   iob_t2p_ram 
+   iob_ram_t2p 
      #(
        .DATA_W(DATA_WIDTH),
        .ADDR_W(ADDRESS_WIDTH)
        ) 
-   fifo_t2p_ram 
+   fifo_ram_t2p0 
      (
       .w_clk(w_clk),
       .w_en(w_en_int),
