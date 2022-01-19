@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-module iob_sync_fifo
+module iob_fifo_sync
   #(parameter
     DATA_W = 0,
     ADDR_W = 0, 
@@ -87,7 +87,7 @@ module iob_sync_fifo
    
    
    //FIFO memory
-   iob_2p_ram
+   iob_ram_2p
      #(
        .DATA_W(DATA_W), 
        .ADDR_W(ADDR_W)

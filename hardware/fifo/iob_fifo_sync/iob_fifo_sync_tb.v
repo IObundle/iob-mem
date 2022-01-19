@@ -6,7 +6,7 @@
 `define ADDR_W 10
 `define TESTSIZE 256 //test size in bytes
 
-module iob_sync_fifo_tb;
+module iob_fifo_sync_tb;
    
     localparam DATA_W = `DATA_W;
     localparam ADDR_W = `ADDR_W;
@@ -110,7 +110,7 @@ module iob_sync_fifo_tb;
     end // end of read process
 
    // Instantiate the Unit Under Test (UUT)
-   iob_sync_fifo 
+   iob_fifo_sync 
      #(
        .DATA_W(DATA_W), 
        .ADDR_W(ADDR_W)
