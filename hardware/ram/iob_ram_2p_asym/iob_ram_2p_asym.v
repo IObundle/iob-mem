@@ -1,21 +1,20 @@
 `timescale 1ns / 1ps
-`include "iob_lib.vh"
+`define max(a,b) {(a) > (b) ? (a) : (b)}
+`define min(a,b) {(a) < (b) ? (a) : (b)}
 
-module iob_ram_t2p_asym
+module iob_ram_2p_asym
   #(
     parameter W_DATA_W = 0,
     parameter R_DATA_W = 0,
     parameter MAXADDR_W = 0
     )
    (
+    input                     clk,
     //write port
-    input                     w_clk,
     input                     w_en,
     input [W_DATA_W-1:0]      w_data,
     input [W_ADDR_W-1:0]      w_addr,
-
     //read port
-    input                     r_clk,
     input                     r_en,
     input [R_ADDR_W-1:0]      r_addr,
     output reg [R_DATA_W-1:0] r_data
@@ -30,7 +29,7 @@ module iob_ram_t2p_asym
    //determine W_ADDR_W and R_ADDR_W
    localparam W_ADDR_W = W_DATA_W == MAXDATA_W? MINADDR_W: MAXADDR_W;
    localparam R_ADDR_W = R_DATA_W == MAXDATA_W? MINADDR_W: MAXADDR_W;
-   
+
    //symmetric memory block buses
    //write buses
    reg [N-1:0]                en_wr;
@@ -44,20 +43,18 @@ module iob_ram_t2p_asym
    //instantiate N symmetric RAM blocks and connect them to the buses
    genvar                 i;
    generate 
-      for (i=0; i<N; i=i+1) begin : t2p_ram_array
-         iob_ram_t2p
+      for (i=0; i<N; i=i+1) begin
+         iob_2p_ram
              #(
                .DATA_W(MINDATA_W),
                .ADDR_W(MINADDR_W)
                )
-         iob_ram_t2p_inst
+         iob_2p_ram_inst
              (
-              .w_clk(w_clk),
+              .clk(clk),
               .w_en(en_wr[i]),
               .w_addr(addr_wr[i]),
               .w_data(data_wr[i]),
-
-              .r_clk(w_clk),
               .r_en(r_en),
               .r_addr(addr_rd[i]),
               .r_data(data_rd[i])              
@@ -67,11 +64,11 @@ module iob_ram_t2p_asym
    endgenerate
 
    integer j,k,l;
-
    generate
 
       if (W_DATA_W > R_DATA_W) begin
-          //write parallel
+         
+         //write parallel
          always @* begin
             for (j=0; j < N; j= j+1) begin
                en_wr[j] = w_en;
@@ -89,7 +86,7 @@ module iob_ram_t2p_asym
 
          //read address register
          reg [R_ADDR_W-W_ADDR_W-1:0] r_addr_lsbs_reg;
-         always @(posedge r_clk)
+         always @(posedge clk)
            r_addr_lsbs_reg <= r_addr[R_ADDR_W-W_ADDR_W-1:0];
            
          //read mux
@@ -99,8 +96,8 @@ module iob_ram_t2p_asym
                r_data = data_rd[r_addr_lsbs_reg];
             end
          end
- 
-      end else if (W_DATA_W < R_DATA_W) begin
+         
+      end else  if (W_DATA_W < R_DATA_W) begin
          //write serial
          always @* begin
             for (j=0; j < N; j= j+1) begin
@@ -130,8 +127,6 @@ module iob_ram_t2p_asym
             addr_rd[0] = r_addr;
             r_data = data_rd[0];
          end
-
-      end 
+      end
    endgenerate
 endmodule
-
