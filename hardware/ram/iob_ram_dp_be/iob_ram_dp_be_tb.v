@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module iob_dp_ram_be_tb;
+module iob_ram_dp_be_tb;
 
    // Inputs
    reg clk;
@@ -144,16 +144,15 @@ module iob_dp_ram_be_tb;
    end
 
    // Instantiate the Unit Under Test (UUT)
-   iob_dp_ram_be
+   iob_ram_dp_be
      #(
        .DATA_W(`DATA_W),
        .ADDR_W(`ADDR_W)
 	   )
    uut
      (
-	  .clk(clk),
-
-	  .enA(enaA),
+      .clk(clk),
+      .enA(enaA),
       .weA(weA),
       .addrA(addrA),
       .dinA(data_inA),
@@ -164,7 +163,7 @@ module iob_dp_ram_be_tb;
       .addrB(addrB),
       .dinB(data_inB),
       .doutB(data_outB)
-	  );
+      );
    
    // system clock
    always #(clk_per/2) clk = ~clk;

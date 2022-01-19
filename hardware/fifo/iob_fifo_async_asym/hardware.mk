@@ -1,4 +1,4 @@
-ifneq (iob_fifo_async_asym,$(filter $S, $(MODULES)))
+ifneq (iob_fifo_async_asym,$(filter iob_fifo_async_asym,, $(MODULES)))
 
 # Add to modules list
 MODULES+=iob_fifo_async_asym
