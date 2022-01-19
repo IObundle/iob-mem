@@ -1,19 +1,16 @@
-MEM_NAME ?= sfifo_asym
-include $(MEM_DIR)/config.mk
+ifneq (iob_sync_fifo_asym,$(filter $S, $(MODULES)))
+
+# Add to modules list
+MODULES+=iob_sync_fifo_asym
 
 # Paths
-SFIFO_ASYM_DIR=$(MEM_HW_DIR)/fifo/sfifo_asym
+SFIFO_ASYM_DIR=$(MEM_FIFO_DIR)/iob_sync_fifo_asym
 
 # Submodules
-ifneq (2p_asym_ram,$(filter 2p_asym_ram, $(MODULES)))
-include $(MEM_HW_DIR)/ram/2p_asym_ram/hardware.mk
-endif
-
-ifneq (bin_counter,$(filter bin_counter, $(MODULES)))
-BIN_COUNTER_DIR=$(MEM_HW_DIR)/fifo
-VSRC+=$(BIN_COUNTER_DIR)/bin_counter.v
-MODULES+=bin_counter
-endif
+include $(MEM_RAM_DIR)/iob_ram_2p_asym/hardware.mk
+include $(MEM_FIFO_DIR)/bin_counter/hardware.mk
 
 # Sources
 VSRC+=$(SFIFO_ASYM_DIR)/iob_sync_fifo_asym.v
+
+endif
