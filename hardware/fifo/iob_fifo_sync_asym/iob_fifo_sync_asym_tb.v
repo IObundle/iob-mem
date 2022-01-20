@@ -8,7 +8,7 @@
 `define TESTSIZE 256
 
 
-module iob_sync_fifo_asym_tb;
+module iob_fifo_sync_asym_tb;
 
    localparam TESTSIZE = `TESTSIZE; //bytes
    localparam W_DATA_W = `W_DATA_W;
@@ -118,7 +118,7 @@ module iob_sync_fifo_asym_tb;
    end
       
    // Instantiate the Unit Under Test (UUT)
-   iob_sync_fifo_asym 
+   iob_fifo_sync_asym 
      #(
        .W_DATA_W(W_DATA_W),
        .R_DATA_W(R_DATA_W),

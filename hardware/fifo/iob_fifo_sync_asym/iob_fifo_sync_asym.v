@@ -1,7 +1,7 @@
 `timescale 1ns/1ps
 `include "iob_lib.vh"
 
-module iob_sync_fifo_asym
+module iob_fifo_sync_asym
   #(
     parameter 
     W_DATA_W = 0,
@@ -94,13 +94,13 @@ module iob_sync_fifo_asym
    assign r_level = wptr_rside - rptr;
   
    //FIFO memory
-   iob_2p_asym_ram
+   iob_ram_2p_asym
      #(
        .W_DATA_W(W_DATA_W),
        .R_DATA_W(R_DATA_W),
        .MAXADDR_W(ADDR_W)
        ) 
-   fifo_ram 
+    iob_ram_2p_asym0
      (
       .clk(clk),
       
