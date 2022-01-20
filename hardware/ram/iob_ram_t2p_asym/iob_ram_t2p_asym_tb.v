@@ -100,7 +100,7 @@ module iob_ram_t2p_asym_tb;
      #(
        .W_DATA_W(W_DATA_W),
        .R_DATA_W(R_DATA_W),
-       .MAXADDR_W(MAXADDR_W)
+       .ADDR_W(MAXADDR_W)
        )
    uut 
      (
