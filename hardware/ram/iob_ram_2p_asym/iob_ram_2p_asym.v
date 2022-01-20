@@ -44,12 +44,12 @@ module iob_ram_2p_asym
    genvar                 i;
    generate 
       for (i=0; i<N; i=i+1) begin
-         iob_2p_ram
+         iob_ram_2p
              #(
                .DATA_W(MINDATA_W),
                .ADDR_W(MINADDR_W)
                )
-         iob_2p_ram_inst
+         iob_ram_2p_inst
              (
               .clk(clk),
               .w_en(en_wr[i]),

@@ -1,23 +1,25 @@
 `timescale 1ns / 1ps
 
-`define NUM_COL 2
-`define COL_WIDTH 4
-`define DATA_WIDTH (`NUM_COL * `COL_WIDTH)
-`define ADDR_WIDTH 4
+`define DATA_W 32
+`define ADDR_W 4
 
 module iob_regfile_dp_tb;
-   
-   //Inputs
+
+   // Inputs
    reg clk;
    reg rst;
-   reg [`DATA_WIDTH-1:0] wdata;
-   reg [`ADDR_WIDTH-1:0] addr;
-   reg [`NUM_COL-1:0]    en;
-   
-   //Ouptuts
-   reg [`DATA_WIDTH-1 :0] rdata;
+   reg [`DATA_W-1:0] wdataA;
+   reg [`DATA_W-1:0] wdataB;
+   reg [`ADDR_W-1:0] addrA;
+   reg [`ADDR_W-1:0] addrB;
+   reg               enA;
+   reg               enB;
 
-   integer                i;
+   // Ouptuts
+   reg [`DATA_W-1 :0] rdataA;
+   reg [`DATA_W-1 :0] rdataB;
+
+   integer            i, seq_ini;
 
    parameter clk_per = 10; // clk period = 10 timeticks
 
@@ -27,100 +29,154 @@ module iob_regfile_dp_tb;
       $dumpfile("uut.vcd");
       $dumpvars();
 `endif
-      
-      //Initialize Inputs
+
+      // Initialize Inputs
       clk = 1;
       rst = 0;
-      wdata = 0;
-      addr = 0;
-      en = 0;
+
+      wdataA = 0;
+      addrA = 0;
+      enA = 0;
+
+      wdataB = 0;
+      addrB = 0;
+      enB = 0;
+
+      // Number from which to start the incremental sequence to write into the Register File
+      seq_ini = 32;
 
       #clk_per;
       @(posedge clk) #1; 
       rst = 1;
       @(posedge clk) #1;
       rst = 0;
-      
-      @(posedge clk) #1;
-      en = 1;
 
-      //Write and real all the locations
-      for(i=0; i < 16; i = i + 1) begin
-         addr = i;
-         wdata = i;
+      @(posedge clk) #1;
+      enA = 1;
+
+      // Write and real all the locations
+      for(i=0; i < 2**`ADDR_W; i = i + 1) begin
+         addrA = i;
+         wdataA = i+seq_ini;
          @(posedge clk) #1;
-         if(rdata != i) begin
-            $display("Test 1 failed: read error in rdata.\n \t i=%0d; data=%0d", i, rdata);
+         if(rdataA != i+seq_ini) begin
+            $display("Test 1 failed: read error in rdata.\n \t data=%0d; rdata=%0d", i+seq_ini, rdataA);
             $finish;
          end
          @(posedge clk) #1;
       end
 
       @(posedge clk) #1;
-      en = 0;
-      addr = 0;
+      enA = 0;
+      addrA = 0;
 
-      //Read all the locations and check if still stored
-      for(i=0; i < 16; i = i + 1) begin
-         addr = i;
+      // Read all the locations and check if still stored
+      for(i=0; i < 2**`ADDR_W; i = i + 1) begin
+         addrA = i;
          @(posedge clk) #1;
-         if(rdata != i) begin
-            $display("Test 2 failed: read error in rdata.\n \t i=%0d; data=%0d", i, rdata);
+         if(rdataA != i+seq_ini) begin
+            $display("Test 2 failed: read error in rdata.\n \t data=%0d; rdata=%0d", i+seq_ini, rdataA);
             $finish;
          end
          @(posedge clk) #1;
       end
 
-      //Resets the entire memory
-      @(posedge clk) #1; 
+      // Resets the entire memory
+      @(posedge clk) #1;
       rst = 1;
       @(posedge clk) #1;
       rst = 0;
 
-
-      //Read all the locations and check if reset worked
-      for(i=0; i < 16; i = i + 1) begin
-         addr = i;
+      // Read all the locations and check if reset worked
+      for(i=0; i < 2**`ADDR_W; i = i + 1) begin
+         addrA = i;
          @(posedge clk) #1;
-         if(rdata != 0) begin
+         if(rdataA != 0) begin
             $display("Test 3 failed: rdata is not null");
             $finish;
          end
          @(posedge clk) #1;
       end
 
-      #clk_per
-        $display("%c[1;34m",27);
+      // Number from which to start the incremental sequence to write into the Register File
+      seq_ini = 64;
+
+      @(posedge clk) #1;
+      enB = 1;
+
+      // Write and real all the locations
+      for(i=0; i < 2**`ADDR_W; i = i + 1) begin
+         addrB = i;
+         wdataB = i+seq_ini;
+         @(posedge clk) #1;
+         if(rdataB != i+seq_ini) begin
+            $display("Test 1 failed: read error in rdata.\n \t data=%0d; rdata=%0d", i+seq_ini, rdataB);
+            $finish;
+         end
+         @(posedge clk) #1;
+      end
+
+      @(posedge clk) #1;
+      enB = 0;
+      addrB = 0;
+
+      // Read all the locations and check if still stored
+      for(i=0; i < 2**`ADDR_W; i = i + 1) begin
+         addrB = i;
+         @(posedge clk) #1;
+         if(rdataB != i+seq_ini) begin
+            $display("Test 2 failed: read error in rdata.\n \t data=%0d; rdata=%0d", i+seq_ini, rdataB);
+            $finish;
+         end
+         @(posedge clk) #1;
+      end
+
+      // Resets the entire memory
+      @(posedge clk) #1;
+      rst = 1;
+      @(posedge clk) #1;
+      rst = 0;
+
+      // Read all the locations and check if reset worked
+      for(i=0; i < 2**`ADDR_W; i = i + 1) begin
+         addrB = i;
+         @(posedge clk) #1;
+         if(rdataB != 0) begin
+            $display("Test 3 failed: rdata is not null");
+            $finish;
+         end
+         @(posedge clk) #1;
+      end
+
+      #clk_per;
+      $display("%c[1;34m",27);
       $display("Test completed successfully.");
       $display("%c[0m",27);
       #(5*clk_per) $finish;
-
    end
 
    // Instantiate the Unit Under Test (UUT)
    iob_regfile_dp
      #(
-       .NUM_COL(`NUM_COL), 
-       .COL_WIDTH(`COL_WIDTH),
-       .ADDR_WIDTH(`ADDR_WIDTH),
-       .DATA_WIDTH(`DATA_WIDTH)
+       .ADDR_W(`ADDR_W),
+       .DATA_W(`DATA_W)
        )
    uut (
         .clk(clk),
         .rst(rst),
 
-        .wdataA(wdata),
-        .addrA(addr),
-        .weA(en),
-        .rdataA(rdata),
+        .wdataA(wdataA),
+        .addrA(addrA),
+        .weA(enA),
+        .rdataA(rdataA),
 
-        .wdataB(wdata),
-        .addrB(addr),
-        .weB(en),
-        .rdataB(rdata)
+        .wdataB(wdataB),
+        .addrB(addrB),
+        .weB(enB),
+        .rdataB(rdataB)
         );
-   
-   // system clock
-   always #(clk_per/2) clk = ~clk; 
 
-endmodule // iob_dp_reg_file_tb
+   // system clock
+   always #(clk_per/2) clk = ~clk;
+
+endmodule
