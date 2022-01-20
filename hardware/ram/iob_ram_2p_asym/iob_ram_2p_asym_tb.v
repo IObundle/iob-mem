@@ -16,7 +16,7 @@ module iob_ram_2p_asym_tb;
    localparam MINADDR_W = MAXADDR_W - $clog2(MAXDATA_W/MINDATA_W);
    localparam W_ADDR_W = W_DATA_W == MINDATA_W? MAXADDR_W: MINADDR_W;
    localparam R_ADDR_W = R_DATA_W == MINDATA_W? MAXADDR_W: MINADDR_W;
- 
+
    reg clk = 0;
 
    //write port 
@@ -24,7 +24,7 @@ module iob_ram_2p_asym_tb;
    reg [W_DATA_W-1:0] w_data;
    reg [W_ADDR_W-1:0] w_addr;
    //read port
-   reg                 r_en = 0;
+   reg                r_en = 0;
    wire [R_DATA_W-1:0] r_data;
    reg [R_ADDR_W-1:0]  r_addr;
 
@@ -35,10 +35,10 @@ module iob_ram_2p_asym_tb;
    always #(clk_per/2) clk = ~clk; 
 
    localparam seq_ini = 10;
-   integer              i;
+   integer             i;
 
    reg [W_DATA_W*2**W_ADDR_W-1:0] test_data;
-   reg [R_DATA_W-1:0]              r_data_expected;
+   reg [R_DATA_W-1:0]             r_data_expected;
    
    initial begin
 
@@ -46,7 +46,7 @@ module iob_ram_2p_asym_tb;
       $display("W_ADDR_W=%d", W_ADDR_W);      
       $display("R_DATA_W=%d", R_DATA_W);
       $display("R_ADDR_W=%d", R_ADDR_W);
-   
+
       if(W_DATA_W > R_DATA_W)
         $display("W_DATA_W > R_DATA_W");
       else if (W_DATA_W < R_DATA_W)

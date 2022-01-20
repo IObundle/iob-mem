@@ -1,5 +1,7 @@
 `timescale 1ns / 1ps
 
+`define DATA_W 8
+`define ADDR_W 4
 `define FILE "data.hex"
 
 module iob_rom_dp_tb;

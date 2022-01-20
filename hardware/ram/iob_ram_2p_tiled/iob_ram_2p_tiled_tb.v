@@ -62,8 +62,8 @@ module iob_ram_2p_tiled_tb;
       w_en = 1;
 
       //Write all the locations of RAM 
-      for(i = 0; i < 16; i = i + 1) begin
-         w_data = i + 32;
+      for(i = 0; i < 2**`ADDR_W; i = i + 1) begin
+         w_data = i+seq_ini;
          addr = i;
          @(posedge clk) #1;
       end
@@ -75,10 +75,10 @@ module iob_ram_2p_tiled_tb;
       r_en = 0;
       @(posedge clk) #1;
 
-      for(i = 0; i < 16; i = i + 1) begin
+      for(i = 0; i < 2**`ADDR_W; i = i + 1) begin
          addr = i;
          @(posedge clk) #1;
-         if(r_data!=0) begin
+         if(r_data != 0) begin
             $display("Test 1 failed: with r_en = 0, at position %0d, r_data should be 0 but is %d", i, r_data);
             $finish;
          end
@@ -88,11 +88,11 @@ module iob_ram_2p_tiled_tb;
       @(posedge clk) #1;
       
       //Read all the locations of RAM with r_en = 1
-      for(i = 0; i < 16; i = i + 1) begin
+      for(i = 0; i < 2**`ADDR_W; i = i + 1) begin
          addr = i;
          @(posedge clk) #1;
-         if(r_data!=i+32) begin
-            $display("Test 2 failed: on position %0d, r_data is %d where it should be %0d", i, r_data, i+32);
+         if(r_data != i+seq_ini) begin
+            $display("Test 2 failed: on position %0d, r_data is %d where it should be %0d", i, r_data, i+seq_ini);
             $finish;
          end
       end
