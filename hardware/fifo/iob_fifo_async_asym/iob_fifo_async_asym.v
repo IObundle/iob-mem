@@ -176,7 +176,7 @@ module iob_fifo_async_asym
      #(
        .W_DATA_W(W_DATA_W),
        .R_DATA_W(R_DATA_W),
-       .MAXADDR_W(ADDR_W)
+       .ADDR_W(ADDR_W)
        ) 
    t2p_asym_ram 
      (
