@@ -4,9 +4,16 @@
 
 module iob_ram_2p_asym
   #(
-    parameter W_DATA_W = 0,
-    parameter R_DATA_W = 0,
-    parameter MAXADDR_W = 0
+    parameter
+    W_DATA_W = 0,
+    R_DATA_W = 0,
+    ADDR_W = 0,//higher ADDR_W (lower DATA_W)
+    //determine W_ADDR_W and R_ADDR_W
+    MAXDATA_W = `max(W_DATA_W, R_DATA_W),
+    MINDATA_W = `min(W_DATA_W, R_DATA_W),
+    MINADDR_W = ADDR_W-$clog2(MAXDATA_W/MINDATA_W),//lower ADDR_W (higher DATA_W)
+    W_ADDR_W = (W_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W,
+    R_ADDR_W = (R_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W
     )
    (
     input                     clk,
@@ -21,14 +28,9 @@ module iob_ram_2p_asym
     );
 
    //determine the number of blocks N
-   localparam MAXDATA_W = `max(W_DATA_W, R_DATA_W);
-   localparam MINDATA_W = `min(W_DATA_W, R_DATA_W);
    localparam N = MAXDATA_W/MINDATA_W;
-   localparam MINADDR_W = MAXADDR_W - $clog2(N);
 
-   //determine W_ADDR_W and R_ADDR_W
-   localparam W_ADDR_W = W_DATA_W == MAXDATA_W? MINADDR_W: MAXADDR_W;
-   localparam R_ADDR_W = R_DATA_W == MAXDATA_W? MINADDR_W: MAXADDR_W;
+
 
    //symmetric memory block buses
    //write buses
@@ -42,7 +44,7 @@ module iob_ram_2p_asym
 
    //instantiate N symmetric RAM blocks and connect them to the buses
    genvar                 i;
-   generate 
+   generate
       for (i=0; i<N; i=i+1) begin
          iob_ram_2p
              #(
@@ -57,9 +59,9 @@ module iob_ram_2p_asym
               .w_data(data_wr[i]),
               .r_en(r_en),
               .r_addr(addr_rd[i]),
-              .r_data(data_rd[i])              
+              .r_data(data_rd[i])
               );
-         
+
       end
    endgenerate
 
@@ -67,7 +69,7 @@ module iob_ram_2p_asym
    generate
 
       if (W_DATA_W > R_DATA_W) begin
-         
+
          //write parallel
          always @* begin
             for (j=0; j < N; j= j+1) begin
@@ -76,7 +78,7 @@ module iob_ram_2p_asym
                addr_wr[j] = w_addr;
             end
          end
-         
+
          //read serial
          always @* begin
             for (k=0; k < N; k= k+1) begin
@@ -88,7 +90,7 @@ module iob_ram_2p_asym
          reg [R_ADDR_W-W_ADDR_W-1:0] r_addr_lsbs_reg;
          always @(posedge clk)
            r_addr_lsbs_reg <= r_addr[R_ADDR_W-W_ADDR_W-1:0];
-           
+
          //read mux
          always @* begin
             r_data = 1'b0;
@@ -96,14 +98,14 @@ module iob_ram_2p_asym
                r_data = data_rd[r_addr_lsbs_reg];
             end
          end
-         
+
       end else  if (W_DATA_W < R_DATA_W) begin
          //write serial
          always @* begin
             for (j=0; j < N; j= j+1) begin
                en_wr[j] = w_en & (w_addr[W_ADDR_W-R_ADDR_W-1:0] == j[W_ADDR_W-R_ADDR_W-1:0]);
                data_wr[j] = w_data;
-               addr_wr[j] = w_addr[R_ADDR_W-1:0];
+               addr_wr[j] = w_addr[$clog2(N)+:R_ADDR_W];
             end
          end
          //read parallel
