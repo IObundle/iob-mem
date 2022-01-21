@@ -35,7 +35,7 @@ sim: $(VSRC) $(VHDR) data.hex
 	@echo "\n\nTesting module $(MEM_NAME)\n\n"
 	@./a.out
 ifeq ($(VCD),1)
-	if [ ! `pgrep gtkwave` ]; then gtkwave uut.vcd; fi &
+	@if [ ! `pgrep gtkwave` ]; then gtkwave uut.vcd; fi &
 endif
 
 $(HEX_FILES):
