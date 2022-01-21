@@ -2,10 +2,10 @@
 `include "iob_lib.vh"
 
 //test defines
-`define W_DATA_W 32
-`define R_DATA_W 8
-`define ADDR_W 10
-`define TESTSIZE 256
+`define R_DATA_W 32
+`define W_DATA_W 8
+`define ADDR_W 4
+`define TESTSIZE 256 //bytes
 
 
 module iob_fifo_sync_asym_tb;
@@ -27,13 +27,13 @@ module iob_fifo_sync_asym_tb;
    reg                 w_en = 0;
    reg [W_DATA_W-1:0]  w_data;
    wire                w_full;
-   wire [W_ADDR_W-1:0] w_level;
+   wire [ADDR_W-1:0]   w_level;
    
    //read port 
    reg                 r_en = 0;
    wire [R_DATA_W-1:0] r_data;
    wire                r_empty;
-   wire [R_ADDR_W-1:0] r_level;
+   wire [ADDR_W-1:0]   r_level;
 
    parameter clk_per = 10; // clk period = 10 timeticks
    always
@@ -44,7 +44,10 @@ module iob_fifo_sync_asym_tb;
    reg [W_DATA_W*2**W_ADDR_W-1:0] test_data;
    reg [W_DATA_W*2**W_ADDR_W-1:0] read;
 
-   initial begin //writer process
+   //
+   //WRITE PROCESS
+   //
+   initial begin
 
       if(W_DATA_W > R_DATA_W)
         $display("W_DATA_W > R_DATA_W");
@@ -82,39 +85,41 @@ module iob_fifo_sync_asym_tb;
       
       
       //write test data to fifo
-      for(i = 0; i < ((TESTSIZE*8)/W_ADDR_W); i = i + 1) begin
-         if( i == ((TESTSIZE*8)/W_ADDR_W/2) ) //another pause
+      for(i = 0; i < ((TESTSIZE*8)/W_DATA_W); i = i + 1) begin
+         if( i == ((TESTSIZE*8)/W_DATA_W/2) ) //another pause
            #1000000 @(posedge clk) #1;
 
-         if(!w_full) begin
-            w_en = 1;
-            w_data = test_data[i*W_ADDR_W +: W_ADDR_W];
-            @(posedge clk) #1;
-            w_en = 0;
-         end
+         while(w_full)  @(posedge clk) #1;
+         w_en = 1;
+         w_data = test_data[i*W_DATA_W +: W_DATA_W];
+         @(posedge clk) #1;
+         w_en = 0;
       end
 
-      #(5*clk_per) $finish;
-
    end // end of writer process
-   
-   initial begin //reader process
+
+   //
+   // READ PROCESS
+   //
+   initial begin
 
       //wait for reset to be de-asserted
       @(negedge reset) repeat(4) @(posedge clk) #1;
 
       //read data from fifo
-      for(j = 0; j < ((TESTSIZE*8)/R_ADDR_W); j = j + 1) begin
-         if(!r_empty) begin
-            r_en = 1;
-            @(posedge clk) #1;
-            read[j*R_ADDR_W +: R_ADDR_W] = r_data;
-            r_en = 0;
-         end
+      for(j = 0; j < ((TESTSIZE*8)/R_DATA_W); j = j + 1) begin
+         while(r_empty) @(posedge clk) #1;
+         r_en = 1;
+         @(posedge clk) #1;
+         read[j*R_DATA_W +: R_DATA_W] = r_data;
+         r_en = 0;
       end
 
-      if(read != test_data)
+      if(!(read === test_data))
         $display("ERROR: data read does not match the test data.");   
+
+      #(5*clk_per) $finish;
+
    end
       
    // Instantiate the Unit Under Test (UUT)
