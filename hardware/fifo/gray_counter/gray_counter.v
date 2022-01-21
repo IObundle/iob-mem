@@ -22,7 +22,7 @@ module gray_counter
         gray_counter <= 0; 
      end else if (en) begin
         bin_counter   <= bin_counter + 1'b1;
-        gray_counter <= W > 1? {bin_counter, bin_counter[W-2:0] ^ bin_counter[W-1:1]} : bin_counter;
+        gray_counter <= W > 1? {bin_counter[W-1], bin_counter[W-2:0] ^ bin_counter[W-1:1]} : bin_counter;
      end
    
 endmodule
