@@ -2,17 +2,10 @@
 `include "iob_lib.vh"
 
 //test defines
-<<<<<<< HEAD:hardware/fifo/iob_fifo_sync_asym/iob_fifo_sync_asym_tb.v
-`define W_DATA_W 8
-`define R_DATA_W 32
-`define ADDR_W 10
-`define TESTSIZE 256
-=======
 `define R_DATA_W 32
 `define W_DATA_W 8
 `define ADDR_W 4
 `define TESTSIZE 256 //bytes
->>>>>>> bd4957c41a98b22d8674d6835f5921ffdb292c35:hardware/fifo/iob_fifo_sync_asym/iob_sync_fifo_asym_tb.v
 
 
 module iob_fifo_sync_asym_tb;
@@ -22,27 +15,21 @@ module iob_fifo_sync_asym_tb;
    localparam R_DATA_W = `R_DATA_W;
    localparam MAXDATA_W = `max(W_DATA_W, R_DATA_W);
    localparam MINDATA_W = `min( W_DATA_W, R_DATA_W );
-   localparam ADDR_W = `ADDR_W;
+   localparam ADDR_W = `ADDR_W;   
    localparam MINADDR_W = ADDR_W-$clog2(MAXDATA_W/MINDATA_W);//lower ADDR_W (higher DATA_W)
    localparam W_ADDR_W = W_DATA_W == MAXDATA_W? MINADDR_W : ADDR_W;
    localparam R_ADDR_W = R_DATA_W == MAXDATA_W? MINADDR_W : ADDR_W;
-
+   
    reg reset = 0;
    reg                 clk = 0;
-
-   //write port
+ 
+   //write port 
    reg                 w_en = 0;
    reg [W_DATA_W-1:0]  w_data;
    wire                w_full;
-<<<<<<< HEAD:hardware/fifo/iob_fifo_sync_asym/iob_fifo_sync_asym_tb.v
-   wire [W_ADDR_W-1:0] w_level;
-
-   //read port
-=======
    wire [ADDR_W-1:0]   w_level;
    
    //read port 
->>>>>>> bd4957c41a98b22d8674d6835f5921ffdb292c35:hardware/fifo/iob_fifo_sync_asym/iob_sync_fifo_asym_tb.v
    reg                 r_en = 0;
    wire [R_DATA_W-1:0] r_data;
    wire                r_empty;
@@ -50,7 +37,7 @@ module iob_fifo_sync_asym_tb;
 
    parameter clk_per = 10; // clk period = 10 timeticks
    always
-     #(clk_per/2) clk = ~clk;
+     #(clk_per/2) clk = ~clk; 
 
    integer             i,j; //iterators
 
@@ -75,7 +62,7 @@ module iob_fifo_sync_asym_tb;
 
       //create the test data bytes
       for (i=0; i < TESTSIZE; i=i+1)
-        test_data[i*8 +: 8] = i;
+        test_data[i*8 +: 8] = i;    
 
       // optional VCD
 `ifdef VCD
@@ -91,12 +78,12 @@ module iob_fifo_sync_asym_tb;
       reset = 1;
       @(posedge clk) #1;
       reset = 0;
-
+      
 
       //pause for 1ms to allow the reader to test the empty flag
       #1000000 @(posedge clk) #1;
-
-
+      
+      
       //write test data to fifo
       for(i = 0; i < ((TESTSIZE*8)/W_DATA_W); i = i + 1) begin
          if( i == ((TESTSIZE*8)/W_DATA_W/2) ) //another pause
@@ -111,14 +98,10 @@ module iob_fifo_sync_asym_tb;
 
    end // end of writer process
 
-<<<<<<< HEAD:hardware/fifo/iob_fifo_sync_asym/iob_fifo_sync_asym_tb.v
-   initial begin //reader process
-=======
    //
    // READ PROCESS
    //
    initial begin
->>>>>>> bd4957c41a98b22d8674d6835f5921ffdb292c35:hardware/fifo/iob_fifo_sync_asym/iob_sync_fifo_asym_tb.v
 
       //wait for reset to be de-asserted
       @(negedge reset) repeat(4) @(posedge clk) #1;
@@ -132,30 +115,21 @@ module iob_fifo_sync_asym_tb;
          r_en = 0;
       end
 
-<<<<<<< HEAD:hardware/fifo/iob_fifo_sync_asym/iob_fifo_sync_asym_tb.v
-      if(read !== test_data)
-        $display("ERROR: data read does not match the test data.");
-=======
       if(!(read === test_data))
         $display("ERROR: data read does not match the test data.");   
 
       #(5*clk_per) $finish;
 
->>>>>>> bd4957c41a98b22d8674d6835f5921ffdb292c35:hardware/fifo/iob_fifo_sync_asym/iob_sync_fifo_asym_tb.v
    end
-
+      
    // Instantiate the Unit Under Test (UUT)
-<<<<<<< HEAD:hardware/fifo/iob_fifo_sync_asym/iob_fifo_sync_asym_tb.v
-   iob_fifo_sync_asym
-=======
    iob_fifo_sync_asym 
->>>>>>> bd4957c41a98b22d8674d6835f5921ffdb292c35:hardware/fifo/iob_fifo_sync_asym/iob_sync_fifo_asym_tb.v
      #(
        .W_DATA_W(W_DATA_W),
        .R_DATA_W(R_DATA_W),
        .ADDR_W(ADDR_W)
-       )
-   uut
+       ) 
+   uut 
      (
       .rst(reset),
       .clk(clk),

@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-ifneq (iob_fifo_sync_asym,$(filter $S, $(MODULES)))
-=======
 ifneq (iob_fifo_sync_asym,$(filter iob_fifo_sync_asym, $(MODULES)))
->>>>>>> bd4957c41a98b22d8674d6835f5921ffdb292c35
 
 # Add to modules list
 MODULES+=iob_fifo_sync_asym
