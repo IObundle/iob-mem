@@ -1,9 +1,9 @@
 `timescale 1ns/1ps
 `include "iob_lib.vh"
 
-module iob_sync_fifo_asym
+module iob_fifo_sync_asym
   #(
-    parameter 
+    parameter
     W_DATA_W = 0,
     R_DATA_W = 0,
     ADDR_W = 0,//higher ADDR_W (lower DATA_W)
@@ -39,11 +39,11 @@ module iob_sync_fifo_asym
    wire                   w_en_int = w_en & ~w_full;
 
    wire [W_ADDR_W-1:0]    wptr;
-   bin_counter 
+   bin_counter
      #(
        W_ADDR_W
-       ) 
-   wptr_counter 
+       )
+   wptr_counter
      (
       .clk(clk),
       .rst(rst),
@@ -59,11 +59,11 @@ module iob_sync_fifo_asym
    wire                   r_en_int  = r_en & ~r_empty;
 
    wire [R_ADDR_W-1:0]    rptr;
-   bin_counter 
+   bin_counter
      #(
        R_ADDR_W
-       ) 
-   rptr_counter 
+       )
+   rptr_counter
      (
       .clk(clk),
       .rst(rst),
@@ -72,7 +72,7 @@ module iob_sync_fifo_asym
       );
 
 
-   //compute FIFO levels 
+   //compute FIFO levels
    localparam ADDR_W_DIFF = ADDR_W - MINADDR_W;
    wire [R_ADDR_W-1:0]    wptr_rside;
    wire [W_ADDR_W-1:0]    rptr_wside;
@@ -92,22 +92,22 @@ module iob_sync_fifo_asym
 
    assign w_level = wptr - rptr_wside;
    assign r_level = wptr_rside - rptr;
-  
+
    //FIFO memory
-   iob_2p_asym_ram
+   iob_ram_2p_asym
      #(
        .W_DATA_W(W_DATA_W),
        .R_DATA_W(R_DATA_W),
-       .MAXADDR_W(ADDR_W)
-       ) 
-   fifo_ram 
+       .ADDR_W(ADDR_W)
+       )
+   fifo_ram
      (
       .clk(clk),
-      
+
       .w_en(w_en_int),
       .w_data(w_data),
       .w_addr(wptr),
-      
+
       .r_en(r_en_int),
       .r_addr(rptr),
       .r_data(r_data)

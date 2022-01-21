@@ -2,8 +2,8 @@
 `include "iob_lib.vh"
 
 //test defines
-`define W_DATA_W 32
-`define R_DATA_W 8
+`define W_DATA_W 8
+`define R_DATA_W 32
 `define ADDR_W 10
 `define TESTSIZE 256
 
@@ -15,21 +15,21 @@ module iob_sync_fifo_asym_tb;
    localparam R_DATA_W = `R_DATA_W;
    localparam MAXDATA_W = `max(W_DATA_W, R_DATA_W);
    localparam MINDATA_W = `min( W_DATA_W, R_DATA_W );
-   localparam ADDR_W = `ADDR_W;   
+   localparam ADDR_W = `ADDR_W;
    localparam MINADDR_W = ADDR_W-$clog2(MAXDATA_W/MINDATA_W);//lower ADDR_W (higher DATA_W)
    localparam W_ADDR_W = W_DATA_W == MAXDATA_W? MINADDR_W : ADDR_W;
    localparam R_ADDR_W = R_DATA_W == MAXDATA_W? MINADDR_W : ADDR_W;
-   
+
    reg reset = 0;
    reg                 clk = 0;
- 
-   //write port 
+
+   //write port
    reg                 w_en = 0;
    reg [W_DATA_W-1:0]  w_data;
    wire                w_full;
    wire [W_ADDR_W-1:0] w_level;
-   
-   //read port 
+
+   //read port
    reg                 r_en = 0;
    wire [R_DATA_W-1:0] r_data;
    wire                r_empty;
@@ -37,7 +37,7 @@ module iob_sync_fifo_asym_tb;
 
    parameter clk_per = 10; // clk period = 10 timeticks
    always
-     #(clk_per/2) clk = ~clk; 
+     #(clk_per/2) clk = ~clk;
 
    integer             i,j; //iterators
 
@@ -59,7 +59,7 @@ module iob_sync_fifo_asym_tb;
 
       //create the test data bytes
       for (i=0; i < TESTSIZE; i=i+1)
-        test_data[i*8 +: 8] = i;    
+        test_data[i*8 +: 8] = i;
 
       // optional VCD
 `ifdef VCD
@@ -75,12 +75,12 @@ module iob_sync_fifo_asym_tb;
       reset = 1;
       @(posedge clk) #1;
       reset = 0;
-      
+
 
       //pause for 1ms to allow the reader to test the empty flag
       #1000000 @(posedge clk) #1;
-      
-      
+
+
       //write test data to fifo
       for(i = 0; i < ((TESTSIZE*8)/W_ADDR_W); i = i + 1) begin
          if( i == ((TESTSIZE*8)/W_ADDR_W/2) ) //another pause
@@ -97,7 +97,7 @@ module iob_sync_fifo_asym_tb;
       #(5*clk_per) $finish;
 
    end // end of writer process
-   
+
    initial begin //reader process
 
       //wait for reset to be de-asserted
@@ -113,18 +113,18 @@ module iob_sync_fifo_asym_tb;
          end
       end
 
-      if(read != test_data)
-        $display("ERROR: data read does not match the test data.");   
+      if(read !== test_data)
+        $display("ERROR: data read does not match the test data.");
    end
-      
+
    // Instantiate the Unit Under Test (UUT)
-   iob_sync_fifo_asym 
+   iob_fifo_sync_asym
      #(
        .W_DATA_W(W_DATA_W),
        .R_DATA_W(R_DATA_W),
        .ADDR_W(ADDR_W)
-       ) 
-   uut 
+       )
+   uut
      (
       .rst(reset),
       .clk(clk),

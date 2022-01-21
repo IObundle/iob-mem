@@ -16,10 +16,10 @@ module iob_ram_2p_asym_tb;
    localparam MINADDR_W = MAXADDR_W - $clog2(MAXDATA_W/MINDATA_W);
    localparam W_ADDR_W = W_DATA_W == MINDATA_W? MAXADDR_W: MINADDR_W;
    localparam R_ADDR_W = R_DATA_W == MINDATA_W? MAXADDR_W: MINADDR_W;
- 
+
    reg clk = 0;
 
-   //write port 
+   //write port
    reg w_en = 0;
    reg [W_DATA_W-1:0] w_data;
    reg [W_ADDR_W-1:0] w_addr;
@@ -32,21 +32,21 @@ module iob_ram_2p_asym_tb;
 
    // system clock
    localparam clk_per = 10; //ns
-   always #(clk_per/2) clk = ~clk; 
+   always #(clk_per/2) clk = ~clk;
 
    localparam seq_ini = 10;
    integer              i;
 
    reg [W_DATA_W*2**W_ADDR_W-1:0] test_data;
    reg [R_DATA_W-1:0]              r_data_expected;
-   
+
    initial begin
 
       $display("W_DATA_W=%d", W_DATA_W);
-      $display("W_ADDR_W=%d", W_ADDR_W);      
+      $display("W_ADDR_W=%d", W_ADDR_W);
       $display("R_DATA_W=%d", R_DATA_W);
       $display("R_ADDR_W=%d", R_ADDR_W);
-   
+
       if(W_DATA_W > R_DATA_W)
         $display("W_DATA_W > R_DATA_W");
       else if (W_DATA_W < R_DATA_W)
@@ -56,8 +56,8 @@ module iob_ram_2p_asym_tb;
 
       //compute the test_data
       for (i=0; i < 2**W_ADDR_W; i=i+1)
-        test_data[i*W_DATA_W +: W_DATA_W] = i+seq_ini;    
-      
+        test_data[i*W_DATA_W +: W_DATA_W] = i+seq_ini;
+
       // optional VCD
 `ifdef VCD
       $dumpfile("uut.vcd");
@@ -65,8 +65,8 @@ module iob_ram_2p_asym_tb;
 `endif
       repeat(4) @(posedge clk) #1;
 
-      //write all the locations of RAM 
-      w_en = 1; 
+      //write all the locations of RAM
+      w_en = 1;
       for(i = 0; i < 2**W_ADDR_W; i = i + 1) begin
          w_addr = i;
          w_data = i+seq_ini;
@@ -83,13 +83,13 @@ module iob_ram_2p_asym_tb;
          @(posedge clk) #1;
          //verify response
          r_data_expected = test_data[i*R_DATA_W +: R_DATA_W];
-         if(r_data != r_data_expected)
+         if(r_data !== r_data_expected)
            $display("read addr=%x, got %x, expected %x", r_addr, r_data, r_data_expected);
       end
 
       #(5*clk_per) $finish;
    end
-   
+
    // instantiate the Unit Under Test (UUT)
    iob_ram_2p_asym
      #(
@@ -97,15 +97,15 @@ module iob_ram_2p_asym_tb;
        .R_DATA_W(R_DATA_W),
        .MAXADDR_W(MAXADDR_W)
        )
-   uut 
+   uut
      (
-      .clk(clk), 
-      
+      .clk(clk),
+
       .w_en(w_en),
       .w_addr(w_addr),
       .w_data(w_data),
-      
-      .r_en(r_en), 
+
+      .r_en(r_en),
       .r_addr(r_addr),
       .r_data(r_data)
       );
