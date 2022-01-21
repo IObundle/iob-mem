@@ -8,7 +8,6 @@ SFIFO_DIR=$(MEM_FIFO_DIR)/iob_fifo_sync
 
 # Submodules
 include $(MEM_RAM_DIR)/iob_ram_2p/hardware.mk
-include $(MEM_FIFO_DIR)/bin_counter/hardware.mk
 
 # Sources
 VSRC+=$(SFIFO_DIR)/iob_fifo_sync.v
