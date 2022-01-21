@@ -95,11 +95,11 @@ module iob_fifo_sync_asym
    //compute hypothetical next level
    `COMB begin
       level_nxt = level;
-      if(w_en && !r_en)
+      if(w_en_int && !r_en_int)
         level_nxt = level + w_incr;
-      else if (w_en && r_en)
+      else if (w_en_int && r_en_int)
         level_nxt = level + w_incr - r_incr;
-      else if (!w_en && r_en)
+      else if (!w_en_int && r_en_int)
         level_nxt = level - r_incr;
    end
 
