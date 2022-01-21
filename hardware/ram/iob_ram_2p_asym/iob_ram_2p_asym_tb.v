@@ -24,7 +24,7 @@ module iob_ram_2p_asym_tb;
    reg [W_DATA_W-1:0] w_data;
    reg [W_ADDR_W-1:0] w_addr;
    //read port
-   reg                 r_en = 0;
+   reg                r_en = 0;
    wire [R_DATA_W-1:0] r_data;
    reg [R_ADDR_W-1:0]  r_addr;
 
@@ -35,11 +35,16 @@ module iob_ram_2p_asym_tb;
    always #(clk_per/2) clk = ~clk;
 
    localparam seq_ini = 10;
-   integer              i;
+   integer             i;
 
    reg [W_DATA_W*2**W_ADDR_W-1:0] test_data;
+<<<<<<< HEAD
    reg [R_DATA_W-1:0]              r_data_expected;
 
+=======
+   reg [R_DATA_W-1:0]             r_data_expected;
+   
+>>>>>>> bd4957c41a98b22d8674d6835f5921ffdb292c35
    initial begin
 
       $display("W_DATA_W=%d", W_DATA_W);
