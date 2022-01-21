@@ -2,8 +2,8 @@
 `include "iob_lib.vh"
 
 //test defines
-`define R_DATA_W 32
-`define W_DATA_W 8
+`define R_DATA_W 8
+`define W_DATA_W 32
 `define ADDR_W 4
 `define TESTSIZE 256 //bytes
 
@@ -80,14 +80,14 @@ module iob_fifo_sync_asym_tb;
       reset = 0;
       
 
-      //pause for 1ms to allow the reader to test the empty flag
-      #1000000 @(posedge clk) #1;
+      //pause for 0.1ms to allow the reader to test the empty flag
+      #100000 @(posedge clk) #1;
       
       
       //write test data to fifo
       for(i = 0; i < ((TESTSIZE*8)/W_DATA_W); i = i + 1) begin
-         if( i == ((TESTSIZE*8)/W_DATA_W/2) ) //another pause
-           #1000000 @(posedge clk) #1;
+         if( i == ((TESTSIZE*8)/W_DATA_W/2) ) //another 0.1ms pause
+           #100000 @(posedge clk) #1;
 
          while(w_full)  @(posedge clk) #1;
          w_en = 1;
