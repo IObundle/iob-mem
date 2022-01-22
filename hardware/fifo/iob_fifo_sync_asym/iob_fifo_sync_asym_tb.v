@@ -2,8 +2,8 @@
 `include "iob_lib.vh"
 
 //test defines
-`define R_DATA_W 8
 `define W_DATA_W 32
+`define R_DATA_W 8
 `define ADDR_W 4
 `define TESTSIZE 256 //bytes
 
@@ -96,7 +96,7 @@ module iob_fifo_sync_asym_tb;
          w_en = 0;
       end
 
-   end // end of writer process
+   end
 
    //
    // READ PROCESS
@@ -115,11 +115,13 @@ module iob_fifo_sync_asym_tb;
          r_en = 0;
       end
 
-      if(!(read === test_data))
+      if(!(read === test_data)) begin
         $display("ERROR: data read does not match the test data.");   
+        $display("data read: %x", read);   
+        $display("test data: %x", test_data);
+      end
 
       #(5*clk_per) $finish;
-
    end
       
    // Instantiate the Unit Under Test (UUT)

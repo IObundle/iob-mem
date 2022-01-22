@@ -5,13 +5,7 @@ module iob_fifo_async_asym
   #(parameter 
     W_DATA_W = 0,
     R_DATA_W = 0,
-    ADDR_W = 0,//higher ADDR_W (lower DATA_W)
-    //determine W_ADDR_W and R_ADDR_W
-    MAXDATA_W = `max(W_DATA_W, R_DATA_W),
-    MINDATA_W = `min(W_DATA_W, R_DATA_W),
-    MINADDR_W = ADDR_W-$clog2(MAXDATA_W/MINDATA_W),//lower ADDR_W (higher DATA_W)
-    W_ADDR_W = (W_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W,
-    R_ADDR_W = (R_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W
+    ADDR_W = 0 //higher ADDR_W lower DATA_W
     )
    (
     input                     rst,
@@ -21,155 +15,258 @@ module iob_fifo_async_asym
     input                     r_en,
     output reg [R_DATA_W-1:0] r_data, 
     output                    r_empty,
-    output [R_ADDR_W-1:0]     r_level,
+    output                    r_full,
+    output reg [ADDR_W-1:0]   r_level,
 
     //write port	 
     input                     w_clk,
     input                     w_en,
     input [W_DATA_W-1:0]      w_data, 
+    output                    w_empty,
     output                    w_full,
-    output [W_ADDR_W-1:0]     w_level
+    output reg [ADDR_W-1:0]   w_level
 
     );
 
-   //local variables
-   localparam ADDR_W_DIFF = ADDR_W - MINADDR_W;
-   localparam W_FIFO_DEPTH = (1 << W_ADDR_W);
+    //determine W_ADDR_W and R_ADDR_W
+   localparam MAXDATA_W = `max(W_DATA_W, R_DATA_W);
+   localparam MINDATA_W = `min(W_DATA_W, R_DATA_W);
+   localparam R = MAXDATA_W/MINDATA_W;
+   localparam ADDR_W_DIFF = $clog2(R);
+   localparam MINADDR_W = ADDR_W-$clog2(R);//lower ADDR_W (higher DATA_W)
+   localparam W_ADDR_W = (W_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W;
+   localparam R_ADDR_W = (R_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W;
+   wire [ADDR_W:0] FIFO_SIZE = (1'b1 << ADDR_W); //in bytes
    
 
-   
-   //WRITE DOMAIN 
-   wire 		      w_en_int;
-   wire [W_ADDR_W-1:0] 	      write_addr;
-   wire [W_ADDR_W-1:0]        write_addr_bin;
-   reg [R_ADDR_W-1:0] 	      read_addr_sync[1:0];
-   wire [R_ADDR_W-1:0] 	      read_addr_bin_w;
-   wire [W_ADDR_W-1:0] 	      read_addr_bin_w_n;
-   
-   
-   //READ DOMAIN    
-   wire 		      r_en_int;
-   wire [R_ADDR_W-1:0] 	      read_addr;
-   wire [R_ADDR_W-1:0]        read_addr_bin;
-   reg [W_ADDR_W-1:0] 	      write_addr_sync[1:0];
-   wire [W_ADDR_W-1:0] 	      write_addr_bin_r;
-   wire [R_ADDR_W-1:0] 	      write_addr_bin_r_n;
+   //read/write increments
+   wire [ADDR_W-1:0]       r_incr, w_incr;
 
+   //binary read addresses on both domains
+   wire [R_ADDR_W-1:0]        r_addr_bin, w_r_addr_bin;
+   wire [W_ADDR_W-1:0] 	      w_addr_bin, r_w_addr_bin;
+  
+   //normalized addresses
+   wire [ADDR_W-1:0]       w_addr_bin_n, r_addr_bin_n;
+   wire [ADDR_W-1:0]       r_w_addr_bin_n, w_r_addr_bin_n;
    
-   
-   //convert addresses from gray to binary code
-   gray2bin 
-     #(
-       .DATA_W(R_ADDR_W)
-       ) 
-   gray2bin_read_addr_sync 
-     (
-      .gr(read_addr_sync[1]),
-      .bin(read_addr_bin_w)
-      );
-
-   gray2bin 
-     #(
-       .DATA_W(W_ADDR_W)
-       ) 
-   gray2bin_write_addr_sync 
-     (
-      .gr(write_addr_sync[1]),
-      .bin(write_addr_bin_r)
-      );
-
-   //normalise addresses from write (read) to read (write) sizes
-   generate
-      if(W_ADDR_W > R_ADDR_W) begin
-	 assign read_addr_bin_w_n = {read_addr_bin_w, {ADDR_W_DIFF{1'b0}}};
-	 assign write_addr_bin_r_n = write_addr_bin_r[W_ADDR_W-1:ADDR_W_DIFF];
-      end else if (W_ADDR_W == R_ADDR_W) begin
-	 assign read_addr_bin_w_n = read_addr_bin_w;
-	 assign write_addr_bin_r_n = write_addr_bin_r;
-      end else begin //W_ADDR_W < R_ADDR_W
-	 assign read_addr_bin_w_n = read_addr_bin_w[R_ADDR_W-1:ADDR_W_DIFF];
-	 assign write_addr_bin_r_n = {write_addr_bin_r, {ADDR_W_DIFF{1'b0}}};
+   //assign according to assymetry type
+   generate 
+      if (W_DATA_W > R_DATA_W) begin 
+         assign r_incr = 1'b1;
+         assign w_incr = 1'b1 << ADDR_W_DIFF;
+         assign r_w_addr_bin_n = r_w_addr_bin<<ADDR_W_DIFF;
+         assign w_r_addr_bin_n = w_r_addr_bin;
+         assign w_addr_bin_n = w_addr_bin<<ADDR_W_DIFF;
+         assign r_addr_bin_n = r_addr_bin;
+      end else if (R_DATA_W > W_DATA_W) begin 
+         assign w_incr = 1'b1;
+         assign r_incr = 1'b1 << ADDR_W_DIFF;
+         assign r_w_addr_bin_n = r_w_addr_bin;
+         assign w_r_addr_bin_n = w_r_addr_bin<<ADDR_W_DIFF;
+         assign w_addr_bin_n = w_addr_bin;
+         assign r_addr_bin_n = r_addr_bin<<ADDR_W_DIFF;
+      end else begin
+         assign r_incr = 1'b1;
+         assign w_incr = 1'b1;
+         assign r_w_addr_bin_n = r_w_addr_bin;
+         assign w_r_addr_bin_n = w_r_addr_bin;
+         assign w_addr_bin_n = w_addr_bin;
+         assign r_addr_bin_n = r_addr_bin;
       end
    endgenerate
 
 
-
-   //WRITE DOMAIN LOGIC
-
-   //sync gray read pointer to write domain
-   always @ (posedge w_clk) begin 
-      read_addr_sync[0] <= read_addr;
-      read_addr_sync[1] <= read_addr_sync[0];
-   end
-   
-   //effective write enable
-   assign w_en_int = w_en & ~w_full;
-
-   //write address gray code counter
-   gray_counter 
-     #(
-       .W(W_ADDR_W)
-       ) 
-   write_addr_counter 
-     (
-      .clk(w_clk),
-      .rst(rst), 
-      .en(w_en_int),
-      .data_out(write_addr)
-      );
-
-   //compute write side info
-   gray2bin 
-     #(
-       .DATA_W(W_ADDR_W)
-       ) 
-   gray2bin_write_addr 
-     (
-      .gr(write_addr),
-      .bin(write_addr_bin)
-      );
-
-   assign w_level = write_addr_bin - read_addr_bin_w_n;
-   assign w_full = (w_level == (W_FIFO_DEPTH-1));
-   
-   //READ DOMAIN LOGIC
-
-   //sync write pointer
+   //sync write address to read domain
+   wire [W_ADDR_W-1:0]        w_addr;
+   reg [W_ADDR_W-1:0]         r_w_addr[1:0];
    always @ (posedge r_clk) begin 
-      write_addr_sync[0] <= write_addr;
-      write_addr_sync[1] <= write_addr_sync[0];
+      r_w_addr[0] <= w_addr;
+      r_w_addr[1] <= r_w_addr[0];
    end
 
-   //effective read enable
-   assign r_en_int  = r_en & ~r_empty;
 
+   //sync read address to write domain
+   wire [R_ADDR_W-1:0] 	      r_addr;
+   reg [R_ADDR_W-1:0] 	      w_r_addr[1:0];
+   always @ (posedge w_clk) begin 
+      w_r_addr[0] <= r_addr;
+      w_r_addr[1] <= w_r_addr[0];
+   end
+   
+   
+   //READ DOMAIN FIFO INFO
+   wire [ADDR_W-1:0]         r_level_int = r_w_addr_bin_n - r_addr_bin_n;
+   reg [ADDR_W-1:0]          r_level_int_reg;
+   `REG_AR(r_clk, rst, 1'b0, r_level_int_reg, r_level_int)
+
+   wire signed [ADDR_W-1:0] r_level_incr = r_level_int-r_level_int_reg;
+   
+   reg [ADDR_W:0]         r_level_nxt;
+   reg [1:0]              r_pc, r_pc_nxt;
+   localparam EMPTY=0, DECREASED=1, INCREASED=2, FULL=3;
+   
+   `COMB begin
+      r_level_nxt = r_level;
+      r_pc_nxt = r_pc;
+      
+      case (r_pc)
+        
+        EMPTY: begin
+           r_pc_nxt = r_pc;
+           if(r_level_incr > 0 && r_level+r_level_incr >= r_incr)
+             r_pc_nxt = INCREASED;
+        end
+        
+        INCREASED: begin
+           if(r_level_incr > 0 && r_level+r_level_incr > (FIFO_SIZE-w_incr))
+             r_pc_nxt = FULL;
+           else if(r_level_incr < 0 && r_level+r_level_incr < r_incr)
+             r_pc_nxt = EMPTY;
+        end
+        
+        DECREASED: begin
+           if(r_level_incr < 0 && r_level+r_level_incr < r_incr)
+             r_pc_nxt = EMPTY;
+           else if(r_level_incr > 0 && r_level+r_level_incr > (FIFO_SIZE-w_incr))
+             r_pc_nxt = FULL;
+        end
+        
+        FULL: begin
+           if(r_level_incr < 0 && r_level+r_level_incr <= (FIFO_SIZE-w_incr))
+             r_pc_nxt = DECREASED;
+        end
+      
+      endcase // case (r_pc)
+
+   end
+   //READ FIFO EMPTY
+   assign r_empty = r_pc == EMPTY;
+   //READ FIFO FULL
+   assign r_full = r_pc == FULL;
+
+
+   //WRITE DOMAIN FIFO INFO
+   wire [ADDR_W-1:0]         w_level_int = w_addr_bin_n - w_r_addr_bin_n;
+   reg [ADDR_W-1:0]          w_level_int_reg;
+   `REG_AR(r_clk, rst, 1'b0, w_level_int_reg, w_level_int)
+
+   wire signed [ADDR_W-1:0] w_level_incr = w_level_int-w_level_int_reg;
+   
+   reg [ADDR_W:0]           w_level_nxt;
+   reg [1:0]                w_pc, w_pc_nxt;
+   
+   `COMB begin
+      w_level_nxt = r_level;
+      w_pc_nxt = w_pc;
+      
+      case (w_pc)
+        
+        EMPTY: begin
+           w_pc_nxt = r_pc;
+           if(w_level_incr > 0 && w_level+w_level_incr >= r_incr)
+             w_pc_nxt = INCREASED;
+        end
+        
+        INCREASED: begin
+           if(w_level_incr > 0 && w_level+w_level_incr > (FIFO_SIZE-w_incr))
+             w_pc_nxt = FULL;
+           else if(w_level_incr < 0 && w_level+w_level_incr < r_incr)
+             w_pc_nxt = EMPTY;
+        end
+        
+        DECREASED: begin
+           if(w_level_incr < 0 && w_level+w_level_incr < r_incr)
+             w_pc_nxt = EMPTY;
+           else if(w_level_incr > 0 && w_level+w_level_incr > (FIFO_SIZE-w_incr))
+             w_pc_nxt = FULL;
+        end
+        
+        FULL: begin
+           if(w_level_incr < 0 && w_level+w_level_incr <= (FIFO_SIZE-w_incr))
+             w_pc_nxt = DECREASED;
+        end
+      
+      endcase // case (r_pc)
+
+   end
+   //WRITE FIFO EMPTY
+   assign w_empty = r_pc == EMPTY;
+   //READ FIFO FULL
+   assign w_full = r_pc == FULL;
+   
+   
    //read address gray code counter
+   wire r_en_int  = r_en & ~r_empty;
    gray_counter
      #(
        .W(R_ADDR_W)
        ) 
-   read_addr_counter 
+   r_addr_counter 
      (
       .clk(r_clk),
       .rst(rst), 
       .en(r_en_int),
-      .data_out(read_addr)
+      .data_out(r_addr)
       );
-   
-   //compute read side info
+  
+   //write address gray code counter
+   wire w_en_int = w_en & ~w_full;
+   gray_counter 
+     #(
+       .W(W_ADDR_W)
+       ) 
+   w_addr_counter 
+     (
+      .clk(w_clk),
+      .rst(rst), 
+      .en(w_en_int),
+      .data_out(w_addr)
+      );
+
+   //convert gray read address to binary
    gray2bin 
      #(
        .DATA_W(R_ADDR_W)
        ) 
-   gray2bin_read_addr
+   gray2bin_r_addr 
      (
-      .gr(read_addr),
-      .bin(read_addr_bin)
+      .gr(r_addr),
+      .bin(r_addr_bin)
       );
-   
-   assign r_level = write_addr_bin_r_n - read_addr_bin;
-   assign r_empty = (r_level == 0);
-   
+
+   //convert synced gray write address to binary
+   gray2bin 
+     #(
+       .DATA_W(W_ADDR_W)
+       ) 
+   gray2bin_r_addr_sync 
+     (
+      .gr(r_w_addr[1]),
+      .bin(r_w_addr_bin)
+      );
+
+   //convert gray write address to binary
+   gray2bin 
+     #(
+       .DATA_W(W_ADDR_W)
+       ) 
+   gray2bin_w_addr
+     (
+      .gr(w_addr),
+      .bin(w_addr_bin)
+      );
+
+   //convert synced gray read address to binary
+   gray2bin 
+     #(
+       .DATA_W(R_ADDR_W)
+       ) 
+   gray2bin_w_addr_sync 
+     (
+      .gr(w_r_addr[1]),
+      .bin(w_r_addr_bin)
+      );
 
    // FIFO memory
    iob_ram_t2p_asym
@@ -183,10 +280,10 @@ module iob_fifo_async_asym
       .w_clk(w_clk),
       .w_en(w_en_int),
       .w_data(w_data),
-      .w_addr(write_addr_bin),
+      .w_addr(w_addr_bin),
       
       .r_clk(r_clk),
-      .r_addr(read_addr_bin),
+      .r_addr(r_addr_bin),
       .r_en(r_en_int),
       .r_data(r_data)
       );

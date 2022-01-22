@@ -6,7 +6,7 @@ module iob_fifo_sync_asym
     parameter
     W_DATA_W = 0,
     R_DATA_W = 0,
-    ADDR_W = 0 //higher ADDR_W (lower DATA_W)
+    ADDR_W = 0 //higher ADDR_W lower DATA_W
     )
    (
     input                 rst,
@@ -34,10 +34,10 @@ module iob_fifo_sync_asym
    localparam MINADDR_W = ADDR_W-$clog2(R);//lower ADDR_W (higher DATA_W)
    localparam W_ADDR_W = (W_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W;
    localparam R_ADDR_W = (R_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W;
+   localparam FIFO_SIZE = (1'b1 << ADDR_W); //in bytes
 
    //effective write enable
    wire                   w_en_int = w_en & ~w_full;
-
 
    //write address
    `VAR(w_addr, W_ADDR_W)
@@ -71,9 +71,9 @@ module iob_fifo_sync_asym
 
    `COMB begin
       level_nxt = level;
-      if(w_en && !r_en && (level + w_incr) <= (1'b1<<ADDR_W))
+      if(w_en && !r_en && (level + w_incr) <= FIFO_SIZE)
         level_nxt = level + w_incr;
-      else if(w_en && r_en && (level + w_incr - r_incr) <= (1'b1<<ADDR_W) && (level + w_incr - r_incr) >= 0)
+      else if(w_en && r_en && (level + w_incr - r_incr) <= FIFO_SIZE && (level + w_incr - r_incr) >= 0)
              level_nxt = level + w_incr -r_incr;
       else if (!w_en && r_en && (level-r_incr) >= 0 )
         level_nxt = level -r_incr;
@@ -81,7 +81,9 @@ module iob_fifo_sync_asym
    
    //FIFO empty
    assign r_empty = level < r_incr;
-   assign w_full = level > ((1'b1 << ADDR_W) -w_incr);
+
+   //FIFO empty
+   assign w_full = level > (FIFO_SIZE -w_incr);
    
 
    //FIFO memory

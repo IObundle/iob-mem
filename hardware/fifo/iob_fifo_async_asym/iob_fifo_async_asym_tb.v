@@ -4,8 +4,9 @@
 //test defines
 `define W_DATA_W 32
 `define R_DATA_W 8
-`define ADDR_W 10
-`define TESTSIZE (2*2**ADDR_W) //twice the fifo size
+`define ADDR_W 4
+`define TESTSIZE 256 //bytes
+
 
 module iob_fifo_async_asym_tb;
 
@@ -26,15 +27,15 @@ module iob_fifo_async_asym_tb;
    reg                 w_en = 0;
    reg [W_DATA_W-1:0]  w_data;
    wire                w_full;
-   wire [W_ADDR_W-1:0] w_level;
+   wire [ADDR_W-1:0] w_level;
    
    //read port 
-   reg r_clk = 0;
-   reg r_en = 0;
+   reg                 r_clk = 0;
+   reg                 r_en = 0;
    wire [R_DATA_W-1:0] r_data;
    wire                r_empty;
-   wire [R_ADDR_W-1:0] r_level;
-
+   wire [ADDR_W-1:0] r_level;
+   
    
    // clocks
    parameter clk_per_w = 10; //ns
@@ -42,7 +43,7 @@ module iob_fifo_async_asym_tb;
    parameter clk_per_r = 13; //ns
    always #(clk_per_r/2) r_clk = ~r_clk;
 
-   integer              i,j; //iterators
+   integer             i,j; //iterators
 
    reg [W_DATA_W*2**W_ADDR_W-1:0] test_data;
    reg [W_DATA_W*2**W_ADDR_W-1:0] read;
@@ -83,26 +84,23 @@ module iob_fifo_async_asym_tb;
       reset = 0;
       
 
-      //pause for 1ms to allow the reader to test the empty flag
-      #1000000 @(posedge w_clk) #1;
+      //pause for 0.1ms to allow the reader to test the empty flag
+      #100000 @(posedge w_clk) #1;
       
       
       //write test data to fifo
-      for(i = 0; i < ((TESTSIZE*8)/W_ADDR_W); i = i + 1) begin
-         if( i == ((TESTSIZE*8)/W_ADDR_W/2) ) //another pause
-           #1000000 @(posedge w_clk) #1;
+      for(i = 0; i < ((TESTSIZE*8)/W_DATA_W); i = i + 1) begin
+         if( i == ((TESTSIZE*8)/W_DATA_W/2) ) //another 0.1ms pause
+           #100000 @(posedge w_clk) #1;
 
-         if(!w_full) begin
-            w_en = 1;
-            w_data = test_data[i*W_ADDR_W +: W_ADDR_W];
-            @(posedge w_clk) #1;
-            w_en = 0;
-         end
+         while(w_full)  @(posedge w_clk) #1;
+         w_en = 1;
+         w_data = test_data[i*W_DATA_W +: W_DATA_W];
+         @(posedge w_clk) #1;
+         w_en = 0;
       end
 
-      #(5*clk_per_r) $finish;
-
-   end // end of writer process
+   end
 
    //
    // READ PROCESS
@@ -113,11 +111,11 @@ module iob_fifo_async_asym_tb;
       @(negedge reset) repeat(4) @(posedge r_clk) #1;
       
       //read data from fifo
-      for(j = 0; j < ((TESTSIZE*8)/R_ADDR_W); j = j + 1) begin
+      for(j = 0; j < ((TESTSIZE*8)/R_DATA_W); j = j + 1) begin
          while(r_empty) @(posedge r_clk) #1;
          r_en = 1;
          @(posedge r_clk) #1;
-         read[j*R_ADDR_W +: R_ADDR_W] = r_data;
+         read[j*R_DATA_W +: R_DATA_W] = r_data;
          r_en = 0;
       end
 
@@ -126,6 +124,7 @@ module iob_fifo_async_asym_tb;
         $display("data read: %x", read);   
         $display("test data: %x", test_data);
       end
+      #(5*clk_per_r) $finish;
    end
    
    // Instantiate the Unit Under Test (UUT)
@@ -143,11 +142,13 @@ module iob_fifo_async_asym_tb;
       .r_en(r_en),
       .r_data(r_data),
       .r_empty(r_empty),
+      .r_full(r_empty),
       .r_level(r_level),
 
       .w_clk(w_clk),
       .w_en(w_en),
       .w_data(w_data),
+      .w_empty(w_empty),
       .w_full(w_full),
       .w_level(w_level)
       );
