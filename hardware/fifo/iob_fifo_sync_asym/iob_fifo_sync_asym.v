@@ -34,7 +34,7 @@ module iob_fifo_sync_asym
    localparam MINADDR_W = ADDR_W-$clog2(R);//lower ADDR_W (higher DATA_W)
    localparam W_ADDR_W = (W_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W;
    localparam R_ADDR_W = (R_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W;
-   localparam FIFO_SIZE = (1'b1 << ADDR_W); //in bytes
+   localparam [ADDR_W:0] FIFO_SIZE = (1'b1 << ADDR_W); //in bytes
 
    //effective write enable
    wire                   w_en_int = w_en & ~w_full;

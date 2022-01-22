@@ -36,7 +36,7 @@ module iob_fifo_async_asym
    localparam MINADDR_W = ADDR_W-$clog2(R);//lower ADDR_W (higher DATA_W)
    localparam W_ADDR_W = (W_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W;
    localparam R_ADDR_W = (R_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W;
-   wire [ADDR_W:0] FIFO_SIZE = (1'b1 << ADDR_W); //in bytes
+   localparam [ADDR_W:0] FIFO_SIZE = (1'b1 << ADDR_W); //in bytes
    
 
    //read/write increments
@@ -104,6 +104,7 @@ module iob_fifo_async_asym
    
    reg [ADDR_W:0]         r_level_nxt;
    reg [1:0]              r_pc, r_pc_nxt;
+   `REG_AR(r_clk, rst, 1'b0, r_pc, r_pc_nxt)
    localparam EMPTY=0, DECREASED=1, INCREASED=2, FULL=3;
    
    `COMB begin
@@ -114,11 +115,14 @@ module iob_fifo_async_asym
         
         EMPTY: begin
            r_pc_nxt = r_pc;
-           if(r_level_incr > 0 && r_level+r_level_incr >= r_incr)
-             r_pc_nxt = INCREASED;
+           if(r_level_incr > 0 && r_level+r_level_incr >= r_incr) begin
+              r_pc_nxt = INCREASED;
+              r_level_nxt = r_level+r_level_incr;
+           end
         end
         
         INCREASED: begin
+           r_level_nxt = r_level+r_level_incr;
            if(r_level_incr > 0 && r_level+r_level_incr > (FIFO_SIZE-w_incr))
              r_pc_nxt = FULL;
            else if(r_level_incr < 0 && r_level+r_level_incr < r_incr)
@@ -126,6 +130,7 @@ module iob_fifo_async_asym
         end
         
         DECREASED: begin
+           r_level_nxt = r_level+r_level_incr;
            if(r_level_incr < 0 && r_level+r_level_incr < r_incr)
              r_pc_nxt = EMPTY;
            else if(r_level_incr > 0 && r_level+r_level_incr > (FIFO_SIZE-w_incr))
@@ -133,15 +138,17 @@ module iob_fifo_async_asym
         end
         
         FULL: begin
-           if(r_level_incr < 0 && r_level+r_level_incr <= (FIFO_SIZE-w_incr))
-             r_pc_nxt = DECREASED;
+           if(r_level_incr < 0 && r_level+r_level_incr <= (FIFO_SIZE-w_incr)) begin
+              r_pc_nxt = DECREASED;
+              r_level_nxt = r_level+r_level_incr;
+           end
         end
       
       endcase // case (r_pc)
 
    end
    //READ FIFO EMPTY
-   assign r_empty = r_pc == EMPTY;
+   assign r_empty = (r_pc == EMPTY);
    //READ FIFO FULL
    assign r_full = r_pc == FULL;
 
@@ -155,6 +162,7 @@ module iob_fifo_async_asym
    
    reg [ADDR_W:0]           w_level_nxt;
    reg [1:0]                w_pc, w_pc_nxt;
+   `REG_AR(w_clk, rst, 1'b0, w_pc, w_pc_nxt)
    
    `COMB begin
       w_level_nxt = r_level;
@@ -164,11 +172,14 @@ module iob_fifo_async_asym
         
         EMPTY: begin
            w_pc_nxt = r_pc;
-           if(w_level_incr > 0 && w_level+w_level_incr >= r_incr)
-             w_pc_nxt = INCREASED;
+           if(w_level_incr > 0 && w_level+w_level_incr >= r_incr) begin
+              w_pc_nxt = INCREASED;
+              r_level_nxt = r_level+r_level_incr;
+           end
         end
         
         INCREASED: begin
+           r_level_nxt = r_level+r_level_incr;
            if(w_level_incr > 0 && w_level+w_level_incr > (FIFO_SIZE-w_incr))
              w_pc_nxt = FULL;
            else if(w_level_incr < 0 && w_level+w_level_incr < r_incr)
@@ -176,6 +187,7 @@ module iob_fifo_async_asym
         end
         
         DECREASED: begin
+           r_level_nxt = r_level+r_level_incr;
            if(w_level_incr < 0 && w_level+w_level_incr < r_incr)
              w_pc_nxt = EMPTY;
            else if(w_level_incr > 0 && w_level+w_level_incr > (FIFO_SIZE-w_incr))
@@ -183,8 +195,10 @@ module iob_fifo_async_asym
         end
         
         FULL: begin
-           if(w_level_incr < 0 && w_level+w_level_incr <= (FIFO_SIZE-w_incr))
-             w_pc_nxt = DECREASED;
+           if(w_level_incr < 0 && w_level+w_level_incr <= (FIFO_SIZE-w_incr)) begin 
+              w_pc_nxt = DECREASED;
+              r_level_nxt = r_level+r_level_incr;
+           end
         end
       
       endcase // case (r_pc)

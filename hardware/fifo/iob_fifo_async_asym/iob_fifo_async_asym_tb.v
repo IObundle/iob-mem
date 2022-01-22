@@ -26,6 +26,7 @@ module iob_fifo_async_asym_tb;
    reg                 w_clk = 0;
    reg                 w_en = 0;
    reg [W_DATA_W-1:0]  w_data;
+   wire                w_empty;
    wire                w_full;
    wire [ADDR_W-1:0] w_level;
    
@@ -34,6 +35,7 @@ module iob_fifo_async_asym_tb;
    reg                 r_en = 0;
    wire [R_DATA_W-1:0] r_data;
    wire                r_empty;
+   wire                r_full;
    wire [ADDR_W-1:0] r_level;
    
    
@@ -142,7 +144,7 @@ module iob_fifo_async_asym_tb;
       .r_en(r_en),
       .r_data(r_data),
       .r_empty(r_empty),
-      .r_full(r_empty),
+      .r_full(r_full),
       .r_level(r_level),
 
       .w_clk(w_clk),
