@@ -56,7 +56,7 @@ module iob_ram_t2p_asym
               .w_addr(addr_wr[i]),
               .w_data(data_wr[i]),
 
-              .r_clk(w_clk),
+              .r_clk(r_clk),
               .r_en(r_en),
               .r_addr(addr_rd[i]),
               .r_data(data_rd[i])              

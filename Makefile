@@ -14,11 +14,6 @@ include $(MODULE_DIR)/hardware.mk
 # testbench
 VSRC+=$(wildcard $(MODULE_DIR)/$(MEM_NAME)_tb.v)
 
-# hex files generation for tb
-# generate .hex file from string, checks from ram if string is valid
-HEX_FILES:=data.hex
-GEN_HEX:=echo "!IObundle 2020!" | od -A n -t x1 > data.hex
-
 # Rules
 .PHONY: sim sim-all clean corename $(ALL_MODULES)
 
@@ -29,7 +24,7 @@ GEN_HEX:=echo "!IObundle 2020!" | od -A n -t x1 > data.hex
 # Icarus Verilog simulator flags
 VLOG=iverilog -W all -g2005-sv $(INCLUDE) $(DEFINE)
 
-sim: $(VSRC) $(VHDR) data.hex
+sim: $(VSRC) $(VHDR)
 	@echo $(VSRC)
 	$(VLOG) $(VSRC)
 	@echo "\n\nTesting module $(MEM_NAME)\n\n"
@@ -38,8 +33,12 @@ ifeq ($(VCD),1)
 	@if [ ! `pgrep gtkwave` ]; then gtkwave uut.vcd; fi &
 endif
 
-$(HEX_FILES):
-	@$(GEN_HEX)
+sim-waves: uut.vcd
+	gtkwave uut.vcd &
+
+uut.vcd:
+	make sim VCD=1
+
 
 ALL_MODULES=$(shell find . -name hardware.mk | sed 's/\/hardware.mk//g' | tail -n +3)
 
@@ -63,7 +62,7 @@ debug:
 # 
 
 clean:
-	@rm -f *~ \#*\# a.out *.hex *.vcd *.drom *.png *.pyc
+	@rm -f *~ \#*\# a.out *.vcd *.drom *.png *.pyc
 
 
 #

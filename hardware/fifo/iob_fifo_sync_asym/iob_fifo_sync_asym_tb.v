@@ -41,8 +41,8 @@ module iob_fifo_sync_asym_tb;
 
    integer             i,j; //iterators
 
-   reg [W_DATA_W*2**W_ADDR_W-1:0] test_data;
-   reg [W_DATA_W*2**W_ADDR_W-1:0] read;
+   reg [TESTSIZE*8-1:0] test_data;
+   reg [TESTSIZE*8-1:0] read;
 
    //
    //WRITE PROCESS

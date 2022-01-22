@@ -14,17 +14,17 @@ module iob_fifo_async_asym
     input                     r_clk, 
     input                     r_en,
     output reg [R_DATA_W-1:0] r_data, 
-    output                    r_empty,
-    output                    r_full,
-    output reg [ADDR_W-1:0]   r_level,
+    output reg                r_empty,
+    output reg                r_full,
+    output reg [ADDR_W:0]     r_level,
 
     //write port	 
     input                     w_clk,
     input                     w_en,
     input [W_DATA_W-1:0]      w_data, 
-    output                    w_empty,
-    output                    w_full,
-    output reg [ADDR_W-1:0]   w_level
+    output reg                w_empty,
+    output reg                w_full,
+    output reg [ADDR_W:0]     w_level
 
     );
 
@@ -40,15 +40,15 @@ module iob_fifo_async_asym
    
 
    //read/write increments
-   wire [ADDR_W-1:0]       r_incr, w_incr;
+   wire [ADDR_W-1:0]          r_incr, w_incr;
 
    //binary read addresses on both domains
    wire [R_ADDR_W-1:0]        r_addr_bin, w_r_addr_bin;
-   wire [W_ADDR_W-1:0] 	      w_addr_bin, r_w_addr_bin;
+   wire [W_ADDR_W-1:0]        w_addr_bin, r_w_addr_bin;
   
    //normalized addresses
-   wire [ADDR_W-1:0]       w_addr_bin_n, r_addr_bin_n;
-   wire [ADDR_W-1:0]       r_w_addr_bin_n, w_r_addr_bin_n;
+   wire [ADDR_W-1:0]          w_addr_bin_n, r_addr_bin_n;
+   wire [ADDR_W-1:0]          r_w_addr_bin_n, w_r_addr_bin_n;
    
    //assign according to assymetry type
    generate 
@@ -96,120 +96,83 @@ module iob_fifo_async_asym
    
    
    //READ DOMAIN FIFO INFO
-   wire [ADDR_W-1:0]         r_level_int = r_w_addr_bin_n - r_addr_bin_n;
-   reg [ADDR_W-1:0]          r_level_int_reg;
-   `REG_AR(r_clk, rst, 1'b0, r_level_int_reg, r_level_int)
+   wire [ADDR_W-1:0]      r_level_int = r_w_addr_bin_n - r_addr_bin_n;
+   
+   //read state
+   localparam EMPTY=0, DEFAULT=1, FULL=2;
+   reg [1:0]              r_st, r_st_nxt;
+   `REG_AR(r_clk, rst, 1'b0, r_st, r_st_nxt)
 
-   wire signed [ADDR_W-1:0] r_level_incr = r_level_int-r_level_int_reg;
-   
-   reg [ADDR_W:0]         r_level_nxt;
-   reg [1:0]              r_pc, r_pc_nxt;
-   `REG_AR(r_clk, rst, 1'b0, r_pc, r_pc_nxt)
-   localparam EMPTY=0, DECREASED=1, INCREASED=2, FULL=3;
-   
+   //read state machine
    `COMB begin
-      r_level_nxt = r_level;
-      r_pc_nxt = r_pc;
+      r_level = r_level_int;
+      r_full = 1'b0;
+      r_empty = 1'b0;
+      r_st_nxt = r_st;
       
-      case (r_pc)
+      case (r_st)
         
         EMPTY: begin
-           r_pc_nxt = r_pc;
-           if(r_level_incr > 0 && r_level+r_level_incr >= r_incr) begin
-              r_pc_nxt = INCREASED;
-              r_level_nxt = r_level+r_level_incr;
-           end
+           r_empty = 1'b1;
+           if(r_level_int >= r_incr)
+             r_st_nxt = DEFAULT;
         end
         
-        INCREASED: begin
-           r_level_nxt = r_level+r_level_incr;
-           if(r_level_incr > 0 && r_level+r_level_incr > (FIFO_SIZE-w_incr))
-             r_pc_nxt = FULL;
-           else if(r_level_incr < 0 && r_level+r_level_incr < r_incr)
-             r_pc_nxt = EMPTY;
+        default: begin
+           if(r_en && (r_level_int-r_incr) < r_incr)
+             r_st_nxt = EMPTY;
+           else if(r_level_int > (FIFO_SIZE-w_incr) || r_level_int == 0)
+             r_st_nxt = FULL;
         end
-        
-        DECREASED: begin
-           r_level_nxt = r_level+r_level_incr;
-           if(r_level_incr < 0 && r_level+r_level_incr < r_incr)
-             r_pc_nxt = EMPTY;
-           else if(r_level_incr > 0 && r_level+r_level_incr > (FIFO_SIZE-w_incr))
-             r_pc_nxt = FULL;
-        end
-        
+
         FULL: begin
-           if(r_level_incr < 0 && r_level+r_level_incr <= (FIFO_SIZE-w_incr)) begin
-              r_pc_nxt = DECREASED;
-              r_level_nxt = r_level+r_level_incr;
-           end
+           r_full = 1'b1;
+           r_level = FIFO_SIZE;
+           if(r_en && (r_level_int-r_incr) <= (FIFO_SIZE-w_incr))
+             r_st_nxt = DEFAULT;
         end
-      
-      endcase // case (r_pc)
+        
+      endcase
 
    end
-   //READ FIFO EMPTY
-   assign r_empty = (r_pc == EMPTY);
-   //READ FIFO FULL
-   assign r_full = r_pc == FULL;
-
 
    //WRITE DOMAIN FIFO INFO
-   wire [ADDR_W-1:0]         w_level_int = w_addr_bin_n - w_r_addr_bin_n;
-   reg [ADDR_W-1:0]          w_level_int_reg;
-   `REG_AR(r_clk, rst, 1'b0, w_level_int_reg, w_level_int)
+   wire [ADDR_W-1:0]      w_level_int = w_addr_bin_n - w_r_addr_bin_n;
 
-   wire signed [ADDR_W-1:0] w_level_incr = w_level_int-w_level_int_reg;
-   
-   reg [ADDR_W:0]           w_level_nxt;
-   reg [1:0]                w_pc, w_pc_nxt;
-   `REG_AR(w_clk, rst, 1'b0, w_pc, w_pc_nxt)
-   
+   //write state
+   reg [1:0]              w_st, w_st_nxt;
+   `REG_AR(w_clk, rst, 1'b0, w_st, w_st_nxt)
+
    `COMB begin
-      w_level_nxt = r_level;
-      w_pc_nxt = w_pc;
+      w_level = w_level_int;
+      w_full = 1'b0;
+      w_empty = 1'b0;
+      w_st_nxt = w_st;
       
-      case (w_pc)
-        
+      case (w_st)
         EMPTY: begin
-           w_pc_nxt = r_pc;
-           if(w_level_incr > 0 && w_level+w_level_incr >= r_incr) begin
-              w_pc_nxt = INCREASED;
-              r_level_nxt = r_level+r_level_incr;
-           end
+           w_empty = 1'b1;
+           if( w_en && (w_level_int + w_incr) >= r_incr )
+             w_st_nxt = DEFAULT;
         end
         
-        INCREASED: begin
-           r_level_nxt = r_level+r_level_incr;
-           if(w_level_incr > 0 && w_level+w_level_incr > (FIFO_SIZE-w_incr))
-             w_pc_nxt = FULL;
-           else if(w_level_incr < 0 && w_level+w_level_incr < r_incr)
-             w_pc_nxt = EMPTY;
+        DEFAULT: begin
+           if( w_en && (w_level_int + w_incr) > (FIFO_SIZE-w_incr)  )
+              w_st_nxt = FULL;
+           else if (w_level_int < r_incr)
+              w_st_nxt = EMPTY;
         end
-        
-        DECREASED: begin
-           r_level_nxt = r_level+r_level_incr;
-           if(w_level_incr < 0 && w_level+w_level_incr < r_incr)
-             w_pc_nxt = EMPTY;
-           else if(w_level_incr > 0 && w_level+w_level_incr > (FIFO_SIZE-w_incr))
-             w_pc_nxt = FULL;
-        end
-        
-        FULL: begin
-           if(w_level_incr < 0 && w_level+w_level_incr <= (FIFO_SIZE-w_incr)) begin 
-              w_pc_nxt = DECREASED;
-              r_level_nxt = r_level+r_level_incr;
-           end
-        end
-      
-      endcase // case (r_pc)
 
+        FULL: begin
+           w_full = 1'b1;
+           w_level = FIFO_SIZE;
+           if(w_level_int != 0 && w_level_int <= (FIFO_SIZE-w_incr))
+              w_st_nxt = DEFAULT;
+        end
+        
+      endcase
    end
-   //WRITE FIFO EMPTY
-   assign w_empty = r_pc == EMPTY;
-   //READ FIFO FULL
-   assign w_full = r_pc == FULL;
-   
-   
+
    //read address gray code counter
    wire r_en_int  = r_en & ~r_empty;
    gray_counter
