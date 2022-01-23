@@ -1,5 +1,5 @@
 # PATHS
-LIB_DIR ?=submodules/LIB
+LIB_DIR ?=$(MEM_DIR)/submodules/LIB
 MEM_HW_DIR ?=$(MEM_DIR)/hardware
 MEM_FIFO_DIR ?=$(MEM_HW_DIR)/fifo
 MEM_RAM_DIR ?=$(MEM_HW_DIR)/ram

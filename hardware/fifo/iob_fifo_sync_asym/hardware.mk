@@ -7,6 +7,7 @@ MODULES+=iob_fifo_sync_asym
 SFIFO_ASYM_DIR=$(MEM_FIFO_DIR)/iob_fifo_sync_asym
 
 # Submodules
+include $(LIB_DIR)/hardware/hardware.mk
 include $(MEM_RAM_DIR)/iob_ram_2p_asym/hardware.mk
 
 # Sources

@@ -5,6 +5,7 @@ ifneq (iob_ram_t2p_asym,$(filter iob_ram_t2p_asym,, $(MODULES)))
 MODULES+=iob_ram_t2p_asym
 
 # Submodules
+include $(LIB_DIR)/hardware/hardware.mk
 include $(MEM_RAM_DIR)/iob_ram_t2p/hardware.mk
 
 # Sources
