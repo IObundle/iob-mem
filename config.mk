@@ -6,4 +6,4 @@ MEM_RAM_DIR ?=$(MEM_HW_DIR)/ram
 MEM_ROM_DIR ?=$(MEM_HW_DIR)/rom
 MEM_REGF_DIR ?=$(MEM_HW_DIR)/regfile
 MEM_SW_DIR ?=$(MEM_DIR)/software
-MEM_PYTHON_DIR ?=$(SW_DIR)/python
+MEM_PYTHON_DIR ?=$(MEM_SW_DIR)/python
