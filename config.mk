@@ -7,11 +7,3 @@ MEM_ROM_DIR ?=$(MEM_HW_DIR)/rom
 MEM_REGF_DIR ?=$(MEM_HW_DIR)/regfile
 MEM_SW_DIR ?=$(MEM_DIR)/software
 MEM_PYTHON_DIR ?=$(SW_DIR)/python
-
-# INCLUDES
-INCLUDE+=$(incdir)$(LIB_DIR)/hardware/include
-
-# DEFINES
-ifeq ($(VCD),1)
-DEFINE+=$(defmacro)VCD
-endif

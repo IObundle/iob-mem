@@ -4,7 +4,7 @@ module iob_rom_sp
   #(
     parameter DATA_W = 8,
     parameter ADDR_W = 10,
-    parameter FILE = "rom.dat"
+    parameter FILE = "none"
 	)
    (
     input                    clk,
