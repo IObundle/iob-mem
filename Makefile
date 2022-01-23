@@ -11,6 +11,14 @@ MODULE_DIR = $(shell find . -name $(MEM_NAME))
 # sources 
 include $(MODULE_DIR)/hardware.mk
 
+# INCLUDES
+INCLUDE+=$(incdir)$(LIB_DIR)/hardware/include
+
+# DEFINES
+ifeq ($(VCD),1)
+DEFINE+=$(defmacro)VCD
+endif
+
 # testbench
 VSRC+=$(wildcard $(MODULE_DIR)/$(MEM_NAME)_tb.v)
 

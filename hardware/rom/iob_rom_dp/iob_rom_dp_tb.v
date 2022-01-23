@@ -2,7 +2,6 @@
 
 `define DATA_W 8
 `define ADDR_W 4
-`define FILE "data.hex"
 
 module iob_rom_dp_tb;
 
@@ -16,11 +15,8 @@ module iob_rom_dp_tb;
    // Ouptuts
    reg [`DATA_W-1:0] r_data_a;
    reg [`DATA_W-1:0] r_data_b;
-   
-   // .hex file
-   reg [`DATA_W-1:0] filemem [0:2**`ADDR_W-1];
 
-   integer           i;
+   integer           i, seq_ini;
 
    parameter clk_per = 10; // clk period = 10 timeticks
    
@@ -39,10 +35,13 @@ module iob_rom_dp_tb;
       r_en_b = 0;
       addr_b = 0;
 
-      #clk_per;
-      @(posedge clk) #1;
-      $readmemh(`FILE, filemem);
+      // Number from which to start the incremental sequence to initialize the ROM
+      seq_ini = 32;
+      for(i=0; i < 2**`ADDR_W; i = i + 1) begin
+         uut.rom[i] = i+seq_ini;
+      end
 
+      #clk_per;
       @(posedge clk) #1;
       r_en_a = 1;
       r_en_b = 1;
@@ -52,12 +51,12 @@ module iob_rom_dp_tb;
          addr_a = i;
          addr_b = 2**`ADDR_W-1-i;
          @(posedge clk) #1;
-         if(filemem[i] != r_data_a) begin
-            $display("Port A - Test failed: read error in position %d, where tb.hex=%h but r_data=%h", i, filemem[i], r_data_a);
+         if(i+seq_ini != r_data_a) begin
+            $display("Port A - Test failed: read error in position %d, where expected data=%h but r_data=%h", i, i+seq_ini, r_data_a);
             $finish;
          end
-         if (filemem[2**`ADDR_W-1-i] != r_data_b) begin
-            $display("Port B - Test failed: read error in position %d, where tb.hex=%h but r_data=%h", i, filemem[2**`ADDR_W-1-i], r_data_b);
+         if (seq_ini+2**`ADDR_W-1-i != r_data_b) begin
+            $display("Port B - Test failed: read error in position %d, where expected data=%h but r_data=%h", 2**`ADDR_W-1-i, seq_ini+2**`ADDR_W-1-i, r_data_b);
             $finish;
          end
       end
@@ -78,8 +77,7 @@ module iob_rom_dp_tb;
    iob_rom_dp
      #(
        .DATA_W(`DATA_W),
-       .ADDR_W(`ADDR_W),
-       .FILE(`FILE)
+       .ADDR_W(`ADDR_W)
        )
    uut
      (
