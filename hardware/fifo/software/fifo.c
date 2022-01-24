@@ -1,5 +1,5 @@
 #include "fifo.h"
-#include "interconnect.h"
+#include "iob-lib.h"
 
 int fifo_empty(int base) {
   return IO_GET(base, FIFO_EMPTY);
