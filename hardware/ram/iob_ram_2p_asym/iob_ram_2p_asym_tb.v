@@ -38,13 +38,8 @@ module iob_ram_2p_asym_tb;
    integer             i;
 
    reg [W_DATA_W*2**W_ADDR_W-1:0] test_data;
-<<<<<<< HEAD
-   reg [R_DATA_W-1:0]              r_data_expected;
-
-=======
    reg [R_DATA_W-1:0]             r_data_expected;
-   
->>>>>>> bd4957c41a98b22d8674d6835f5921ffdb292c35
+
    initial begin
 
       $display("W_DATA_W=%d", W_DATA_W);
@@ -100,7 +95,7 @@ module iob_ram_2p_asym_tb;
      #(
        .W_DATA_W(W_DATA_W),
        .R_DATA_W(R_DATA_W),
-       .MAXADDR_W(MAXADDR_W)
+       .ADDR_W(MAXADDR_W)
        )
    uut
      (
