@@ -71,14 +71,28 @@ module iob_fifo_sync_asym
 
    `COMB begin
       level_nxt = level;
-      if(w_en && !r_en && (level + w_incr) <= FIFO_SIZE)
+      if(w_en_int && !r_en_int)
         level_nxt = level + w_incr;
-      else if(w_en && r_en && (level + w_incr - r_incr) <= FIFO_SIZE && (level + w_incr - r_incr) >= 0)
+      else if(w_en_int && r_en_int)
              level_nxt = level + w_incr -r_incr;
-      else if (!w_en && r_en && (level-r_incr) >= 0 )
+      else if (!w_en_int && r_en_int)
         level_nxt = level -r_incr;
    end
-   
+
+  generate
+    if (W_DATA_W > R_DATA_W) begin
+      assign r_level = level;
+      assign w_level = level >> ADDR_W_DIFF;
+    end else if (R_DATA_W > W_DATA_W) begin
+      assign w_level = level;
+      assign r_level = level >> ADDR_W_DIFF;
+    end else begin
+      assign r_level = level;
+      assign w_level = level;
+    end
+  endgenerate
+
+
    //FIFO empty
    assign r_empty = level < r_incr;
 
