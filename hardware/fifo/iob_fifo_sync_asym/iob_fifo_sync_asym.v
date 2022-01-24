@@ -16,13 +16,14 @@ module iob_fifo_sync_asym
     input                 r_en,
     output [R_DATA_W-1:0] r_data,
     output                r_empty,
-    output [ADDR_W-1:0]   r_level,
 
     //write port
     input                 w_en,
     input [W_DATA_W-1:0]  w_data,
     output                w_full,
-    output [ADDR_W-1:0]   w_level
+
+    //FIFO level
+    output reg [ADDR_W:0] level
     );
 
 
@@ -50,13 +51,13 @@ module iob_fifo_sync_asym
    `VAR(r_addr, R_ADDR_W)
    `COUNTER_ARE(clk, rst, r_en_int, r_addr)
 
-   //read/write increments
+   //assign according to assymetry type
    wire [ADDR_W-1:0]       r_incr, w_incr;
-   generate 
-      if (W_DATA_W > R_DATA_W) begin 
+   generate
+      if (W_DATA_W > R_DATA_W) begin
         assign r_incr = 1'b1;
         assign w_incr = 1'b1 << ADDR_W_DIFF;
-      end else if (R_DATA_W > W_DATA_W) begin 
+      end else if (R_DATA_W > W_DATA_W) begin
         assign w_incr = 1'b1;
         assign r_incr = 1'b1 << ADDR_W_DIFF;
       end else begin
@@ -64,9 +65,9 @@ module iob_fifo_sync_asym
         assign w_incr = 1'b1;
       end
    endgenerate
-   
+
    //FIFO level
-   reg [ADDR_W:0]         level, level_nxt;
+   reg [ADDR_W:0]         level_nxt;
    `REG_AR(clk, rst, 1'b0, level, level_nxt)
 
    `COMB begin
@@ -79,26 +80,11 @@ module iob_fifo_sync_asym
         level_nxt = level -r_incr;
    end
 
-  generate
-    if (W_DATA_W > R_DATA_W) begin
-      assign r_level = level;
-      assign w_level = level >> ADDR_W_DIFF;
-    end else if (R_DATA_W > W_DATA_W) begin
-      assign w_level = level;
-      assign r_level = level >> ADDR_W_DIFF;
-    end else begin
-      assign r_level = level;
-      assign w_level = level;
-    end
-  endgenerate
-
-
    //FIFO empty
    assign r_empty = level < r_incr;
 
-   //FIFO empty
+   //FIFO full
    assign w_full = level > (FIFO_SIZE -w_incr);
-   
 
    //FIFO memory
    iob_ram_2p_asym

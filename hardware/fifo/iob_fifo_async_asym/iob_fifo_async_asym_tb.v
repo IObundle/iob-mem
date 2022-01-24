@@ -5,7 +5,7 @@
 `define W_DATA_W 32
 `define R_DATA_W 8
 `define ADDR_W 4
-`define TESTSIZE 32 //bytes
+`define TESTSIZE 256 //bytes
 
 
 module iob_fifo_async_asym_tb;
