@@ -103,9 +103,9 @@ module iob_ram_t2p_asym
          //write serial
          always @* begin
             for (j=0; j < N; j= j+1) begin
-               en_wr[j] = w_en & (w_addr[W_ADDR_W-R_ADDR_W-1:0] == j[W_ADDR_W-R_ADDR_W-1:0]);
+               en_wr[j] = w_en & (w_addr[W_ADDR_W-R_ADDR_W-1:0] == j);
                data_wr[j] = w_data;
-               addr_wr[j] = w_addr[R_ADDR_W-1:0];
+               addr_wr[j] = w_addr[W_ADDR_W-1 -: R_ADDR_W];
             end
          end
          //read parallel
