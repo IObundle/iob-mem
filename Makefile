@@ -19,6 +19,8 @@ endif
 # testbench
 VSRC+=$(wildcard $(MODULE_DIR)/$(MEM_NAME)_tb.v)
 
+ALL_MODULES=$(shell find . -name hardware.mk -not -path './submodules/*' | sed 's/\/hardware.mk//g' | tail -n +3)
+
 # Rules
 .PHONY: sim sim-all clean corename $(ALL_MODULES)
 
@@ -45,7 +47,6 @@ uut.vcd:
 	make sim VCD=1
 
 
-ALL_MODULES=$(shell find . -name hardware.mk | sed 's/\/hardware.mk//g' | tail -n +3)
 
 sim-all: $(ALL_MODULES)
 	@echo "Listing all modules: $(ALL_MODULES)"
