@@ -22,7 +22,7 @@ VSRC+=$(wildcard $(MODULE_DIR)/$(MEM_NAME)_tb.v)
 ALL_MODULES=$(shell find . -name hardware.mk -not -path './submodules/*' | sed 's/\/hardware.mk//g' | tail -n +3)
 
 # Rules
-.PHONY: sim sim-all clean corename $(ALL_MODULES)
+.PHONY: sim sim-all clean $(ALL_MODULES)
 
 #
 # Simulate
@@ -69,12 +69,3 @@ debug:
 
 clean:
 	@rm -f *~ \#*\# a.out *.vcd *.drom *.png *.pyc
-
-
-#
-# Module name
-#
-
-corename:
-	@echo "MEM"
-
