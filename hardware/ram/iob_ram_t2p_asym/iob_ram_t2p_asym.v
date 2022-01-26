@@ -89,7 +89,8 @@ module iob_ram_t2p_asym
          //read address register
          reg [R_ADDR_W-W_ADDR_W-1:0] r_addr_lsbs_reg;
          always @(posedge r_clk)
-           r_addr_lsbs_reg <= r_addr[R_ADDR_W-W_ADDR_W-1:0];
+           if (r_en)
+             r_addr_lsbs_reg <= r_addr[R_ADDR_W-W_ADDR_W-1:0];
            
          //read mux
          always @* begin
