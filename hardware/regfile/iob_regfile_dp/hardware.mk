@@ -1,8 +1,8 @@
 ifneq ($(ASIC),1)
-ifneq (iob_regfile_dp,$(filter iob_regfile_dp,, $(MODULES)))
+ifneq (iob_regfile_dp,$(filter iob_regfile_dp,, $(HW_MODULES)))
 
 # Add to modules list
-MODULES+=iob_regfile_dp
+HW_MODULES+=iob_regfile_dp
 
 # Paths
 DP_REGFILE_DIR=$(MEM_REGF_DIR)/iob_regfile_dp

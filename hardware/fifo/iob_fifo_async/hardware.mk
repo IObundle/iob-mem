@@ -1,7 +1,7 @@
-ifneq (iob_fifo_async,$(filter iob_fifo_async,, $(MODULES)))
+ifneq (iob_fifo_async,$(filter iob_fifo_async,, $(HW_MODULES)))
 
 # Add to modules list
-MODULES+=iob_fifo_async
+HW_MODULES+=iob_fifo_async
 
 # Paths
 AFIFO_DIR=$(MEM_FIFO_DIR)/iob_fifo_async

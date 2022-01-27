@@ -1,8 +1,8 @@
 ifneq ($(ASIC),1)
-ifneq (iob_rom_dp,$(filter $S, $(MODULES)))
+ifneq (iob_rom_dp,$(filter $S, $(HW_MODULES)))
 
 # Add to modules list
-MODULES+=iob_rom_dp
+HW_MODULES+=iob_rom_dp
 
 # Paths
 DPROM_DIR=$(MEM_ROM_DIR)/iob_rom_dp

@@ -1,8 +1,8 @@
 ifneq ($(ASIC),1)
-ifneq (iob_ram_t2p,$(filter $S, $(MODULES)))
+ifneq (iob_ram_t2p,$(filter $S, $(HW_MODULES)))
 
 # Add to modules list
-MODULES+=iob_ram_t2p
+HW_MODULES+=iob_ram_t2p
 
 # Paths
 T2PRAM_DIR=$(MEM_RAM_DIR)/iob_ram_t2p

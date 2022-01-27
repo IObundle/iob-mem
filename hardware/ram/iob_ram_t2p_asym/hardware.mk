@@ -1,8 +1,8 @@
 ifneq ($(ASIC),1)
-ifneq (iob_ram_t2p_asym,$(filter iob_ram_t2p_asym,, $(MODULES)))
+ifneq (iob_ram_t2p_asym,$(filter iob_ram_t2p_asym,, $(HW_MODULES)))
 
 # Add to modules list
-MODULES+=iob_ram_t2p_asym
+HW_MODULES+=iob_ram_t2p_asym
 
 # Submodules
 include $(LIB_DIR)/hardware/hardware.mk

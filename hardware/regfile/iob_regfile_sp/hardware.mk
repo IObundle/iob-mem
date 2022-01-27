@@ -1,8 +1,8 @@
 ifneq ($(ASIC),1)
-ifneq (iob_regfile_sp,$(filter iob_regfile_sp,, $(MODULES)))
+ifneq (iob_regfile_sp,$(filter iob_regfile_sp,, $(HW_MODULES)))
 
 # Add to modules list
-MODULES+=iob_regfile_sp
+HW_MODULES+=iob_regfile_sp
 
 # Paths
 SP_REGFILE_DIR=$(MEM_REGF_DIR)/iob_regfile_sp

@@ -19,10 +19,10 @@ endif
 # testbench
 VSRC+=$(wildcard $(MODULE_DIR)/$(MEM_NAME)_tb.v)
 
-ALL_MODULES=$(shell find . -name hardware.mk -not -path './submodules/*' | sed 's/\/hardware.mk//g' | tail -n +3)
+ALL_HW_MODULES=$(shell find . -name hardware.mk -not -path './submodules/*' | sed 's/\/hardware.mk//g' | tail -n +3)
 
 # Rules
-.PHONY: sim sim-all clean $(ALL_MODULES)
+.PHONY: sim sim-all clean $(ALL_HW_MODULES)
 
 #
 # Simulate
@@ -59,10 +59,10 @@ ifeq ($(VCD),1)
 	@if [ ! `pgrep gtkwave` ]; then gtkwave uut.vcd; fi &
 endif
 
-sim-all: $(ALL_MODULES)
-	@echo "Listing all modules: $(ALL_MODULES)"
+sim-all: $(ALL_HW_MODULES)
+	@echo "Listing all modules: $(ALL_HW_MODULES)"
 
-$(ALL_MODULES):
+$(ALL_HW_MODULES):
 	make sim MEM_NAME=$(shell basename $@)
 
 #
@@ -72,7 +72,7 @@ $(ALL_MODULES):
 debug:
 	@echo $(MODULE_DIR)
 	@echo $(VSRC)
-	@echo $(MODULES)
+	@echo $(HW_MODULES)
 
 #
 # Clean

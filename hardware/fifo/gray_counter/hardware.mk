@@ -1,7 +1,7 @@
-ifneq (gray_counter,$(filter gray_counter,, $(MODULES)))
+ifneq (gray_counter,$(filter gray_counter,, $(HW_MODULES)))
 
 # Add to modules list
-MODULES+=gray_counter
+HW_MODULES+=gray_counter
 
 # Paths
 GRAY_COUNTER_DIR=$(MEM_FIFO_DIR)/gray_counter

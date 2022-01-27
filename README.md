@@ -15,7 +15,7 @@ Each module is provided with a Verilog testbench and a Makefile segment called
 hardware.mk. The hardware.mk Makefile segment may include the hardware.mk
 segments that are used in other modules that may be included in the module of
 interest. The hardware.mk Makefile segment sets the variables used in IObundle
-projects, such as the MODULES variable, which contain a list of all modules used
+projects, such as the HW_MODULES variable, which contain a list of all modules used
 in the project. Another variable of interest contains the directory path of the
 module. The list of Verilog sources is added to the variable VSRC. Finally, the
 required Verilog macros are added to the DEFINE variable so that the module is
