@@ -8,7 +8,7 @@ MEM_DIR=.
 MEM_NAME ?= iob_ram_sp
 MODULE_DIR = $(shell find . -name $(MEM_NAME))
 
-# sources 
+# sources
 include $(MODULE_DIR)/hardware.mk
 
 # DEFINES
@@ -46,7 +46,18 @@ sim-waves: uut.vcd
 uut.vcd:
 	make sim VCD=1
 
-
+test-sim: $(VSRC) $(VHDR)
+	@echo $(VSRC)
+	@echo "\n\nTesting module $(MEM_NAME)\n\n"
+	$(VLOG) $(defmacro)W_DATA_W=32 $(defmacro)R_DATA_W=8 $(VSRC)
+	@./a.out
+	$(VLOG) $(defmacro)W_DATA_W=8 $(defmacro)R_DATA_W=32 $(VSRC)
+	@./a.out
+	$(VLOG) $(defmacro)W_DATA_W=8 $(defmacro)R_DATA_W=8 $(VSRC)
+	@./a.out
+ifeq ($(VCD),1)
+	@if [ ! `pgrep gtkwave` ]; then gtkwave uut.vcd; fi &
+endif
 
 sim-all: $(ALL_MODULES)
 	@echo "Listing all modules: $(ALL_MODULES)"
@@ -65,7 +76,7 @@ debug:
 
 #
 # Clean
-# 
+#
 
 clean:
 	@rm -f *~ \#*\# a.out *.vcd *.drom *.png *.pyc
