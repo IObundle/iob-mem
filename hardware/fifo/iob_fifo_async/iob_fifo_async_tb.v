@@ -1,54 +1,76 @@
 `timescale 1ns / 1ps
+`include "iob_lib.vh"
 
-`define DATA_W 8
+//test defines
 `define ADDR_W 4
-`define TESTSIZE 256 // test size in bytes
+`define TESTSIZE 256 //bytes
+
 
 module iob_fifo_async_tb;
 
-   localparam DATA_W = `DATA_W;
+   localparam TESTSIZE = `TESTSIZE; //bytes
+   localparam W_DATA_W = `W_DATA_W;
+   localparam R_DATA_W = `R_DATA_W;
+   localparam MAXDATA_W = `max(W_DATA_W, R_DATA_W);
+   localparam MINDATA_W = `min( W_DATA_W, R_DATA_W );
    localparam ADDR_W = `ADDR_W;
-   localparam TESTSIZE = `TESTSIZE;
+   localparam R=MAXDATA_W/MINDATA_W;
+   localparam MINADDR_W = ADDR_W-$clog2(R);//lower ADDR_W (higher DATA_W)
+   localparam W_ADDR_W = W_DATA_W == MAXDATA_W? MINADDR_W : ADDR_W;
+   localparam R_ADDR_W = R_DATA_W == MAXDATA_W? MINADDR_W : ADDR_W;
 
-   // Inputs
-   reg rst;
-   reg r_en;
-   reg r_clk = 0;
-   reg [DATA_W-1:0] w_data;
-   reg              w_en;
-   reg              w_clk = 1;
+   reg reset = 0;
 
-   // Outputs
-   reg [DATA_W-1:0] r_data;
-   wire             r_empty;
-   wire [ADDR_W-1:0] r_level;
-   wire              w_full;
-   wire [ADDR_W-1:0] w_level;
+   //write port
+   reg                 w_clk = 0;
+   reg                 w_en = 0;
+   reg [W_DATA_W-1:0]  w_data;
+   wire                w_empty;
+   wire                w_full;
+   wire [ADDR_W:0]     w_level;
 
-   integer           i, j;
+   //read port
+   reg                 r_clk = 0;
+   reg                 r_en = 0;
+   wire [R_DATA_W-1:0] r_data;
+   wire                r_empty;
+   wire                r_full;
+   wire [ADDR_W:0]     r_level;
 
-   reg [DATA_W*2**ADDR_W-1:0] test_input;
-   reg [DATA_W*2**ADDR_W-1:0] test_output;
 
-   // Clocks
+   // clocks
    parameter clk_per_w = 10; //ns
    always #(clk_per_w/2) w_clk = ~w_clk;
    parameter clk_per_r = 13; //ns
    always #(clk_per_r/2) r_clk = ~r_clk;
 
-   initial begin // Writer process
+   integer             i,j; //iterators
 
-      // Initialize Inputs
-      w_en = 0;
-      w_data = 0;
+   reg [TESTSIZE*8-1:0] test_data;
+   reg [TESTSIZE*8-1:0] read;
 
-      $display("DATA_W = %.0f", DATA_W);
-      $display("ADDR_W = %.0f", ADDR_W);
+   //
+   // WRITE PROCESS
+   //
+   reg                  w_r_en = 0;//disable reads initially
 
-      // Create the test data bytes
-      for(i=0; i < TESTSIZE; i=i+1) begin
-         test_input[i*8 +: 8] = i;
-      end
+   initial begin
+
+      if(W_DATA_W > R_DATA_W)
+        $display("W_DATA_W > R_DATA_W");
+      else if (W_DATA_W < R_DATA_W)
+        $display("W_DATA_W < R_DATA_W");
+      else
+        $display("W_DATA_W = R_DATA_W");
+
+      $display("W_DATA_W=%d", W_DATA_W);
+      $display("W_ADDR_W=%d", W_ADDR_W);
+      $display("R_DATA_W=%d", R_DATA_W);
+      $display("R_ADDR_W=%d", R_ADDR_W);
+
+      //create the test data bytes
+      for (i=0; i < TESTSIZE; i=i+1)
+        test_data[i*8 +: 8] = i;
 
       // optional VCD
 `ifdef VCD
@@ -57,82 +79,128 @@ module iob_fifo_async_tb;
 `endif
       repeat(4) @(posedge w_clk) #1;
 
-      // Write all the locations of FIFO
+
+      //reset FIFO
       #clk_per_w;
       @(posedge w_clk) #1;
-      rst = 1;
-      @(posedge w_clk) #1;
-      rst = 0;
+      reset = 1;
+      repeat (4) @(posedge w_clk) #1;
+      reset = 0;
 
-      // Pause for 1ms to allow the reader to test the empty flag
-      #1000000 @(posedge w_clk) #1;
-
-      // Write test input to fifo
-      for(i=0; i < ((TESTSIZE*8)/DATA_W); i=i+1) begin
-         if(i == ((TESTSIZE*8)/DATA_W/2)) begin // Another pause
-            #1000000 @(posedge w_clk) #1;
-         end
-
-         if(~w_full) begin
-            w_en = 1;
-            w_data = test_input[i*DATA_W +: DATA_W];
-            @(posedge w_clk) #1;
-            w_en = 0;
-         end
+      //fill up the FIFO
+      for(i = 0; i < 2**W_ADDR_W; i = i + 1) begin
+         w_en = 1;
+         w_data = test_data[i*W_DATA_W +: W_DATA_W];
          @(posedge w_clk) #1;
       end
+      w_en = 0;
 
-      #(5*clk_per_r) $finish;
-   end  // end of Writer process
+      if(w_full != 1) begin
+         $display("ERROR: expecting w_full=1");
+         $finish;
+      end
+      $display("INFO: w_full=1 as expected");
 
-   initial begin // Read process
 
-      // initialize values
-      r_en = 0;
+      if(w_level != 2**ADDR_W) begin
+        $display("ERROR: expecting w_level = 2**ADDR");
+         $finish;
+      end
+      $display("INFO: w_level = 2**ADDR as expected");
 
-      @(negedge rst) repeat(4) @(posedge r_clk) #1;
+      //enable reads and wait for empty
+      w_r_en = 1;
+      while (!w_empty) @(posedge w_clk) #1;
+      $display("INFO: w_empty=0 as expected");
 
-      // Read data from fifo
-      for(j=0; j < ((TESTSIZE*8)/DATA_W); j=j+1) begin
-         // Wait for data to read
-         while(r_empty) begin
-            @(posedge r_clk) #1;
-         end
-
-         if(~r_empty) begin
-            r_en = 1;
-            @(posedge r_clk) #1;
-            test_output[j*DATA_W +: DATA_W] = r_data;
-            r_en = 0;
-         end
+      //write test data continuously to the FIFO
+      for(i = 0; i < ((TESTSIZE*8)/W_DATA_W); i = i + 1) begin
+         while(w_full)  @(posedge w_clk) #1;
+         w_en = 1;
+         w_data = test_data[i*W_DATA_W +: W_DATA_W];
+         @(posedge w_clk) #1;
+         w_en = 0;
       end
 
-      // Compare written and read data
-      if(test_output !== test_input)
+   end
+
+   //
+   // READ PROCESS
+   //
+
+   initial begin
+
+      //wait for reset to be de-asserted
+      @(negedge reset) repeat(4) @(posedge r_clk) #1;
+      while(!w_r_en) @(posedge r_clk) #1;
+
+
+      //wait for FIFO full
+      while (!r_full)  @(posedge r_clk) #1;
+      $display("INFO: r_full=1 as expected");
+
+      //read data from the entire FIFO
+      for(j = 0; j < 2**R_ADDR_W; j = j + 1) begin
+         while(r_empty) @(posedge r_clk) #1;
+         r_en = 1;
+         @(posedge r_clk) #1;
+         read[j*R_DATA_W +: R_DATA_W] = r_data;
+         r_en = 0;
+      end
+
+      while(!r_empty)  @(posedge r_clk) #1;
+      $display("INFO: r_empty = 1 as expected");
+
+
+      if(r_level != 0) begin
+         $display("ERROR: expecting r_level = 0, but got r_level=%d", r_level);
+         $finish;
+      end
+      $display("INFO: r_level = 0 as expected");
+
+
+      //read data continuously from the FIFO
+      for(j = 0; j < ((TESTSIZE*8)/R_DATA_W); j = j + 1) begin
+         while(r_empty) @(posedge r_clk) #1;
+         r_en = 1;
+         @(posedge r_clk) #1;
+         read[j*R_DATA_W +: R_DATA_W] = r_data;
+         r_en = 0;
+      end
+
+      if(read !== test_data) begin
         $display("ERROR: data read does not match the test data.");
-   end // end of Read process
+        $display("data read XOR test data: %x", read^test_data);
+      end
+      $display("INFO: data read matches test data as expected");
+
+      #(5*clk_per_r) $finish;
+   end
 
    // Instantiate the Unit Under Test (UUT)
    iob_fifo_async
      #(
-       .DATA_W(DATA_W),
+       .W_DATA_W(W_DATA_W),
+       .R_DATA_W(R_DATA_W),
        .ADDR_W(ADDR_W)
        )
    uut
      (
-      .rst(rst),
-
-      .w_clk(w_clk),
-      .w_en(w_en),
-      .w_data(w_data),
-      .w_full(w_full),
-      .w_level(w_level),
+      .rst(reset),
 
       .r_clk(r_clk),
       .r_en(r_en),
       .r_data(r_data),
       .r_empty(r_empty),
-      .r_level(r_level)
+      .r_full(r_full),
+      .r_level(r_level),
+
+      .w_clk(w_clk),
+      .w_en(w_en),
+      .w_data(w_data),
+      .w_empty(w_empty),
+      .w_full(w_full),
+      .w_level(w_level)
       );
 
 endmodule
