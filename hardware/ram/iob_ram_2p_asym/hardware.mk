@@ -4,14 +4,11 @@ ifneq (iob_ram_2p_asym,$(filter iob_ram_2p_asym,, $(HW_MODULES)))
 # Add to modules list
 HW_MODULES+=iob_ram_2p_asym
 
-# Paths
-2P_ASYM_RAM_DIR=$(MEM_RAM_DIR)/iob_ram_2p_asym
-
 # Submodules
-include $(MEM_RAM_DIR)/iob_ram_2p/hardware.mk
+include $(MEM_DIR)/hardware/ram/iob_ram_2p/hardware.mk
 
 # Sources
-VSRC+=$(2P_ASYM_RAM_DIR)/iob_ram_2p_asym.v
+VSRC+=$(MEM_DIR)/hardware/ram/iob_ram_2p_asym/iob_ram_2p_asym.v
 
 endif
 endif
