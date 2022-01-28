@@ -4,11 +4,8 @@ ifneq (iob_regfile_dp,$(filter iob_regfile_dp,, $(HW_MODULES)))
 # Add to modules list
 HW_MODULES+=iob_regfile_dp
 
-# Paths
-DP_REGFILE_DIR=$(MEM_REGF_DIR)/iob_regfile_dp
-
 # Sources
-VSRC+=$(DP_REGFILE_DIR)/iob_regfile_dp.v
+VSRC+=$(MEM_DIR)/hardware/regfile/iob_regfile_dp/iob_regfile_dp.v
 
 endif
 endif
