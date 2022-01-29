@@ -98,10 +98,10 @@ module iob_fifo_async
    //READ DOMAIN FIFO INFO
    wire [ADDR_W-1:0]      r_level_int = r_w_addr_bin_n - r_addr_bin_n;
 
-   //read state
-   localparam EMPTY=0, DEFAULT=1, FULL=2;
+   //read state (gray encoded)
+   localparam INIT=3, EMPTY=1, DEFAULT=0, FULL=2;
    reg [1:0]              r_st, r_st_nxt;
-   `REG_AR(r_clk, rst, 1'b0, r_st, r_st_nxt)
+   `REG_AR(r_clk, rst, INIT, r_st, r_st_nxt)
 
    //read state machine
    `COMB begin
@@ -112,6 +112,11 @@ module iob_fifo_async
 
       case (r_st)
 
+        INIT: begin
+           r_full = 1'b1;
+           r_empty = 1'b1;
+        end
+        
         EMPTY: begin
            r_empty = 1'b1;
            if(r_level_int >= r_incr)
@@ -141,7 +146,7 @@ module iob_fifo_async
 
    //write state
    reg [1:0]              w_st, w_st_nxt;
-   `REG_AR(w_clk, rst, 1'b0, w_st, w_st_nxt)
+   `REG_AR(w_clk, rst, INIT, w_st, w_st_nxt)
 
    `COMB begin
       w_level = w_level_int;
@@ -150,6 +155,12 @@ module iob_fifo_async
       w_st_nxt = w_st;
 
       case (w_st)
+
+        INIT: begin
+           w_full = 1'b1;
+           w_empty = 1'b1;
+        end
+        
         EMPTY: begin
            w_empty = 1'b1;
            if( w_en && (w_level_int + w_incr) >= r_incr )

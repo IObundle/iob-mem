@@ -1,6 +1,5 @@
 defmacro:=-D
 incdir:=-I
-include config.mk
 
 MEM_DIR=.
 
@@ -15,6 +14,9 @@ include $(MODULE_DIR)/hardware.mk
 ifeq ($(VCD),1)
 DEFINE+=$(defmacro)VCD
 endif
+
+# INCLUDES
+INCLUDE+=$(incdir)./submodules/LIB/hardware/include
 
 # testbench
 VSRC+=$(wildcard $(MODULE_DIR)/$(MEM_NAME)_tb.v)
