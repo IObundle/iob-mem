@@ -112,10 +112,11 @@ module iob_fifo_async
 
       case (r_st)
 
-        INIT: begin
+        INIT: begin //reset state: ensures usability only in the next state
            r_full = 1'b1;
            r_empty = 1'b1;
-        end
+           r_st_nxt = EMPTY;
+       end
         
         EMPTY: begin
            r_empty = 1'b1;
@@ -156,9 +157,10 @@ module iob_fifo_async
 
       case (w_st)
 
-        INIT: begin
+        INIT: begin //reset state: ensures usability only in the next state
            w_full = 1'b1;
            w_empty = 1'b1;
+           w_st_nxt = EMPTY;
         end
         
         EMPTY: begin

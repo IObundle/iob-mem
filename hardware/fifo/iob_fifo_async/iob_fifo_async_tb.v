@@ -87,6 +87,9 @@ module iob_fifo_async_tb;
       repeat (4) @(posedge w_clk) #1;
       reset = 0;
 
+      //wait for FIFO ready (full = 0)
+      while (w_full) @(posedge w_clk) #1;
+
       //fill up the FIFO
       for(i = 0; i < 2**W_ADDR_W; i = i + 1) begin
          w_en = 1;
@@ -103,7 +106,7 @@ module iob_fifo_async_tb;
 
 
       if(w_level != 2**ADDR_W) begin
-        $display("ERROR: expecting w_level = 2**ADDR");
+        $display("ERROR: expecting w_level = 2**ADDR, got %d", w_level);
          $finish;
       end
       $display("INFO: w_level = 2**ADDR as expected");
