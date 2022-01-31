@@ -44,7 +44,6 @@ def initModule (moduleName,tech, type, async) :
         elif type == "SP":
             print "    parameter FILE = \"rom.dat\""
     if tech == "sky130A":
-        ### for sky130A
         print "    parameter DATA_W ="+str(bits*bytes)+ ","
         print "    parameter ADDR_W ="+str(words)+ ","
         if type == "spregf":
@@ -128,7 +127,6 @@ def instPinout (type, async, be) :
         print "            output [DATA_W-1:0] r_data,"
         print "            input r_en"
        
-    ### for sky130A
     if type == "spregf":
         if async:
             print "            input wclk,"
@@ -247,7 +245,6 @@ def instWires (type, async, be) :
     elif type == "SP":
         print "   wire oe = 1'b1; //r_en;"
     print ""
-############ for sky130A
     if type == "spregf":
         if async:
             print "   wire clkA = wclk;"
@@ -295,7 +292,6 @@ def instWires (type, async, be) :
     elif type == "sprom":
         print "   wire oe = 1'b1; //r_en;"
     print ""    
-################################################################################################
 #
 # Instantiate generated memory
 
@@ -405,7 +401,6 @@ def instMemory (tech, type, words, bits, bytes, mux):
 	        
 	    print "   );"
 	    print ""
-#########for sky130A	    
     elif tech == "sky130A":
         if type == "spregf":
 		    for i in range(bits*bytes):
@@ -455,15 +450,9 @@ def instMemory (tech, type, words, bits, bytes, mux):
             print ""
             print "    .din0 (din),"
             print ""
-            #if bytes > 1:
-             #   for i in range(bytes):
-              #      print "    .WEB"+str(i)+"(wen["+str(i)+"]),"
-            #else:
             print "    .web0(wen),"
             print ""
             print "    .csb0(en),"
-		    
-		    #print "    .OE(oe)," it is not req in sky130A
         elif type == "sprom":
 		    for i in range(bits):
 		        print "    .DO"+str(i)+"(r_data["+str(i)+"]),"
@@ -490,8 +479,6 @@ def instMemory (tech, type, words, bits, bytes, mux):
 		    print "    .CKA(clkA),"
 		    print "    .CKB(clkB)"
         else:
-           # for i in range(words):
-            #    print "    .addr0 (addr["+str(i)+"]),"
             print "    .addr0"+"(addr),"
             print ""
             print "    .clk0(clk)"
@@ -561,7 +548,7 @@ def usage (message) :
     print "       -h, --help    print this message"
     print ""
     sys.exit(1)
-########################
+
 
 def blackboxModule(tech, type) :
     global mems
@@ -639,7 +626,7 @@ def main () :
                 mems.append([words, bits, mux])
         else:
             sys.exit("Unsupported memory type")
-    #########for sky130A
+
     elif sys.argv[1] == "sky130A":
         tech = "sky130A"
         moduleName = sys.argv[2]
