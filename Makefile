@@ -7,6 +7,13 @@ MEM_DIR=.
 MEM_NAME ?= iob_ram_sp
 MODULE_DIR = $(shell find . -name $(MEM_NAME))
 
+# list of asymmetric memories
+IS_ASYM = $(shell echo $(MEM_NAME) | grep fifo)
+IS_ASYM += $(shell echo $(MEM_NAME) | grep 2p)
+IS_ASYM += $(shell echo $(MEM_NAME) | grep dp)
+
+
+
 # DEFINES
 DEFINE+=$(defmacro)ADDR_W=10
 DEFINE+=$(defmacro)DATA_W=32
@@ -37,18 +44,18 @@ ALL_HW_MODULES=$(shell find . -name hardware.mk -not -path './submodules/*' | se
 VLOG=iverilog -W all -g2005-sv $(INCLUDE) $(DEFINE)
 
 sim: exists $(VSRC) $(VHDR)
-	$(VLOG) $(VSRC)
-	@echo "\n\nTesting module $(MEM_NAME)\n\n"
-	@./a.out
+ifeq ($(IS_ASYM),)
+	make sim-sym
+else
+	make sim-asym
+endif
 ifeq ($(VCD),1)
 	@if [ ! `pgrep gtkwave` ]; then gtkwave uut.vcd; fi &
 endif
 
-sim-waves: exists uut.vcd
-	gtkwave uut.vcd &
-
-uut.vcd:
-	make sim VCD=1
+sim-sym:
+	$(VLOG) $(VSRC)
+	@./a.out
 
 sim-asym: exists $(VSRC) $(VHDR)
 	@echo "\n\nTesting module $(MEM_NAME)\n\n"
@@ -58,9 +65,6 @@ sim-asym: exists $(VSRC) $(VHDR)
 	@./a.out
 	$(VLOG) $(defmacro)W_DATA_W=8 $(defmacro)R_DATA_W=8 $(VSRC)
 	@./a.out
-ifeq ($(VCD),1)
-	@if [ ! `pgrep gtkwave` ]; then gtkwave uut.vcd; fi &
-endif
 
 sim-all: $(ALL_HW_MODULES)
 	@echo "Listing all modules: $(ALL_HW_MODULES)"
@@ -80,6 +84,7 @@ endif
 #
 
 debug:
+	@echo $(IS_ASYM)
 	@echo $(MODULE_DIR)
 	@echo $(VSRC)
 	@echo $(HW_MODULES)
