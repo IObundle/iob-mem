@@ -113,7 +113,7 @@ module iob_fifo_async
            r_full = 1'b1;
            r_empty = 1'b1;
            r_st_nxt = EMPTY;
-       end
+        end
         
         EMPTY: begin
            r_empty = 1'b1;
@@ -124,7 +124,7 @@ module iob_fifo_async
         default: begin
            if(r_en && (r_level_int-r_incr) < r_incr)
              r_st_nxt = EMPTY;
-           else if(r_level_int == 0) begin
+           if(r_level_int == 0) begin
               r_full = 1'b1;
               r_level = FIFO_SIZE;
            end
@@ -156,10 +156,10 @@ module iob_fifo_async
         end
         
         default: begin
+           if( w_level_int == 0 )
+             w_empty = 1'b1;
            if(w_en && (w_level_int + w_incr) > (FIFO_SIZE-w_incr))
              w_st_nxt = FULL;
-           else if( w_level_int == 0 )
-             w_empty = 1'b1;
         end
 
         FULL: begin
