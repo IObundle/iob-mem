@@ -42,8 +42,7 @@ def initModule (moduleName,tech, type, async) :
         elif type == "SP":
             print "    parameter FILE = \"rom.dat\""
     if tech == "sky130A":
-		for j in range(len(mems)):
-			[words, bits, bytes, mux] = mems[j]
+		[words, bits, bytes, mux] = mems[-1]
 		print "    parameter DATA_W ="+str(bits*bytes)+ ","
 		print "    parameter ADDR_W ="+str(words)+ ","
 		if type == "spregf":
