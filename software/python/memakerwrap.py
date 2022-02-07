@@ -27,8 +27,6 @@ def timeScale () :
 
 def initModule (moduleName,tech, type, async) :
     global mems
-    for j in range(len(mems)):
-        [words, bits, bytes, mux] = mems[j]
     print "module "+moduleName
     print "  #("
     if tech == "LD130":
@@ -44,16 +42,17 @@ def initModule (moduleName,tech, type, async) :
         elif type == "SP":
             print "    parameter FILE = \"rom.dat\""
     if tech == "sky130A":
-        print "    parameter DATA_W ="+str(bits*bytes)+ ","
-        print "    parameter ADDR_W ="+str(words)+ ","
-        if type == "spregf":
-            print "    parameter USE_RAM = 1"
-        elif type == "dpram":
-            print "    parameter FILE = \"none\""
-        elif type == "spram":
-            print "    parameter FILE = \"none\""
-        elif type == "sprom":
-            print "    parameter FILE = \"rom.dat\""
+		[words, bits, bytes, mux] = mems[-1]
+		print "    parameter DATA_W ="+str(bits*bytes)+ ","
+		print "    parameter ADDR_W ="+str(words)+ ","
+		if type == "spregf":
+			print "    parameter USE_RAM = 1"
+		elif type == "dpram":
+			print "    parameter FILE = \"none\""
+		elif type == "spram":
+			print "    parameter FILE = \"none\""
+		elif type == "sprom":
+			print "    parameter FILE = \"rom.dat\""
         
     print "    )"
 
