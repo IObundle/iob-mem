@@ -121,12 +121,12 @@ module iob_ram_t2p_asym
       end else begin //W_DATA_W = R_DATA_W
          //write serial
          always @* begin
-            en_wr[0] = w_en;
+            en_wr = w_en;
             data_wr[0] = w_data;
             addr_wr[0] = w_addr;
          end
          //read parallel
-         always @* begin
+         always @(r_addr, data_rd[0]) begin
             addr_rd[0] = r_addr;
             r_data = data_rd[0];
          end
