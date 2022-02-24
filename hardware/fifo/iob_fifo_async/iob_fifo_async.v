@@ -79,12 +79,12 @@ module iob_fifo_async
 
    //sync write gray address to read domain
    wire [W_ADDR_W-1:0]        w_waddr_gray;
-   reg [W_ADDR_W-1:0]         r_waddr_gray;
+   wire [W_ADDR_W-1:0]        r_waddr_gray;
    `SYNC(r_clk, rst, 1'b0, W_ADDR_W, w_waddr_gray,  w_waddr_gray_sync0, w_waddr_gray_sync1, r_waddr_gray)
 
    //sync read gray address to write domain
    wire [R_ADDR_W-1:0]        r_raddr_gray;
-   reg [R_ADDR_W-1:0]         w_raddr_gray;
+   wire [R_ADDR_W-1:0]        w_raddr_gray;
    `SYNC(w_clk, rst, 1'b0, R_ADDR_W, r_raddr_gray,  r_raddr_gray_sync0, r_raddr_gray_sync1, w_raddr_gray)
 
 
