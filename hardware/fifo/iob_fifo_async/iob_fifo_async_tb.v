@@ -11,7 +11,7 @@ module iob_fifo_async_tb;
    localparam TESTSIZE = `TESTSIZE; //bytes
    localparam W_DATA_W = `W_DATA_W;
    localparam R_DATA_W = `R_DATA_W;
-   localparam MAXDATA_W = `max(W_DATA_W, R_DATA_W);
+   localparam MAXDATA_W = `iob_max(W_DATA_W, R_DATA_W);
    localparam MINDATA_W = `min( W_DATA_W, R_DATA_W );
    localparam ADDR_W = `ADDR_W;
    localparam R=MAXDATA_W/MINDATA_W;

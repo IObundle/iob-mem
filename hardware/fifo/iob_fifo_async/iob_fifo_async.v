@@ -29,7 +29,7 @@ module iob_fifo_async
     );
 
     //determine W_ADDR_W and R_ADDR_W
-   localparam MAXDATA_W = `max(W_DATA_W, R_DATA_W);
+   localparam MAXDATA_W = `iob_max(W_DATA_W, R_DATA_W);
    localparam MINDATA_W = `min(W_DATA_W, R_DATA_W);
    localparam R = MAXDATA_W/MINDATA_W;
    localparam ADDR_W_DIFF = $clog2(R);
@@ -80,12 +80,12 @@ module iob_fifo_async
    //sync write gray address to read domain
    wire [W_ADDR_W-1:0]        w_waddr_gray;
    wire [W_ADDR_W-1:0]        r_waddr_gray;
-   `SYNC(r_clk, rst, 1'b0, W_ADDR_W, w_waddr_gray,  w_waddr_gray_sync0, w_waddr_gray_sync1, r_waddr_gray)
+   `IOB_SYNC(r_clk, rst, 1'b0, W_ADDR_W, w_waddr_gray,  w_waddr_gray_sync0, w_waddr_gray_sync1, r_waddr_gray)
 
    //sync read gray address to write domain
    wire [R_ADDR_W-1:0]        r_raddr_gray;
    wire [R_ADDR_W-1:0]        w_raddr_gray;
-   `SYNC(w_clk, rst, 1'b0, R_ADDR_W, r_raddr_gray,  r_raddr_gray_sync0, r_raddr_gray_sync1, w_raddr_gray)
+   `IOB_SYNC(w_clk, rst, 1'b0, R_ADDR_W, r_raddr_gray,  r_raddr_gray_sync0, r_raddr_gray_sync1, w_raddr_gray)
 
 
    //READ DOMAIN FIFO LEVEL
@@ -99,9 +99,9 @@ module iob_fifo_async
    //read state
    localparam INIT=0, EMPTY=1, DEFAULT=2, FULL=3;
    reg [1:0]                  r_st, r_st_nxt;
-   `REG_AR(r_clk, rst, INIT, r_st, r_st_nxt)
+   `IOB_REG_AR(r_clk, rst, INIT, r_st, r_st_nxt)
 
-   `COMB begin
+   `IOB_COMB begin
       r_level = r_level_int; //note rhs has 1 bit less
       r_full = 1'b0;
       r_empty = 1'b0;
@@ -139,9 +139,9 @@ module iob_fifo_async
 
    //WRITE STATE MACHINE
    reg [1:0]              w_st, w_st_nxt;
-   `REG_AR(w_clk, rst, INIT, w_st, w_st_nxt)
+   `IOB_REG_AR(w_clk, rst, INIT, w_st, w_st_nxt)
 
-   `COMB begin
+   `IOB_COMB begin
       w_level = w_level_int; //note rhs has 1 bit less
       w_full = 1'b0;
       w_empty = 1'b0;

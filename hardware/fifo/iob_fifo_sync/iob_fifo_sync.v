@@ -28,7 +28,7 @@ module iob_fifo_sync
 
 
     //determine W_ADDR_W and R_ADDR_W
-   localparam MAXDATA_W = `max(W_DATA_W, R_DATA_W);
+   localparam MAXDATA_W = `iob_max(W_DATA_W, R_DATA_W);
    localparam MINDATA_W = `min(W_DATA_W, R_DATA_W);
    localparam R = MAXDATA_W/MINDATA_W;
    localparam ADDR_W_DIFF = $clog2(R);
@@ -41,15 +41,15 @@ module iob_fifo_sync
    wire                   w_en_int = w_en & ~w_full;
 
    //write address
-   `VAR(w_addr, W_ADDR_W)
-   `COUNTER_RE(clk, rst, w_en_int, w_addr)
+   `IOB_VAR(w_addr, W_ADDR_W)
+   `IOB_COUNTER_RE(clk, rst, w_en_int, w_addr)
 
    //effective read enable
    wire                   r_en_int  = r_en & ~r_empty;
 
    //read address
-   `VAR(r_addr, R_ADDR_W)
-   `COUNTER_RE(clk, rst, r_en_int, r_addr)
+   `IOB_VAR(r_addr, R_ADDR_W)
+   `IOB_COUNTER_RE(clk, rst, r_en_int, r_addr)
 
    //assign according to assymetry type
    wire [ADDR_W-1:0]       r_incr, w_incr;
@@ -68,9 +68,9 @@ module iob_fifo_sync
 
    //FIFO level
    reg [ADDR_W:0]         level_nxt;
-   `REG_R(clk, rst, 1'b0, level, level_nxt)
+   `IOB_REG_R(clk, rst, 1'b0, level, level_nxt)
 
-   `COMB begin
+   `IOB_COMB begin
       level_nxt = level;
       if(w_en_int && !r_en_int)
         level_nxt = level + w_incr;
