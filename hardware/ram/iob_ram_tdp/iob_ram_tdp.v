@@ -2,7 +2,7 @@
 
 module iob_ram_tdp
   #(
-    parameter FILE = "none",
+    parameter HEXFILE = "none",
     parameter DATA_W = 0,
     parameter ADDR_W = 0
     )
@@ -25,7 +25,7 @@ module iob_ram_tdp
     );
 
    //this allows ISE 14.7 to work; do not remove
-   localparam mem_init_file_int = FILE;
+   localparam mem_init_file_int = HEXFILE;
 
    // Declare the RAM
    reg [DATA_W-1:0]           ram[2**ADDR_W-1:0];

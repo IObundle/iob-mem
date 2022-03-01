@@ -4,7 +4,7 @@ module iob_rom_sp
   #(
     parameter DATA_W = 8,
     parameter ADDR_W = 10,
-    parameter FILE = "none"
+    parameter HEXFILE = "none"
 	)
    (
     input                    clk,
@@ -14,7 +14,7 @@ module iob_rom_sp
     );
    
    // this allows ISE 14.7 to work; do not remove
-   localparam mem_init_file_int = FILE;
+   localparam mem_init_file_int = HEXFILE;
 
    // Declare the ROM
    reg [DATA_W-1:0]     rom[2**ADDR_W-1:0];
