@@ -8,7 +8,7 @@ module iob_ram_t2p_asym
     ADDR_W = 0,
     // determine W_ADDR_W and R_ADDR_W
     MAXDATA_W = `iob_max(W_DATA_W, R_DATA_W),
-    MINDATA_W = `min(W_DATA_W, R_DATA_W),
+    MINDATA_W = `iob_min(W_DATA_W, R_DATA_W),
     MINADDR_W = ADDR_W-$clog2(MAXDATA_W/MINDATA_W), // lower ADDR_W (higher DATA_W)
     W_ADDR_W = (W_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W,
     R_ADDR_W = (R_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W
@@ -134,4 +134,3 @@ module iob_ram_t2p_asym
       end 
    endgenerate
 endmodule
-
