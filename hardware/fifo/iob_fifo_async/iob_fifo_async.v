@@ -30,7 +30,7 @@ module iob_fifo_async
 
     //determine W_ADDR_W and R_ADDR_W
    localparam MAXDATA_W = `iob_max(W_DATA_W, R_DATA_W);
-   localparam MINDATA_W = `min(W_DATA_W, R_DATA_W);
+   localparam MINDATA_W = `iob_min(W_DATA_W, R_DATA_W);
    localparam R = MAXDATA_W/MINDATA_W;
    localparam ADDR_W_DIFF = $clog2(R);
    localparam MINADDR_W = ADDR_W-$clog2(R);//lower ADDR_W (higher DATA_W)

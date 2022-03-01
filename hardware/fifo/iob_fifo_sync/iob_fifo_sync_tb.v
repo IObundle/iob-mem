@@ -12,7 +12,7 @@ module iob_fifo_sync_tb;
    localparam W_DATA_W = `W_DATA_W;
    localparam R_DATA_W = `R_DATA_W;
    localparam MAXDATA_W = `iob_max(W_DATA_W, R_DATA_W);
-   localparam MINDATA_W = `min( W_DATA_W, R_DATA_W );
+   localparam MINDATA_W = `iob_min( W_DATA_W, R_DATA_W );
    localparam ADDR_W = `ADDR_W;
    localparam R=MAXDATA_W/MINDATA_W;
    localparam MINADDR_W = ADDR_W-$clog2(R);//lower ADDR_W (higher DATA_W)
