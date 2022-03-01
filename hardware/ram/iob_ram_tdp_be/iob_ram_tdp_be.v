@@ -5,7 +5,7 @@
 
 module iob_ram_tdp_be
   #(
-    parameter FILE = "none",
+    parameter HEXFILE = "none",
     parameter ADDR_W = 10, // Addr Width in bits : 2*ADDR_W = RAM Depth
     parameter DATA_W = 32  // Data Width in bits
     )
@@ -36,11 +36,11 @@ module iob_ram_tdp_be
    genvar                    i;
    generate
       for (i=0; i < NUM_COL; i=i+1) begin: ram_col
-         localparam mem_init_file_int = (FILE != "none")? {FILE, "_", file_suffix[8*(i+1)-1 -: 8], ".hex"}: "none";
+         localparam mem_init_file_int = (HEXFILE != "none")? {HEXFILE, "_", file_suffix[8*(i+1)-1 -: 8], ".hex"}: "none";
 
          iob_ram_tdp
              #(
-               .FILE(mem_init_file_int),
+               .HEXFILE(mem_init_file_int),
                .ADDR_W(ADDR_W),
                .DATA_W(COL_W)
                ) ram
@@ -63,7 +63,7 @@ module iob_ram_tdp_be
    endgenerate
 `else // !IS_CYCLONEV
    // this allow ISE 14.7 to work; do not remove
-   localparam mem_init_file_int = {FILE, ".hex"};
+   localparam mem_init_file_int = {HEXFILE, ".hex"};
 
    // Core Memory
    reg [DATA_W-1:0]      ram_block[(2**ADDR_W)-1:0];

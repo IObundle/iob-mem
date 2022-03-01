@@ -36,11 +36,11 @@ def initModule (moduleName,tech, type):
         if type == "SZ":
             print ("    parameter USE_RAM = 1")
         elif type == "SJ":
-            print ("    parameter FILE = \"none\"")
+            print ("    parameter HEXFILE = \"none\"")
         elif type == "SH":
-            print ("    parameter FILE = \"none\"")
+            print ("    parameter HEXFILE = \"none\"")
         elif type == "SP":
-            print ("    parameter FILE = \"rom.dat\"")
+            print ("    parameter HEXFILE = \"rom.dat\"")
     if tech == "sky130A":
         [words, bits, bytes, mux] = mems[-1]
         print ("    parameter DATA_W ="+str(bits*bytes)+ ",")
@@ -48,11 +48,11 @@ def initModule (moduleName,tech, type):
         if type == "spregf":
             print ("    parameter USE_RAM = 1")
         elif type == "dpram":
-            print ("    parameter FILE = \"none\"")
+            print ("    parameter HEXFILE = \"none\"")
         elif type == "spram":
-            print ("    parameter FILE = \"none\"")
+            print ("    parameter HEXFILE = \"none\"")
         elif type == "sprom":
-            print ("    parameter FILE = \"rom.dat\"")
+            print ("    parameter HEXFILE = \"rom.dat\"")
         
     print ("    )")
 
