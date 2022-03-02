@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-module gray_counter 
+module iob_gray_counter 
   #(
     parameter   W = 1
     )
