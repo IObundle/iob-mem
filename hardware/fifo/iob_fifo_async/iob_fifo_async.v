@@ -175,7 +175,7 @@ module iob_fifo_async
 
    //read address gray code counter
    wire r_en_int  = r_en & ~r_empty;
-   gray_counter
+   iob_gray_counter
      #(
        .W(R_ADDR_W)
        )
@@ -189,7 +189,7 @@ module iob_fifo_async
 
    //write address gray code counter
    wire w_en_int = w_en & ~w_full;
-   gray_counter
+   iob_gray_counter
      #(
        .W(W_ADDR_W)
        )
@@ -202,7 +202,7 @@ module iob_fifo_async
       );
 
    //convert gray read address to binary
-   gray2bin
+   iob_gray2bin
      #(
        .DATA_W(R_ADDR_W)
        )
@@ -213,7 +213,7 @@ module iob_fifo_async
       );
 
    //convert synced gray write address to binary
-   gray2bin
+   iob_gray2bin
      #(
        .DATA_W(W_ADDR_W)
        )
@@ -224,7 +224,7 @@ module iob_fifo_async
       );
 
    //convert gray write address to binary
-   gray2bin
+   iob_gray2bin
      #(
        .DATA_W(W_ADDR_W)
        )
@@ -235,7 +235,7 @@ module iob_fifo_async
       );
 
    //convert synced gray read address to binary
-   gray2bin
+   iob_gray2bin
      #(
        .DATA_W(R_ADDR_W)
        )

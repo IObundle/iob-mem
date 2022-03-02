@@ -1,7 +1,7 @@
 `timescale 1ns/1ps
 
 // Convert gray encoding to binary
-module gray2bin #(
+module iob_gray2bin #(
     parameter DATA_W = 4
     ) (
     input [DATA_W-1:0] gr,
@@ -17,4 +17,3 @@ module gray2bin #(
     endgenerate
 
 endmodule
-
