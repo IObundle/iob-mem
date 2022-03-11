@@ -43,6 +43,8 @@ module iob_ram_2p_asym
 
    //instantiate N symmetric RAM blocks and connect them to the buses
    genvar                 i;
+   wire [MINDATA_W-1:0]   data_rd_0 = data_rd[0];
+   
    generate
       for (i=0; i<N; i=i+1) begin : iob_2p_ram_inst
          iob_ram_2p
@@ -127,7 +129,7 @@ module iob_ram_2p_asym
          //read parallel
          always @* begin
             addr_rd[0] = r_addr;
-            r_data = data_rd[0];
+            r_data = data_rd_0;
          end
       end
    endgenerate
