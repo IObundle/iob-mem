@@ -6,11 +6,29 @@ module iob_fifo_sync
     parameter
     W_DATA_W = 0,
     R_DATA_W = 0,
-    ADDR_W = 0 //higher ADDR_W lower DATA_W
+    ADDR_W = 0, //higher ADDR_W lower DATA_W
+    //determine W_ADDR_W and R_ADDR_W
+    MAXDATA_W = `IOB_MAX(W_DATA_W, R_DATA_W),
+    MINDATA_W = `IOB_MIN(W_DATA_W, R_DATA_W),
+    N = MAXDATA_W/MINDATA_W,
+    MINADDR_W = ADDR_W-$clog2(N),//lower ADDR_W (higher DATA_W)
+    W_ADDR_W = (W_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W,
+    R_ADDR_W = (R_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W
     )
    (
     input                 rst,
     input                 clk,
+    
+`ifdef EXPORT_MEM
+    //write port
+    output [N-1:0]            ext_mem_w_en,
+    output [W_DATA_W-1:0]     ext_mem_w_data,
+    output [W_ADDR_W-1:0]     ext_mem_w_addr,
+    //read port
+    output                    ext_mem_r_en,
+    output [R_ADDR_W-1:0]     ext_mem_r_addr,
+    input [R_DATA_W-1:0]      ext_mem_r_data,
+`endif
 
     //read port
     input                 r_en,
@@ -26,15 +44,7 @@ module iob_fifo_sync
     output reg [ADDR_W:0] level
     );
 
-
-    //determine W_ADDR_W and R_ADDR_W
-   localparam MAXDATA_W = `IOB_MAX(W_DATA_W, R_DATA_W);
-   localparam MINDATA_W = `IOB_MIN(W_DATA_W, R_DATA_W);
-   localparam R = MAXDATA_W/MINDATA_W;
-   localparam ADDR_W_DIFF = $clog2(R);
-   localparam MINADDR_W = ADDR_W-$clog2(R);//lower ADDR_W (higher DATA_W)
-   localparam W_ADDR_W = (W_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W;
-   localparam R_ADDR_W = (R_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W;
+   localparam ADDR_W_DIFF = $clog2(N);
    localparam [ADDR_W:0] FIFO_SIZE = (1'b1 << ADDR_W); //in bytes
 
    //effective write enable
@@ -89,21 +99,29 @@ module iob_fifo_sync
    //FIFO memory
    iob_ram_2p_asym
      #(
-       .W_DATA_W(W_DATA_W),
-       .R_DATA_W(R_DATA_W),
-       .ADDR_W(ADDR_W)
+       .W_DATA_W  (W_DATA_W),
+       .R_DATA_W  (R_DATA_W),
+       .ADDR_W    (ADDR_W)
        )
     iob_ram_2p_asym0
      (
-      .clk(clk),
+      .clk           (clk),
+      
+`ifdef EXPORT_MEM
+      .ext_mem_w_en  (ext_mem_w_en),
+      .ext_mem_w_data(ext_mem_w_data),
+      .ext_mem_w_addr(ext_mem_w_addr),
+      .ext_mem_r_en  (ext_mem_r_en),
+      .ext_mem_r_addr(ext_mem_r_addr),
+      .ext_mem_r_data(ext_mem_r_data),
+`endif
+      .w_en          (w_en_int),
+      .w_data        (w_data),
+      .w_addr        (w_addr),
 
-      .w_en(w_en_int),
-      .w_data(w_data),
-      .w_addr(w_addr),
-
-      .r_en(r_en_int),
-      .r_addr(r_addr),
-      .r_data(r_data)
+      .r_en          (r_en_int),
+      .r_addr        (r_addr),
+      .r_data        (r_data)
       );
 
 endmodule
