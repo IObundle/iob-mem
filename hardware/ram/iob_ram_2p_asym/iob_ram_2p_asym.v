@@ -149,7 +149,7 @@ module iob_ram_2p_asym
 
    genvar  p;
    generate
-      for(p=0; p < N; p= p+1) begin
+      for(p=0; p < N; p= p+1) begin : ext_mem_interface_gen
          assign ext_mem_w_en[p+:1] = en_wr[p];
          assign ext_mem_w_addr[p+:MINADDR_W] = addr_wr[p];
          assign ext_mem_w_data[p+:MINDATA_W] = data_wr[p];
