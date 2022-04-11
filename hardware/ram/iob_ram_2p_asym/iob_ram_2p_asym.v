@@ -18,7 +18,7 @@ module iob_ram_2p_asym
     )
    (
     input                     clk,
-`ifdef EXPORT_MEM
+`ifdef IOB_EXPORT_MEM
     //write port
     output [N-1:0]            ext_mem_w_en,
     output [W_DATA_W-1:0]     ext_mem_w_data,
@@ -50,7 +50,7 @@ module iob_ram_2p_asym
 
    wire [MINDATA_W-1:0]   data_rd_0 = data_rd[0];
    
-`ifndef EXPORT_MEM
+`ifndef IOB_EXPORT_MEM
    //instantiate N symmetric RAM blocks
    genvar                 i;
    
@@ -145,7 +145,7 @@ module iob_ram_2p_asym
       end
    endgenerate
 
-`ifdef EXPORT_MEM
+`ifdef IOB_EXPORT_MEM
 
    genvar  p;
    generate
