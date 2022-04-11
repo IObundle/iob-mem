@@ -19,7 +19,7 @@ module iob_fifo_sync
     input                 rst,
     input                 clk,
     
-`ifdef EXPORT_MEM
+`ifdef IOB_EXPORT_MEM
     //write port
     output [N-1:0]            ext_mem_w_en,
     output [W_DATA_W-1:0]     ext_mem_w_data,
@@ -107,7 +107,7 @@ module iob_fifo_sync
      (
       .clk           (clk),
       
-`ifdef EXPORT_MEM
+`ifdef IOB_EXPORT_MEM
       .ext_mem_w_en  (ext_mem_w_en),
       .ext_mem_w_data(ext_mem_w_data),
       .ext_mem_w_addr(ext_mem_w_addr),
