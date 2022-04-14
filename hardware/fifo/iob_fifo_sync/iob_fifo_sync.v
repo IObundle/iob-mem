@@ -16,6 +16,7 @@ module iob_fifo_sync
     R_ADDR_W = (R_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W
     )
    (
+    input                 arst,
     input                 rst,
     input                 clk,
     
@@ -52,14 +53,14 @@ module iob_fifo_sync
 
    //write address
    `IOB_VAR(w_addr, W_ADDR_W)
-   `IOB_COUNTER_RE(clk, rst, w_en_int, w_addr)
+   `IOB_COUNTER_ARRE(clk, arst, rst, w_en_int, w_addr)
 
    //effective read enable
    wire                   r_en_int  = r_en & ~r_empty;
 
    //read address
    `IOB_VAR(r_addr, R_ADDR_W)
-   `IOB_COUNTER_RE(clk, rst, r_en_int, r_addr)
+   `IOB_COUNTER_ARRE(clk, arst, rst, r_en_int, r_addr)
 
    //assign according to assymetry type
    wire [ADDR_W-1:0]       r_incr, w_incr;
@@ -78,7 +79,7 @@ module iob_fifo_sync
 
    //FIFO level
    reg [ADDR_W:0]         level_nxt;
-   `IOB_REG_R(clk, rst, 1'b0, level, level_nxt)
+   `IOB_REG_ARR(clk, arst, 1'b0, rst, 1'b0, level, level_nxt)
 
    `IOB_COMB begin
       level_nxt = level;
