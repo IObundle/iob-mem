@@ -34,12 +34,12 @@ module iob_fifo_sync
     //read port
     input                 r_en,
     output [R_DATA_W-1:0] r_data,
-    output                r_empty,
+    output reg            r_empty,
 
     //write port
     input                 w_en,
     input [W_DATA_W-1:0]  w_data,
-    output                w_full,
+    output reg            w_full,
 
     //FIFO level
     output reg [ADDR_W:0] level
@@ -92,10 +92,14 @@ module iob_fifo_sync
    end
 
    //FIFO empty
-   assign r_empty = level < r_incr;
+   `IOB_VAR(r_empty_nxt, 1)
+   assign r_empty_nxt = level_nxt < r_incr;
+   `IOB_REG_ARR(clk, arst, 1'd0, rst, 1'd0, r_empty, r_empty_nxt)
 
    //FIFO full
-   assign w_full = level > (FIFO_SIZE -w_incr);
+   `IOB_VAR(w_full_nxt, 1)
+   assign w_full_nxt = level_nxt > (FIFO_SIZE -w_incr);
+   `IOB_REG_ARR(clk, arst, 1'd0, rst, 1'd0, w_full, w_full_nxt)
 
    //FIFO memory
    iob_ram_2p_asym
