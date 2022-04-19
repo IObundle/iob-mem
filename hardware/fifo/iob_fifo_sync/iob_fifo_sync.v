@@ -94,12 +94,12 @@ module iob_fifo_sync
    //FIFO empty
    `IOB_VAR(r_empty_nxt, 1)
    assign r_empty_nxt = level_nxt < r_incr;
-   `IOB_REG_ARR(clk, arst, 1'd0, rst, 1'd0, r_empty, r_empty_nxt)
+   `IOB_REG_AR(clk, arst, 1'd0, r_empty, r_empty_nxt)
 
    //FIFO full
    `IOB_VAR(w_full_nxt, 1)
    assign w_full_nxt = level_nxt > (FIFO_SIZE -w_incr);
-   `IOB_REG_ARR(clk, arst, 1'd0, rst, 1'd0, w_full, w_full_nxt)
+   `IOB_REG_AR(clk, arst, 1'd0, w_full, w_full_nxt)
 
    //FIFO memory
    iob_ram_2p_asym
