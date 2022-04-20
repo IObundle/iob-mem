@@ -17,12 +17,12 @@ module iob_rom_sp
    localparam mem_init_file_int = HEXFILE;
 
    // Declare the ROM
-   reg [DATA_W-1:0]     rom[2**ADDR_W-1:0];
+   reg [DATA_W-1:0]     rom[(2**ADDR_W)-1:0];
 
    // Initialize the ROM
    initial 
      if(mem_init_file_int != "none")
-       $readmemh(mem_init_file_int, rom, 0, 2**ADDR_W-1);
+       $readmemh(mem_init_file_int, rom, 0, (2**ADDR_W)-1);
 
    // Operate the ROM
    always @(posedge clk)

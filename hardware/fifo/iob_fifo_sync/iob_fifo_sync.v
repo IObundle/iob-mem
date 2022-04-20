@@ -19,8 +19,7 @@ module iob_fifo_sync
     input                 arst,
     input                 rst,
     input                 clk,
-    
-`ifdef IOB_EXPORT_MEM
+
     //write port
     output [N-1:0]            ext_mem_w_en,
     output [W_DATA_W-1:0]     ext_mem_w_data,
@@ -29,7 +28,6 @@ module iob_fifo_sync
     output                    ext_mem_r_en,
     output [R_ADDR_W-1:0]     ext_mem_r_addr,
     input [R_DATA_W-1:0]      ext_mem_r_data,
-`endif
 
     //read port
     input                 r_en,
@@ -63,7 +61,8 @@ module iob_fifo_sync
    `IOB_COUNTER_ARRE(clk, arst, rst, r_en_int, r_addr)
 
    //assign according to assymetry type
-   wire [ADDR_W-1:0]       r_incr, w_incr;
+   wire [ADDR_W-1:0]       w_incr;
+   wire [ADDR_W-1:0]       r_incr;
    generate
       if (W_DATA_W > R_DATA_W) begin
         assign r_incr = 1'b1;
@@ -83,21 +82,21 @@ module iob_fifo_sync
 
    `IOB_COMB begin
       level_nxt = level;
-      if(w_en_int && !r_en_int)
+      if(w_en_int && (!r_en_int))
         level_nxt = level + w_incr;
       else if(w_en_int && r_en_int)
-             level_nxt = level + w_incr -r_incr;
-      else if (!w_en_int && r_en_int)
+             level_nxt = (level + w_incr) -r_incr;
+      else if ((!w_en_int) && r_en_int)
         level_nxt = level -r_incr;
    end
 
    //FIFO empty
-   `IOB_VAR(r_empty_nxt, 1)
+   `IOB_WIRE(r_empty_nxt, 1)
    assign r_empty_nxt = level_nxt < r_incr;
    `IOB_REG_AR(clk, arst, 1'd0, r_empty, r_empty_nxt)
 
    //FIFO full
-   `IOB_VAR(w_full_nxt, 1)
+   `IOB_WIRE(w_full_nxt, 1)
    assign w_full_nxt = level_nxt > (FIFO_SIZE -w_incr);
    `IOB_REG_AR(clk, arst, 1'd0, w_full, w_full_nxt)
 
@@ -112,14 +111,13 @@ module iob_fifo_sync
      (
       .clk           (clk),
       
-`ifdef IOB_EXPORT_MEM
       .ext_mem_w_en  (ext_mem_w_en),
       .ext_mem_w_data(ext_mem_w_data),
       .ext_mem_w_addr(ext_mem_w_addr),
       .ext_mem_r_en  (ext_mem_r_en),
       .ext_mem_r_addr(ext_mem_r_addr),
       .ext_mem_r_data(ext_mem_r_data),
-`endif
+
       .w_en          (w_en_int),
       .w_data        (w_data),
       .w_addr        (w_addr),
