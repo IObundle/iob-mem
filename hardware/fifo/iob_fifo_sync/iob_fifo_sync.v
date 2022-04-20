@@ -61,7 +61,8 @@ module iob_fifo_sync
    `IOB_COUNTER_ARRE(clk, arst, rst, r_en_int, r_addr)
 
    //assign according to assymetry type
-   wire [ADDR_W-1:0]       r_incr, w_incr;
+   wire [ADDR_W-1:0]       w_incr;
+   wire [ADDR_W-1:0]       r_incr,
    generate
       if (W_DATA_W > R_DATA_W) begin
         assign r_incr = 1'b1;
