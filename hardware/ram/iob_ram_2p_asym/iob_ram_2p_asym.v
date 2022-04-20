@@ -18,7 +18,7 @@ module iob_ram_2p_asym
     )
    (
     input                     clk,
-`ifdef IOB_EXPORT_MEM
+
     //write port
     output [N-1:0]            ext_mem_w_en,
     output [W_DATA_W-1:0]     ext_mem_w_data,
@@ -27,7 +27,7 @@ module iob_ram_2p_asym
     output                    ext_mem_r_en,
     output [R_ADDR_W-1:0]     ext_mem_r_addr,
     input [R_DATA_W-1:0]      ext_mem_r_data,
-`endif
+
     //write port
     input                     w_en,
     input [W_DATA_W-1:0]      w_data,
@@ -49,32 +49,6 @@ module iob_ram_2p_asym
    reg [MINADDR_W-1:0]        addr_rd [N-1:0];
 
    wire [MINDATA_W-1:0]   data_rd_0 = data_rd[0];
-   
-`ifndef IOB_EXPORT_MEM
-   //instantiate N symmetric RAM blocks
-   genvar                 i;
-   
-   generate
-      for (i=0; i<N; i=i+1) begin : iob_2p_ram_inst
-         iob_ram_2p
-             #(
-               .DATA_W(MINDATA_W),
-               .ADDR_W(MINADDR_W)
-               )
-         iob_ram_2p_inst
-             (
-              .clk(clk),
-              .w_en(en_wr[i]),
-              .w_addr(addr_wr[i]),
-              .w_data(data_wr[i]),
-              .r_en(r_en),
-              .r_addr(addr_rd[i]),
-              .r_data(data_rd[i])
-              );
-
-      end
-   endgenerate
-`endif
 
    //connect the buses
    integer j,k,l;
@@ -99,10 +73,10 @@ module iob_ram_2p_asym
          end
 
          //read address register
-         reg [R_ADDR_W-W_ADDR_W-1:0] r_addr_lsbs_reg;
+         reg [(R_ADDR_W-W_ADDR_W)-1:0] r_addr_lsbs_reg;
          always @(posedge clk)
            if (r_en)
-             r_addr_lsbs_reg <= r_addr[R_ADDR_W-W_ADDR_W-1:0];
+             r_addr_lsbs_reg <= r_addr[(R_ADDR_W-W_ADDR_W)-1:0];
 
          //read mux
          always @* begin
@@ -116,7 +90,7 @@ module iob_ram_2p_asym
          //write serial
          always @* begin
             for (j=0; j < N; j= j+1) begin
-               en_wr[j] = w_en & (w_addr[W_ADDR_W-R_ADDR_W-1:0] == j);
+               en_wr[j] = w_en & (w_addr[(W_ADDR_W-R_ADDR_W)-1:0] == j);
                data_wr[j] = w_data;
                addr_wr[j] = w_addr[W_ADDR_W-1 -: R_ADDR_W];
             end
@@ -145,8 +119,6 @@ module iob_ram_2p_asym
       end
    endgenerate
 
-`ifdef IOB_EXPORT_MEM
-
    genvar  p;
    generate
       for(p=0; p < N; p= p+1) begin : ext_mem_interface_gen
@@ -158,5 +130,5 @@ module iob_ram_2p_asym
       end
    endgenerate
    assign ext_mem_r_en = r_en;
-`endif
+
 endmodule
