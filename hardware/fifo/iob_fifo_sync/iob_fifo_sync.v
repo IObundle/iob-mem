@@ -16,31 +16,30 @@ module iob_fifo_sync
     R_ADDR_W = (R_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W
     )
    (
-    input                 arst,
-    input                 rst,
-    input                 clk,
+    `IOB_INPUT(arst, 1),
+    `IOB_INPUT(rst, 1),
+    `IOB_INPUT(clk, 1),
 
     //write port
-    output [N-1:0]            ext_mem_w_en,
-    output [W_DATA_W-1:0]     ext_mem_w_data,
-    output [W_ADDR_W-1:0]     ext_mem_w_addr,
+    `IOB_OUTPUT(ext_mem_w_en, N),
+    `IOB_OUTPUT(ext_mem_w_data, W_DATA_W),
+    `IOB_OUTPUT(ext_mem_w_addr, W_ADDR_W),
     //read port
-    output                    ext_mem_r_en,
-    output [R_ADDR_W-1:0]     ext_mem_r_addr,
-    input [R_DATA_W-1:0]      ext_mem_r_data,
+    `IOB_OUTPUT(ext_mem_r_en, 1),
+    `IOB_OUTPUT(ext_mem_r_addr, R_ADDR_W),
+    `IOB_INPUT(ext_mem_r_data, R_DATA_W),
 
     //read port
-    input                 r_en,
-    output [R_DATA_W-1:0] r_data,
-    output reg            r_empty,
-
+    `IOB_INPUT(r_en, 1),
+    `IOB_OUTPUT(r_data, R_DATA_W),
+    `IOB_OUTPUT_VAR(r_empty, 1),
     //write port
-    input                 w_en,
-    input [W_DATA_W-1:0]  w_data,
-    output reg            w_full,
+    `IOB_INPUT(w_en, 1),
+    `IOB_INPUT(w_data, W_DATA_W),
+    `IOB_OUTPUT_VAR(w_full, 1),
 
     //FIFO level
-    output reg [ADDR_W:0] level
+    `IOB_OUTPUT_VAR(level, (ADDR_W+1))
     );
 
    localparam ADDR_W_DIFF = $clog2(N);
