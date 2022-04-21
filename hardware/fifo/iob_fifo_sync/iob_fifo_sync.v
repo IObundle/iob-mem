@@ -92,7 +92,7 @@ module iob_fifo_sync
    //FIFO empty
    `IOB_WIRE(r_empty_nxt, 1)
    assign r_empty_nxt = level_nxt < r_incr;
-   `IOB_REG_AR(clk, arst, 1'd0, r_empty, r_empty_nxt)
+   `IOB_REG_AR(clk, arst, 1'd1, r_empty, r_empty_nxt)
 
    //FIFO full
    `IOB_WIRE(w_full_nxt, 1)
