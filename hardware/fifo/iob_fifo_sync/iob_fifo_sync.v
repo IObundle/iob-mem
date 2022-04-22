@@ -76,11 +76,11 @@ module iob_fifo_sync
    endgenerate
 
    //FIFO level
-   reg [ADDR_W:0]         level_nxt;
-   `IOB_REG_ARR(clk, arst, 1'b0, rst, 1'b0, level, level_nxt)
+   reg [ADDR_W+1:0]         level_nxt;
+   `IOB_REG_ARR(clk, arst, 1'b0, rst, 1'b0, level, level_nxt[0+:ADDR_W+1])
 
    `IOB_COMB begin
-      level_nxt = level;
+      level_nxt = {1'd0,level};
       if(w_en_int && (!r_en_int))
         level_nxt = level + w_incr;
       else if(w_en_int && r_en_int)
@@ -91,12 +91,12 @@ module iob_fifo_sync
 
    //FIFO empty
    `IOB_WIRE(r_empty_nxt, 1)
-   assign r_empty_nxt = level_nxt < r_incr;
+   assign r_empty_nxt = level_nxt[0+:ADDR_W+1] < r_incr;
    `IOB_REG_AR(clk, arst, 1'd1, r_empty, r_empty_nxt)
 
    //FIFO full
    `IOB_WIRE(w_full_nxt, 1)
-   assign w_full_nxt = level_nxt > (FIFO_SIZE -w_incr);
+   assign w_full_nxt = level_nxt[0+:ADDR_W+1] > (FIFO_SIZE -w_incr);
    `IOB_REG_AR(clk, arst, 1'd0, w_full, w_full_nxt)
 
    //FIFO memory
