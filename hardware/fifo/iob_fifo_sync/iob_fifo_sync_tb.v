@@ -11,8 +11,8 @@ module iob_fifo_sync_tb;
    localparam TESTSIZE = `TESTSIZE; //bytes
    localparam W_DATA_W = `W_DATA_W;
    localparam R_DATA_W = `R_DATA_W;
-   localparam MAXDATA_W = `max(W_DATA_W, R_DATA_W);
-   localparam MINDATA_W = `min( W_DATA_W, R_DATA_W );
+   localparam MAXDATA_W = `IOB_MAX(W_DATA_W, R_DATA_W);
+   localparam MINDATA_W = `IOB_MIN( W_DATA_W, R_DATA_W );
    localparam ADDR_W = `ADDR_W;
    localparam R=MAXDATA_W/MINDATA_W;
    localparam MINADDR_W = ADDR_W-$clog2(R);//lower ADDR_W (higher DATA_W)
@@ -20,6 +20,7 @@ module iob_fifo_sync_tb;
    localparam R_ADDR_W = R_DATA_W == MAXDATA_W? MINADDR_W : ADDR_W;
 
    reg reset = 0;
+   reg arst = 0;
    reg                 clk = 0;
 
    //write port
@@ -79,8 +80,10 @@ module iob_fifo_sync_tb;
       #clk_per;
       @(posedge clk) #1;
       reset = 1;
+      arst = 1;
       repeat (4) @(posedge clk) #1;
       reset = 0;
+      arst = 0;
 
       //fill up the FIFO
       for(i = 0; i < 2**W_ADDR_W; i = i + 1) begin
@@ -177,6 +180,7 @@ module iob_fifo_sync_tb;
        )
    uut
      (
+      .arst(arst),
       .rst(reset),
       .clk(clk),
 

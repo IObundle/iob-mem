@@ -10,8 +10,8 @@ module iob_ram_2p_asym_tb;
    //determine W_ADDR_W and R_ADDR_W
    localparam W_DATA_W = `W_DATA_W;
    localparam R_DATA_W = `R_DATA_W;
-   localparam MAXDATA_W = `max(W_DATA_W, R_DATA_W);
-   localparam MINDATA_W = `min(W_DATA_W, R_DATA_W);
+   localparam MAXDATA_W = `IOB_MAX(W_DATA_W, R_DATA_W);
+   localparam MINDATA_W = `IOB_MIN(W_DATA_W, R_DATA_W);
    localparam MAXADDR_W = `MAXADDR_W;
    localparam MINADDR_W = MAXADDR_W - $clog2(MAXDATA_W/MINDATA_W);
    localparam W_ADDR_W = W_DATA_W == MINDATA_W? MAXADDR_W: MINADDR_W;

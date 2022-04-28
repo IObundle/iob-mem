@@ -7,8 +7,8 @@ module iob_ram_t2p_asym
     R_DATA_W = 0,
     ADDR_W = 0,
     // determine W_ADDR_W and R_ADDR_W
-    MAXDATA_W = `max(W_DATA_W, R_DATA_W),
-    MINDATA_W = `min(W_DATA_W, R_DATA_W),
+    MAXDATA_W = `IOB_MAX(W_DATA_W, R_DATA_W),
+    MINDATA_W = `IOB_MIN(W_DATA_W, R_DATA_W),
     MINADDR_W = ADDR_W-$clog2(MAXDATA_W/MINDATA_W), // lower ADDR_W (higher DATA_W)
     W_ADDR_W = (W_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W,
     R_ADDR_W = (R_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W
@@ -121,12 +121,12 @@ module iob_ram_t2p_asym
       end else begin //W_DATA_W = R_DATA_W
          //write serial
          always @* begin
-            en_wr[0] = w_en;
+            en_wr = w_en;
             data_wr[0] = w_data;
             addr_wr[0] = w_addr;
          end
          //read parallel
-         always @* begin
+         always @(r_addr, data_rd[0]) begin
             addr_rd[0] = r_addr;
             r_data = data_rd[0];
          end
@@ -134,4 +134,3 @@ module iob_ram_t2p_asym
       end 
    endgenerate
 endmodule
-

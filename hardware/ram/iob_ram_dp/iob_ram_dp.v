@@ -2,7 +2,7 @@
 
 module iob_ram_dp
   #(
-    parameter FILE = "none",
+    parameter HEXFILE = "none",
     parameter DATA_W = 8,
     parameter ADDR_W = 6
     )
@@ -25,7 +25,7 @@ module iob_ram_dp
     );
 
    //this allows ISE 14.7 to work; do not remove
-   localparam mem_init_file_int = FILE;
+   localparam mem_init_file_int = HEXFILE;
 
 
    // Declare the RAM
