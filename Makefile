@@ -31,7 +31,7 @@ include $(MODULE_DIR)/hardware.mk
 endif
 
 # submodules
-ifeq (iob_ram_2p_asym,$(filter iob_ram_2p_asym,, $(HW_MODULES)))
+ifneq ($(filter iob_ram_2p_asym, $(HW_MODULES)),)
 include $(MEM_DIR)/hardware/ram/iob_ram_2p/hardware.mk
 endif
 

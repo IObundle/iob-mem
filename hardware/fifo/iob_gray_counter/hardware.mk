@@ -1,4 +1,4 @@
-ifneq (iob_gray_counter,$(filter iob_gray_counter,, $(HW_MODULES)))
+ifeq ($(filter iob_gray_counter, $(HW_MODULES)),)
 
 # Add to modules list
 HW_MODULES+=iob_gray_counter
