@@ -1,4 +1,4 @@
-ifneq (iob_gray2bin,$(filter iob_gray2bin,, $(HW_MODULES)))
+ifeq ($(filter iob_gray2bin, $(HW_MODULES)),)
 
 # Add to modules list
 HW_MODULES+=iob_gray2bin
