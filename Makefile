@@ -29,6 +29,12 @@ INCLUDE+=$(incdir)./submodules/LIB/hardware/include
 ifneq ($(MODULE_DIR),)
 include $(MODULE_DIR)/hardware.mk
 endif
+
+# submodules
+ifeq (iob_ram_2p_asym,$(filter iob_ram_2p_asym,, $(HW_MODULES)))
+include $(MEM_DIR)/hardware/ram/iob_ram_2p/hardware.mk
+endif
+
 # testbench
 VSRC+=$(wildcard $(MODULE_DIR)/$(MEM_NAME)_tb.v)
 
