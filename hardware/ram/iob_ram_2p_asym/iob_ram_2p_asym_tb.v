@@ -16,9 +16,19 @@ module iob_ram_2p_asym_tb;
    localparam MINADDR_W = MAXADDR_W - $clog2(MAXDATA_W/MINDATA_W);
    localparam W_ADDR_W = W_DATA_W == MINDATA_W? MAXADDR_W: MINADDR_W;
    localparam R_ADDR_W = R_DATA_W == MINDATA_W? MAXADDR_W: MINADDR_W;
-
+   localparam N = MAXDATA_W/MINDATA_W;
+   
    reg clk = 0;
 
+   //write port
+   wire [N-1:0]        ext_mem_w_en;
+   wire [W_DATA_W-1:0] ext_mem_w_data;
+   wire [W_ADDR_W-1:0] ext_mem_w_addr;
+   //read port
+   wire                ext_mem_r_en;
+   wire [R_ADDR_W-1:0] ext_mem_r_addr;
+   reg  [R_DATA_W-1:0] ext_mem_r_data;
+   
    //write port
    reg w_en = 0;
    reg [W_DATA_W-1:0] w_data;
@@ -27,8 +37,6 @@ module iob_ram_2p_asym_tb;
    reg                r_en = 0;
    wire [R_DATA_W-1:0] r_data;
    reg [R_ADDR_W-1:0]  r_addr;
-
-
 
    // system clock
    localparam clk_per = 10; //ns
@@ -68,9 +76,10 @@ module iob_ram_2p_asym_tb;
       //write all the locations of RAM
       w_en = 1;
       for(i = 0; i < 2**W_ADDR_W; i = i + 1) begin
-         w_addr = i;
+         w_addr = i;         
          w_data = i+seq_ini;
-         @(posedge clk) #1;
+         
+@(posedge clk) #1;
       end
       w_en = 0;
 
@@ -95,12 +104,20 @@ module iob_ram_2p_asym_tb;
      #(
        .W_DATA_W(W_DATA_W),
        .R_DATA_W(R_DATA_W),
-       .ADDR_W(MAXADDR_W)
+       .ADDR_W(MAXADDR_W),
+       .N(N)
        )
    uut
      (
       .clk(clk),
 
+      .ext_mem_w_en(ext_mem_w_en),
+      .ext_mem_w_data(ext_mem_w_data),
+      .ext_mem_w_addr(ext_mem_w_addr),
+      .ext_mem_r_en(ext_mem_r_en),
+      .ext_mem_r_addr(ext_mem_r_addr),
+      .ext_mem_r_data(ext_mem_r_data),
+      
       .w_en(w_en),
       .w_addr(w_addr),
       .w_data(w_data),

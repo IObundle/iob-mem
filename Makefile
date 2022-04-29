@@ -4,7 +4,8 @@ incdir:=-I
 MEM_DIR=.
 
 # Default module
-MEM_NAME ?= iob_ram_sp
+#MEM_NAME ?= iob_fifo_sync
+MEM_NAME ?= iob_ram_2p_asym
 MODULE_DIR = $(shell find . -name $(MEM_NAME))
 
 # list of asymmetric memories
