@@ -21,12 +21,12 @@ module iob_ram_2p_asym
 
     //write port
     output [N-1:0]            ext_mem_w_en,
-    output [W_DATA_W-1:0]     ext_mem_w_data,
-    output [W_ADDR_W-1:0]     ext_mem_w_addr,
+    output [MINDATA_W*N-1:0]     ext_mem_w_data,
+    output [MINADDR_W*N-1:0]     ext_mem_w_addr,
     //read port
     output                    ext_mem_r_en,
-    output [R_ADDR_W-1:0]     ext_mem_r_addr,
-    input [R_DATA_W-1:0]      ext_mem_r_data,
+    output [MINADDR_W*N-1:0]     ext_mem_r_addr,
+    input [MINDATA_W*N-1:0]      ext_mem_r_data,
 
     //write port
     input                     w_en,
@@ -122,11 +122,11 @@ module iob_ram_2p_asym
    genvar  p;
    generate
       for(p=0; p < N; p= p+1) begin : ext_mem_interface_gen
-         assign ext_mem_w_en[p+:1] = en_wr[p];
-         assign ext_mem_w_addr[p+:MINADDR_W] = addr_wr[p];
-         assign ext_mem_w_data[p+:MINDATA_W] = data_wr[p];
-         assign ext_mem_r_addr[p+:MINADDR_W] = addr_rd[p];
-         assign data_rd[p] = ext_mem_r_data[p+:MINDATA_W];
+         assign ext_mem_w_en[p] = en_wr[p];
+         assign ext_mem_w_addr[p*MINADDR_W+:MINADDR_W] = addr_wr[p];
+         assign ext_mem_w_data[p*MINDATA_W+:MINDATA_W] = data_wr[p];
+         assign ext_mem_r_addr[p*MINADDR_W+:MINADDR_W] = addr_rd[p];
+         assign data_rd[p] = ext_mem_r_data[p*MINDATA_W+:MINDATA_W];
       end
    endgenerate
    assign ext_mem_r_en = r_en;
