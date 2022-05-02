@@ -85,18 +85,16 @@ sim-all: $(ALL_HW_MODULES)
 	@echo "Listing all modules: $(ALL_HW_MODULES)"
 
 $(ALL_HW_MODULES):
-	make sim MEM_NAME=$@ $(TEST_LOG)
+	make sim MEM_NAME=$@
 
 #
 # Test
 #
 
 sim-test:
-	make sim-all VCD=0 TEST_LOG=">> test.log"
+	make sim-all VCD=0
 
 test: clean sim-test
-	sed -i '/make/d' test.log
-	diff -q test.log test.expected
 
 #
 # Debug
