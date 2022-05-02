@@ -35,7 +35,7 @@ endif
 # Testbench
 VSRC+=$(wildcard $(MODULE_DIR)/$(MEM_NAME)_tb.v)
 
-ALL_HW_MODULES=$(shell find . -name hardware.mk -not -path './submodules/*' | sed 's/\/hardware.mk//g' | tail -n +3)
+ALL_HW_MODULES=$(shell basename -a $(shell find . -name hardware.mk -not -path './submodules/*' | sed 's/\/hardware.mk//g' | tail -n +3))
 
 # Rules
 .PHONY: exists \
@@ -70,22 +70,21 @@ endif
 
 sim-sym:
 	$(VLOG) $(VSRC)
-	@./a.out
+	@./a.out $(TEST_LOG)
 
 sim-asym: exists $(VSRC) $(VHDR)
-	@echo "\n\nTesting module $(MEM_NAME)\n\n"
 	$(VLOG) $(defmacro)W_DATA_W=32 $(defmacro)R_DATA_W=8 $(VSRC)
-	@./a.out
+	@./a.out $(TEST_LOG)
 	$(VLOG) $(defmacro)W_DATA_W=8 $(defmacro)R_DATA_W=32 $(VSRC)
-	@./a.out
+	@./a.out $(TEST_LOG)
 	$(VLOG) $(defmacro)W_DATA_W=8 $(defmacro)R_DATA_W=8 $(VSRC)
-	@./a.out
+	@./a.out $(TEST_LOG)
 
 sim-all: $(ALL_HW_MODULES)
 	@echo "Listing all modules: $(ALL_HW_MODULES)"
 
 $(ALL_HW_MODULES):
-	make sim MEM_NAME=$(shell basename $@) $(TEST_LOG)
+	make sim MEM_NAME=$@
 
 #
 # Test
@@ -95,7 +94,7 @@ sim-test:
 	make sim-all VCD=0 TEST_LOG=">> test.log"
 
 test: clean sim-test
-	diff -q test.log test.expected
+	@if [ `grep -c "ERROR" test.log` != 0 ]; then exit 1; fi
 
 #
 # Debug

@@ -44,7 +44,7 @@ module iob_rom_sp_tb;
          addr = i;
          @(posedge clk) #1;
          if(i+seq_ini != r_data) begin
-            $display("Test failed: read error in position %d, where expected data=%h but r_data=%h", i, i+seq_ini, r_data);
+            $display("ERROR: read error in position %d, where expected data=%h but r_data=%h", i, i+seq_ini, r_data);
             $finish;
          end
       end
