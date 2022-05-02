@@ -1,47 +1,55 @@
+MEM_DIR=.
+
 defmacro:=-D
 incdir:=-I
 
-MEM_DIR=.
-
 # Default module
-#MEM_NAME ?= iob_fifo_sync
-MEM_NAME ?= iob_ram_2p_asym
-MODULE_DIR = $(shell find . -name $(MEM_NAME))
+MEM_NAME ?=iob_ram_2p_asym
+MODULE_DIR=$(shell find . -name $(MEM_NAME))
 
 # list of asymmetric memories
-IS_ASYM = $(shell echo $(MEM_NAME) | grep fifo)
-IS_ASYM += $(shell echo $(MEM_NAME) | grep 2p)
-IS_ASYM += $(shell echo $(MEM_NAME) | grep dp)
+IS_ASYM=$(shell echo $(MEM_NAME) | grep fifo)
+IS_ASYM+=$(shell echo $(MEM_NAME) | grep 2p)
+IS_ASYM+=$(shell echo $(MEM_NAME) | grep dp)
 
-
-
-# DEFINES
+# Defines
 DEFINE+=$(defmacro)ADDR_W=10
 DEFINE+=$(defmacro)DATA_W=32
 ifeq ($(VCD),1)
 DEFINE+=$(defmacro)VCD
 endif
 
-# INCLUDES
+# Includes
 INCLUDE+=$(incdir)./submodules/LIB/hardware/include
 
-# SOURCES
+# Sources
 ifneq ($(MODULE_DIR),)
 include $(MODULE_DIR)/hardware.mk
 endif
 
-# submodules
+# Submodules
 ifneq ($(filter iob_ram_2p_asym, $(HW_MODULES)),)
 include $(MEM_DIR)/hardware/ram/iob_ram_2p/hardware.mk
 endif
 
-# testbench
+# Testbench
 VSRC+=$(wildcard $(MODULE_DIR)/$(MEM_NAME)_tb.v)
 
 ALL_HW_MODULES=$(shell find . -name hardware.mk -not -path './submodules/*' | sed 's/\/hardware.mk//g' | tail -n +3)
 
 # Rules
-.PHONY: sim sim-asym sim-all clean $(ALL_HW_MODULES) exists debug
+.PHONY: exists \
+	sim sim-sym sim-asym sim-all \
+	$(ALL_HW_MODULES) \
+	sim-test test \
+	clean \
+	debug
+
+exists:
+ifeq ($(MODULE_DIR),)
+	$(error "Module $(MEM_NAME) not found")
+endif
+	@echo "\n\nSimulating module $(MEM_NAME)\n\n"
 
 #
 # Simulate
@@ -77,17 +85,20 @@ sim-all: $(ALL_HW_MODULES)
 	@echo "Listing all modules: $(ALL_HW_MODULES)"
 
 $(ALL_HW_MODULES):
-	make sim MEM_NAME=$(shell basename $@)
-
-exists:
-ifeq ($(MODULE_DIR),)
-	$(error "Module $(MEM_NAME) not found")
-endif
-	@echo "\n\nSimulating module $(MEM_NAME)\n\n"
-
+	make sim MEM_NAME=$(shell basename $@) $(TEST_LOG)
 
 #
-# DEBUG
+# Test
+#
+
+sim-test:
+	make sim-all VCD=0 TEST_LOG=">> test.log"
+
+test: clean sim-test
+	diff -q test.log test.expected
+
+#
+# Debug
 #
 
 debug:
@@ -101,4 +112,4 @@ debug:
 #
 
 clean:
-	@rm -f *~ \#*\# a.out *.vcd *.drom *.png *.pyc
+	@rm -f *~ \#*\# a.out *.vcd *.drom *.png *.pyc *.log
