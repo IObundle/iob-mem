@@ -22,12 +22,12 @@ module iob_fifo_sync
 
     //write port
     `IOB_OUTPUT(ext_mem_w_en, N),
-    `IOB_OUTPUT(ext_mem_w_data, W_DATA_W),
-    `IOB_OUTPUT(ext_mem_w_addr, W_ADDR_W),
+    `IOB_OUTPUT(ext_mem_w_data, MINDATA_W*N),
+    `IOB_OUTPUT(ext_mem_w_addr, MINADDR_W*N),
     //read port
     `IOB_OUTPUT(ext_mem_r_en, 1),
-    `IOB_OUTPUT(ext_mem_r_addr, R_ADDR_W),
-    `IOB_INPUT(ext_mem_r_data, R_DATA_W),
+    `IOB_OUTPUT(ext_mem_r_addr, MINADDR_W*N),
+    `IOB_INPUT(ext_mem_r_data, MINDATA_W*N),
 
     //read port
     `IOB_INPUT(r_en, 1),

@@ -37,11 +37,25 @@ make sim MEM_NAME=<memory module name>
 
 where MEM\_NAME is a variable that must be set to the name of the directory that
 contains the module to be simulated. By default MEM\_NAME=sp\_ram, pointing to
-the single-port RAM module in `hardware/ram/sp\_ram`. To clean the simulation generated
-artefacts placed in the root directory, type
+the single-port RAM module in `hardware/ram/sp\_ram`.
+
+
+## Testing
+
+### Simulation test
+
+To run a series of simulation tests on Icarus, type:
 
 ```
-make clean 
+make test
+```
+
+## Cleaning
+
+To clean the simulation generated artefacts placed in the root directory, type:
+
+```
+make clean
 ```
 
 

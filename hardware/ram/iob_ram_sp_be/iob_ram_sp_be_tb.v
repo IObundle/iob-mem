@@ -60,7 +60,7 @@ module iob_ram_sp_be_tb;
          addr = i;
          @(posedge clk) #1;
          if(i+seq_ini != data_out) begin
-            $display("Test failed: write error in position %d, where data=%h but data_out=%h", i, i+seq_ini, data_out);
+            $display("ERROR: write error in position %d, where data=%h but data_out=%h", i, i+seq_ini, data_out);
             $finish;
          end
       end
@@ -73,7 +73,7 @@ module iob_ram_sp_be_tb;
          addr = i;
          @(posedge clk) #1;
          if(i+seq_ini == data_out) begin
-            $display("Test failed: read error in position %d, where data and data_out are '%h' but should not be the same", i, data_out);
+            $display("ERROR: read error in position %d, where data and data_out are '%h' but should not be the same", i, data_out);
             $finish;
          end
       end

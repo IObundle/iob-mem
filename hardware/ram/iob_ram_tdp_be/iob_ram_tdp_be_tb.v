@@ -77,7 +77,7 @@ module iob_ram_tdp_be_tb;
          addrA = i;
          @(posedge clkA) #1;
          if(i+seq_ini != data_outA) begin
-            $display("Test failed: write error in port A position %d, where data=%h but data_outA=%h", i, i+seq_ini, data_outA);
+            $display("ERROR: write error in port A position %d, where data=%h but data_outA=%h", i, i+seq_ini, data_outA);
             $finish;
          end
       end
@@ -108,7 +108,7 @@ module iob_ram_tdp_be_tb;
          addrB = i;
          @(posedge clkB) #1;
          if(i+seq_ini != data_outB) begin
-            $display("Test failed: write error in port B position %d, where data=%h but data_outB=%h", i, i+seq_ini, data_outB);
+            $display("ERROR: write error in port B position %d, where data=%h but data_outB=%h", i, i+seq_ini, data_outB);
             $finish;
          end
       end
@@ -122,7 +122,7 @@ module iob_ram_tdp_be_tb;
          addrA = i;
          @(posedge clkA) #1;
          if(i+seq_ini == data_outA) begin
-            $display("Test failed: read error in port A position %d, where data and data_outA are '%h' but should not be the same", i, data_outA);
+            $display("ERROR: read error in port A position %d, where data and data_outA are '%h' but should not be the same", i, data_outA);
             $finish;
          end
       end
@@ -135,7 +135,7 @@ module iob_ram_tdp_be_tb;
          addrB = i;
          @(posedge clkB) #1;
          if(i+seq_ini == data_outB) begin
-            $display("Test failed: read error in port B position %d, where data and data_outB are '%h' but should not be the same", i, data_outB);
+            $display("ERROR: read error in port B position %d, where data and data_outB are '%h' but should not be the same", i, data_outB);
             $finish;
          end
       end

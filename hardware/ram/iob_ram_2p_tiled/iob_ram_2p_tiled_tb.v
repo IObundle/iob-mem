@@ -79,7 +79,7 @@ module iob_ram_2p_tiled_tb;
          addr = i;
          @(posedge clk) #1;
          if(r_data != 0) begin
-            $display("Test 1 failed: with r_en = 0, at position %0d, r_data should be 0 but is %d", i, r_data);
+            $display("ERROR: with r_en = 0, at position %0d, r_data should be 0 but is %d", i, r_data);
             $finish;
          end
       end
@@ -92,7 +92,7 @@ module iob_ram_2p_tiled_tb;
          addr = i;
          @(posedge clk) #1;
          if(r_data != i+seq_ini) begin
-            $display("Test 2 failed: on position %0d, r_data is %d where it should be %0d", i, r_data, i+seq_ini);
+            $display("ERROR: on position %0d, r_data is %d where it should be %0d", i, r_data, i+seq_ini);
             $finish;
          end
       end

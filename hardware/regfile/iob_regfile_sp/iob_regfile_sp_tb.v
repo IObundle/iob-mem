@@ -51,7 +51,7 @@ module iob_regfile_sp_tb;
          w_data = i+seq_ini;
          @(posedge clk) #1;
          if(r_data != i+seq_ini) begin
-            $display("Test 1 failed: read error in r_data.\n \t data=%0d; r_data=%0d", i+seq_ini, r_data);
+            $display("ERROR: read error in r_data.\n \t data=%0d; r_data=%0d", i+seq_ini, r_data);
             $finish;
          end
          @(posedge clk) #1;
@@ -66,7 +66,7 @@ module iob_regfile_sp_tb;
          addr = i;
          @(posedge clk) #1;
          if(r_data != i+seq_ini) begin
-            $display("Test 2 failed: read error in r_data.\n \t data=%0d; r_data=%0d", i+seq_ini, r_data);
+            $display("ERROR: read error in r_data.\n \t data=%0d; r_data=%0d", i+seq_ini, r_data);
             $finish;
          end
          @(posedge clk) #1;
@@ -83,7 +83,7 @@ module iob_regfile_sp_tb;
          addr = i;
          @(posedge clk) #1;
          if(r_data != 0) begin
-            $display("Test 3 failed: r_data is not null");
+            $display("ERROR: r_data is not null");
             $finish;
          end
          @(posedge clk) #1;
