@@ -85,7 +85,7 @@ module iob_fifo_sync
         level_nxt = level + w_incr;
       else if(w_en_int && r_en_int)
              level_nxt = (level + w_incr) -r_incr;
-      else if ((!w_en_int) && r_en_int)
+      else if (r_en_int) // (!w_en_int) && r_en_int
         level_nxt = level -r_incr;
    end
 
