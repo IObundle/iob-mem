@@ -60,7 +60,7 @@ module iob_regfile_dp_tb;
          wdataA = i+seq_ini;
          @(posedge clk) #1;
          if(rdataA != i+seq_ini) begin
-            $display("Test 1 failed: read error in rdata.\n \t data=%0d; rdata=%0d", i+seq_ini, rdataA);
+            $display("ERROR: read error in rdata.\n \t data=%0d; rdata=%0d", i+seq_ini, rdataA);
             $finish;
          end
          @(posedge clk) #1;
@@ -75,7 +75,7 @@ module iob_regfile_dp_tb;
          addrA = i;
          @(posedge clk) #1;
          if(rdataA != i+seq_ini) begin
-            $display("Test 2 failed: read error in rdata.\n \t data=%0d; rdata=%0d", i+seq_ini, rdataA);
+            $display("ERROR: read error in rdata.\n \t data=%0d; rdata=%0d", i+seq_ini, rdataA);
             $finish;
          end
          @(posedge clk) #1;
@@ -92,7 +92,7 @@ module iob_regfile_dp_tb;
          addrA = i;
          @(posedge clk) #1;
          if(rdataA != 0) begin
-            $display("Test 3 failed: rdata is not null");
+            $display("ERROR: rdata is not null");
             $finish;
          end
          @(posedge clk) #1;
@@ -110,7 +110,7 @@ module iob_regfile_dp_tb;
          wdataB = i+seq_ini;
          @(posedge clk) #1;
          if(rdataB != i+seq_ini) begin
-            $display("Test 1 failed: read error in rdata.\n \t data=%0d; rdata=%0d", i+seq_ini, rdataB);
+            $display("ERROR: read error in rdata.\n \t data=%0d; rdata=%0d", i+seq_ini, rdataB);
             $finish;
          end
          @(posedge clk) #1;
@@ -125,7 +125,7 @@ module iob_regfile_dp_tb;
          addrB = i;
          @(posedge clk) #1;
          if(rdataB != i+seq_ini) begin
-            $display("Test 2 failed: read error in rdata.\n \t data=%0d; rdata=%0d", i+seq_ini, rdataB);
+            $display("ERROR: read error in rdata.\n \t data=%0d; rdata=%0d", i+seq_ini, rdataB);
             $finish;
          end
          @(posedge clk) #1;
@@ -142,7 +142,7 @@ module iob_regfile_dp_tb;
          addrB = i;
          @(posedge clk) #1;
          if(rdataB != 0) begin
-            $display("Test 3 failed: rdata is not null");
+            $display("ERROR: rdata is not null");
             $finish;
          end
          @(posedge clk) #1;

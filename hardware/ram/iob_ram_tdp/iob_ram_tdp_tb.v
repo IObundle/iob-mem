@@ -75,7 +75,7 @@ module iob_ram_tdp_tb;
          addr_a = i;
          @(posedge clkA) #1;
          if(i+seq_ini != q_a) begin
-            $display("Test failed: write error in port A position %d, where data=%h but q_a=%h", i, i+seq_ini, q_a);
+            $display("ERROR: write error in port A position %d, where data=%h but q_a=%h", i, i+seq_ini, q_a);
             $finish;
          end
       end
@@ -104,7 +104,7 @@ module iob_ram_tdp_tb;
          addr_b = i;
          @(posedge clkB) #1;
          if(i+seq_ini != q_b) begin
-            $display("Test failed: write error in port B position %d, where data=%h but q_b=%h", i, i+seq_ini, q_b);
+            $display("ERROR: write error in port B position %d, where data=%h but q_b=%h", i, i+seq_ini, q_b);
             $finish;
          end
       end

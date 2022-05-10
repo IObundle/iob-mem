@@ -18,7 +18,8 @@ module iob_fifo_sync_tb;
    localparam MINADDR_W = ADDR_W-$clog2(R);//lower ADDR_W (higher DATA_W)
    localparam W_ADDR_W = W_DATA_W == MAXDATA_W? MINADDR_W : ADDR_W;
    localparam R_ADDR_W = R_DATA_W == MAXDATA_W? MINADDR_W : ADDR_W;
-
+   localparam N = MAXDATA_W/MINDATA_W;
+   
    reg reset = 0;
    reg arst = 0;
    reg                 clk = 0;
@@ -45,6 +46,14 @@ module iob_fifo_sync_tb;
    reg [TESTSIZE*8-1:0] test_data;
    reg [TESTSIZE*8-1:0] read;
 
+   //FIFO memory
+   wire [N-1:0]		ext_mem_w_en;
+   wire [MINDATA_W*N-1:0]	ext_mem_w_data;
+   wire [MINADDR_W*N-1:0]	ext_mem_w_addr;
+   wire	ext_mem_r_en;
+   wire [MINADDR_W*N-1:0]  ext_mem_r_addr;
+   wire [MINDATA_W*N-1:0]  ext_mem_r_data;
+   
    //
    //WRITE PROCESS
    //
@@ -176,13 +185,21 @@ module iob_fifo_sync_tb;
      #(
        .W_DATA_W(W_DATA_W),
        .R_DATA_W(R_DATA_W),
-       .ADDR_W(ADDR_W)
+       .ADDR_W(ADDR_W),
+       .N(N)
        )
    uut
      (
       .arst(arst),
       .rst(reset),
       .clk(clk),
+
+      .ext_mem_w_en(ext_mem_w_en),
+      .ext_mem_w_data(ext_mem_w_data),
+      .ext_mem_w_addr(ext_mem_w_addr),
+      .ext_mem_r_en(ext_mem_r_en),
+      .ext_mem_r_addr(ext_mem_r_addr),
+      .ext_mem_r_data(ext_mem_r_data),
 
       .r_en(r_en),
       .r_data(r_data),
@@ -193,5 +210,39 @@ module iob_fifo_sync_tb;
       .w_full(w_full),
       .level(level)
       );
+   
+   genvar p;
+   generate for(p = 0;p < N; p = p + 1) begin
+      wire mem_w_en;
+      wire [MINDATA_W-1:0]	mem_w_data;
+      wire [MINADDR_W-1:0]	mem_w_addr;
+      wire mem_r_en;
+      wire [MINADDR_W-1:0]  mem_r_addr;
+      wire [MINDATA_W-1:0]  mem_r_data;
+      
+      assign mem_w_en = ext_mem_w_en[p];
+      assign mem_w_addr = ext_mem_w_addr[p*MINADDR_W +: MINADDR_W];
+      assign mem_w_data = ext_mem_w_data[p*MINDATA_W +: MINDATA_W];
+      assign mem_r_en = ext_mem_r_en;
+      assign mem_r_addr = ext_mem_r_addr[p*MINADDR_W +: MINADDR_W];
+      
+      iob_ram_2p
+      #(
+      .DATA_W(MINDATA_W),
+      .ADDR_W(MINADDR_W)
+      )
+      iob_ram_2p_inst
+      (
+      .clk     (clk),
+      .w_en    (mem_w_en),
+      .w_addr  (mem_w_addr),
+      .w_data  (mem_w_data),
+      .r_en    (mem_r_en),
+      .r_addr  (mem_r_addr),
+      .r_data  (mem_r_data)
+      );
+      
+      assign ext_mem_r_data[p*MINDATA_W +: MINDATA_W] = mem_r_data ;
+   end endgenerate
 
 endmodule // iob_sync_fifo_asym_tb

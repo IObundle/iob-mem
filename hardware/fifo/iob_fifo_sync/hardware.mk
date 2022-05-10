@@ -1,4 +1,4 @@
-ifneq (iob_fifo_sync,$(filter iob_fifo_sync, $(HW_MODULES)))
+ifeq ($(filter iob_fifo_sync, $(HW_MODULES)),)
 
 # Add to modules list
 HW_MODULES+=iob_fifo_sync
