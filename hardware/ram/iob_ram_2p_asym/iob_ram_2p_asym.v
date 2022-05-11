@@ -21,12 +21,12 @@ module iob_ram_2p_asym
 
     //write port
     output [N-1:0]            ext_mem_w_en,
-    output [MINDATA_W*N-1:0]     ext_mem_w_data,
-    output [MINADDR_W*N-1:0]     ext_mem_w_addr,
+    output [(MINDATA_W*N)-1:0]     ext_mem_w_data,
+    output [(MINADDR_W*N)-1:0]     ext_mem_w_addr,
     //read port
     output                    ext_mem_r_en,
-    output [MINADDR_W*N-1:0]     ext_mem_r_addr,
-    input [MINDATA_W*N-1:0]      ext_mem_r_data,
+    output [(MINADDR_W*N)-1:0]     ext_mem_r_addr,
+    input [(MINDATA_W*N)-1:0]      ext_mem_r_data,
 
     //write port
     input                     w_en,
