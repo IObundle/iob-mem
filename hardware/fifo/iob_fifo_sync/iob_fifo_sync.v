@@ -22,12 +22,12 @@ module iob_fifo_sync
 
     //write port
     `IOB_OUTPUT(ext_mem_w_en, N),
-    `IOB_OUTPUT(ext_mem_w_data, MINDATA_W*N),
-    `IOB_OUTPUT(ext_mem_w_addr, MINADDR_W*N),
+    `IOB_OUTPUT(ext_mem_w_data, (MINDATA_W*N)),
+    `IOB_OUTPUT(ext_mem_w_addr, (MINADDR_W*N)),
     //read port
     `IOB_OUTPUT(ext_mem_r_en, 1),
-    `IOB_OUTPUT(ext_mem_r_addr, MINADDR_W*N),
-    `IOB_INPUT(ext_mem_r_data, MINDATA_W*N),
+    `IOB_OUTPUT(ext_mem_r_addr, (MINADDR_W*N)),
+    `IOB_INPUT(ext_mem_r_data, (MINDATA_W*N)),
 
     //read port
     `IOB_INPUT(r_en, 1),
@@ -60,21 +60,9 @@ module iob_fifo_sync
    `IOB_COUNTER_ARRE(clk, arst, rst, r_en_int, r_addr)
 
    //assign according to assymetry type
-   wire [ADDR_W:0]       w_incr;
-   wire [ADDR_W:0]       r_incr;
-   generate
-      if (W_DATA_W > R_DATA_W) begin
-        assign r_incr = 1'b1;
-        assign w_incr = 1'b1 << ADDR_W_DIFF;
-      end else if (R_DATA_W > W_DATA_W) begin
-        assign w_incr = 1'b1;
-        assign r_incr = 1'b1 << ADDR_W_DIFF;
-      end else begin
-        assign r_incr = 1'b1;
-        assign w_incr = 1'b1;
-      end
-   endgenerate
-
+   localparam [ADDR_W:0] w_incr = (W_DATA_W > R_DATA_W) ? 1'b1 << ADDR_W_DIFF : 1'b1 ;
+   localparam [ADDR_W:0] r_incr = (R_DATA_W > W_DATA_W) ? 1'b1 << ADDR_W_DIFF : 1'b1 ;
+   
    //FIFO level
    reg [ADDR_W+1:0]         level_nxt;
    `IOB_REG_ARR(clk, arst, 1'b0, rst, 1'b0, level, level_nxt[0+:ADDR_W+1])
@@ -84,7 +72,7 @@ module iob_fifo_sync
       if(w_en_int && (!r_en_int))
         level_nxt = level + w_incr;
       else if(w_en_int && r_en_int)
-             level_nxt = (level + w_incr) -r_incr;
+        level_nxt = (level + w_incr) -r_incr;
       else if (r_en_int) // (!w_en_int) && r_en_int
         level_nxt = level -r_incr;
    end
