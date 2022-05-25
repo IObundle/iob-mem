@@ -182,6 +182,7 @@ def instPinout (type, asynch, be) :
         print ("            input [DATA_W-1:0] din,")
         if be: print ("            input [DATA_W/8-1:0] we,")
         else: print ("            input we,")
+        print  ("       input wmask,")
         print ("            output [DATA_W-1:0] dout")
     elif type == "sprom":
         print ("            input clk,")
@@ -304,7 +305,7 @@ def instMemory (tech, type, words, bits, bytes, mux):
     if tech == "sky130A":
         if type == "spregf":  print ("  " "sram" "_"+str(bits*bytes)+"_"+str(2**words)+"_" +tech+" regf")
         elif type == "dpram": print ("  ""dpram" "_"+str(bits*bytes)+"_"+str(2**words)+" _" +tech+" ram")
-        elif type == "spram": print ("  " "sram" "_"+str(bits*bytes)+"_"+str(2**words)+"_" +tech+" ram")
+        elif type == "spram": print ("  ""sky130" "_" "sram" "_" "2kbyte" "_" "1rw1r" "_" +str(bits*bytes)+ "x"+str(2**words)+"_8"" ram")
         elif type == "sprom": print ("  " "srom" "_"+str(bits*bytes)+"_"+str(2**words)+"_" +tech+" A rom")
     # pinout
     print ("   (")
@@ -449,8 +450,13 @@ def instMemory (tech, type, words, bits, bytes, mux):
             print ("    .din0 (din),")
             print ("")
             print ("    .web0(wen),")
+            print ("    .wmask0(wmask),")
             print ("")
             print ("    .csb0(en),")
+            print ("    .clk1( ),")
+            print ("    .csb1( ),")
+            print ("    .addr1( ),")
+            print ("    .dout1( ),")
         elif type == "sprom":
             for i in range(bits):
                 print ("    .DO"+str(i)+"(r_data["+str(i)+"]),")
@@ -555,7 +561,7 @@ def blackboxModule(tech, type) :
     print ("(* blackbox *)")
     if type == "spregf":  print ("module" "  " "sram" "_"+str(bits*bytes)+"_"+str(2**words)+"_" +tech+  "(clk0,csb0,web0,addr0,din0,dout0);")
     elif type == "dpram": print ("module" "  " "dpram" "_"+str(bits*bytes)+"_"+str(2**words)+"_"+tech+  "(clk0,csb0,web0,addr0,din0,dout0);")
-    elif type == "spram": print ("module"  "  " "sram" "_"+str(bits*bytes)+"_"+str(2**words)+"_"+tech+  "(clk0,csb0,web0,addr0,din0,dout0);")
+    elif type == "spram": print ("module" "  ""sky130" "_" "sram" "_" "2kbyte" "_" "1rw1r" "_" +str(bits*bytes)+ "x"+str(2**words)+"_8""  "  "(clk0,csb0,web0,wmask0,addr0,din0,dout0,clk1,csb1,addr1,dout1);")
     elif type == "sprom": print ("module"  "  " "srom" "_"+str(bits*bytes)+"_"+str(2**words)+"_"+tech+  "(clk0,csb0,web0,addr0,din0,dout0);")
     print (" ")
     print ("parameter" " " "ADDR_WD" "=" +str(words)+ ";")
@@ -564,9 +570,14 @@ def blackboxModule(tech, type) :
         print ("input clk0;")
         print ("input csb0;")
         print ("input web0;")
+        print ("input wmask0;")
         print ("input" " "  "[" "ADDR_WD-1" ":0" "]" " " "addr0;")
         print ("input" " "  "[" "DATA_WD-1" ":0" "]" " " "din0;")
         print ("output" " " "[" "DATA_WD-1" ":0" "]" " "  "dout0;")
+        print ("input clk1;")
+        print ("input csb1;")
+        print ("input" " "  "[" "ADDR_WD-1" ":0" "]" " " "addr1;")
+        print ("output" " " "[" "DATA_WD-1" ":0" "]" " "  "dout1;")
     print ("endmodule")
 #
 # Main
@@ -677,3 +688,4 @@ def main () :
     sys.exit(ret)
 
 if __name__ == "__main__" : main ()
+
