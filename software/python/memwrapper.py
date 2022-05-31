@@ -182,7 +182,6 @@ def instPinout (type, asynch, be) :
         print ("            input [DATA_W-1:0] din,")
         if be: print ("            input [DATA_W/8-1:0] we,")
         else: print ("            input we,")
-        print  ("       input wmask,")
         print ("            output [DATA_W-1:0] dout")
     elif type == "sprom":
         print ("            input clk,")
@@ -289,6 +288,7 @@ def instWires (type, asynch, be) :
         if be: print ("   wire [DATA_W/8-1:0] wen = ~we;")
         else: print ("   wire wen = ~we;")
         print ("   wire oe = 1'b1; //en & ~(|we);")
+        print (" localparam MASK=4'b1111;")
     elif type == "sprom":
         print ("   wire oe = 1'b1; //r_en;")
     print ("")    
@@ -450,7 +450,7 @@ def instMemory (tech, type, words, bits, bytes, mux):
             print ("    .din0 (din),")
             print ("")
             print ("    .web0(wen),")
-            print ("    .wmask0(wmask),")
+            print ("    .wmask0(MASK),")
             print ("")
             print ("    .csb0(en),")
             print ("    .clk1( ),")
